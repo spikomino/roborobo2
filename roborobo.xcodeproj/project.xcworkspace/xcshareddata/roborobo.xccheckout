@@ -14,15 +14,19 @@
 		<string>https://hotline.isir.upmc.fr/svn/er/src/roborobo</string>
 		<key>8FA7B207-384A-4107-993E-784E84FCAB8E</key>
 		<string>https://hotline.isir.upmc.fr/svn/er</string>
+		<key>D842E5A32604AC7E0AE72DB50DB4728E8C0C3F0F</key>
+		<string>https://github.com/nekonaute/roborobo2.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>roborobo.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>2799ae53-7afe-472e-829e-4046f820420e++1015</key>
-		<string>../..</string>
+		<string>../../../roborobo</string>
 		<key>8FA7B207-384A-4107-993E-784E84FCAB8E</key>
 		<string>../../../er</string>
+		<key>D842E5A32604AC7E0AE72DB50DB4728E8C0C3F0F</key>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectRepositoryRootDictionary</key>
 	<dict>
@@ -30,11 +34,11 @@
 		<string>https://hotline.isir.upmc.fr/svn/er</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://hotline.isir.upmc.fr/svn/er/src/roborobo/roborobo.xcodeproj</string>
+	<string>https://github.com/nekonaute/roborobo2.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>2799ae53-7afe-472e-829e-4046f820420e++1015</string>
+	<string>D842E5A32604AC7E0AE72DB50DB4728E8C0C3F0F</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -52,6 +56,14 @@
 			<string>2799ae53-7afe-472e-829e-4046f820420e++1015</string>
 			<key>IDESourceControlWCCName</key>
 			<string>roborobo</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D842E5A32604AC7E0AE72DB50DB4728E8C0C3F0F</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Roborobo2</string>
 		</dict>
 	</array>
 </dict>
