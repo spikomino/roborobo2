@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>331F29A2-276A-458D-AEF9-374CDCEF060C</string>
+	<key>IDESourceControlProjectName</key>
+	<string>roborobo</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>2799ae53-7afe-472e-829e-4046f820420e++1015</key>
+		<string>https://hotline.isir.upmc.fr/svn/er/src/roborobo</string>
+		<key>8FA7B207-384A-4107-993E-784E84FCAB8E</key>
+		<string>https://hotline.isir.upmc.fr/svn/er</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>roborobo.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>2799ae53-7afe-472e-829e-4046f820420e++1015</key>
+		<string>../..</string>
+		<key>8FA7B207-384A-4107-993E-784E84FCAB8E</key>
+		<string>../../../er</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>2799ae53-7afe-472e-829e-4046f820420e++1015</key>
+		<string>https://hotline.isir.upmc.fr/svn/er</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://hotline.isir.upmc.fr/svn/er/src/roborobo/roborobo.xcodeproj</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>2799ae53-7afe-472e-829e-4046f820420e++1015</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8FA7B207-384A-4107-993E-784E84FCAB8E</string>
+			<key>IDESourceControlWCCName</key>
+			<string>er</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>2799ae53-7afe-472e-829e-4046f820420e++1015</string>
+			<key>IDESourceControlWCCName</key>
+			<string>roborobo</string>
+		</dict>
+	</array>
+</dict>
+</plist>

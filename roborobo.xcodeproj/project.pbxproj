@@ -1,0 +1,936 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		002F3A0009D0884600EBEB88 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = 002F39F909D0881F00EBEB88 /* SDL.framework */; };
+		002F3A2E09D0888800EBEB88 /* SDLMain.m in Sources */ = {isa = PBXBuildFile; fileRef = 002F3A2C09D0888800EBEB88 /* SDLMain.m */; };
+		3701DAB11382892400B12539 /* Elman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAAA1382892400B12539 /* Elman.cpp */; };
+		3701DAB21382892400B12539 /* LayeredNeuralNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAAB1382892400B12539 /* LayeredNeuralNetwork.cpp */; };
+		3701DAB31382892400B12539 /* MLP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAAC1382892400B12539 /* MLP.cpp */; };
+		3701DAB41382892400B12539 /* NeuralNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAAD1382892400B12539 /* NeuralNetwork.cpp */; };
+		3701DAB51382892400B12539 /* NeuralNetworkException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAAE1382892400B12539 /* NeuralNetworkException.cpp */; };
+		3701DAB61382892400B12539 /* Perceptron.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAAF1382892400B12539 /* Perceptron.cpp */; };
+		3701DAB71382892400B12539 /* ReservoirNeuralNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3701DAB01382892400B12539 /* ReservoirNeuralNetwork.cpp */; };
+		370DD55718E497620084BE83 /* DemoMedeaAgentObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 370DD55118E497620084BE83 /* DemoMedeaAgentObserver.cpp */; };
+		370DD55918E497620084BE83 /* DemoMedeaController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 370DD55318E497620084BE83 /* DemoMedeaController.cpp */; };
+		370DD55A18E497620084BE83 /* DemoMedeaSharedData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 370DD55418E497620084BE83 /* DemoMedeaSharedData.cpp */; };
+		370DD55B18E497620084BE83 /* DemoMedeaWorldObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 370DD55518E497620084BE83 /* DemoMedeaWorldObserver.cpp */; };
+		370DD55E18E4A4390084BE83 /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 370DD55D18E4A4390084BE83 /* Graphics.cpp */; };
+		3720BD0E0F7D149100D5FF81 /* Agent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCD40F7D149100D5FF81 /* Agent.cpp */; };
+		3720BD0F0F7D149100D5FF81 /* AgentObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCD50F7D149100D5FF81 /* AgentObserver.cpp */; };
+		3720BD100F7D149100D5FF81 /* Controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCD60F7D149100D5FF81 /* Controller.cpp */; };
+		3720BD110F7D149100D5FF81 /* Observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCD70F7D149100D5FF81 /* Observer.cpp */; };
+		3720BD120F7D149100D5FF81 /* InspectorAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCD80F7D149100D5FF81 /* InspectorAgent.cpp */; };
+		3720BD130F7D149100D5FF81 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCD90F7D149100D5FF81 /* main.cpp */; };
+		3720BD140F7D149100D5FF81 /* Misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCDA0F7D149100D5FF81 /* Misc.cpp */; };
+		3720BD150F7D149100D5FF81 /* roborobo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCDB0F7D149100D5FF81 /* roborobo.cpp */; };
+		3720BD160F7D149100D5FF81 /* Robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCDC0F7D149100D5FF81 /* Robot.cpp */; };
+		3720BD170F7D149100D5FF81 /* RobotWorldModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCDD0F7D149100D5FF81 /* RobotWorldModel.cpp */; };
+		3720BD1B0F7D149100D5FF81 /* Timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCE10F7D149100D5FF81 /* Timer.cpp */; };
+		3720BD1D0F7D149100D5FF81 /* World.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCE30F7D149100D5FF81 /* World.cpp */; };
+		3720BD1E0F7D149100D5FF81 /* WorldObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCE40F7D149100D5FF81 /* WorldObserver.cpp */; };
+		3720BD1F0F7D149100D5FF81 /* WorldModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3720BCE50F7D149100D5FF81 /* WorldModel.cpp */; };
+		372B8E4F137B305900E7276B /* DemoMedeaConfigurationLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 372B8E4E137B305900E7276B /* DemoMedeaConfigurationLoader.cpp */; };
+		3730415218EB1C3E0086A449 /* libSDL_image-1.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3730415018EB1C3E0086A449 /* libSDL_image-1.2.0.dylib */; };
+		3730415318EB1C3E0086A449 /* libSDL.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3730415118EB1C3E0086A449 /* libSDL.dylib */; };
+		3730415518EB1C8F0086A449 /* libtbb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3730415418EB1C8F0086A449 /* libtbb.dylib */; };
+		3749E178195D7EE900DC68AA /* BasicProjectAgentObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E175195D7EE900DC68AA /* BasicProjectAgentObserver.cpp */; };
+		3749E179195D7EE900DC68AA /* BasicProjectController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E176195D7EE900DC68AA /* BasicProjectController.cpp */; };
+		3749E17A195D7EE900DC68AA /* BasicProjectWorldObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E177195D7EE900DC68AA /* BasicProjectWorldObserver.cpp */; };
+		3749E184195D809C00DC68AA /* SandboxAgentObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E181195D809C00DC68AA /* SandboxAgentObserver.cpp */; };
+		3749E185195D809C00DC68AA /* SandboxController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E182195D809C00DC68AA /* SandboxController.cpp */; };
+		3749E186195D809C00DC68AA /* SandboxWorldObserver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E183195D809C00DC68AA /* SandboxWorldObserver.cpp */; };
+		3749E188195D823900DC68AA /* BasicProjectConfigurationLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3749E187195D823900DC68AA /* BasicProjectConfigurationLoader.cpp */; };
+		375BA8531870CBF600D335FD /* CellularMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 375BA8521870CBF600D335FD /* CellularMap.cpp */; };
+		375FBD2011AC145500597CE9 /* LogManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 375FBD1F11AC145500597CE9 /* LogManager.cpp */; };
+		37764934195D9ADE003D82E3 /* SandboxConfigurationLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37764933195D9ADE003D82E3 /* SandboxConfigurationLoader.cpp */; };
+		3778DD65132EC3650000F4E6 /* Properties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3778DD63132EC3650000F4E6 /* Properties.cpp */; };
+		3778DD66132EC3650000F4E6 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3778DD64132EC3650000F4E6 /* StringUtils.cpp */; };
+		378B2C4E0FE6AF4600B90B67 /* ExtendedProperties.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 378B2C4D0FE6AF4600B90B67 /* ExtendedProperties.cpp */; };
+		37E550CF184DE7400041C388 /* Geometry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37E550CE184DE7400041C388 /* Geometry.cpp */; };
+		37ECDD17136AF6370037E7CE /* LandmarkObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37ECDD16136AF6370037E7CE /* LandmarkObject.cpp */; };
+		37F3D9251909BB430093536D /* ConfigurationLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F3D9241909BB430093536D /* ConfigurationLoader.cpp */; };
+		37F3D928190A5E5D0093536D /* PhysicalObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F3D927190A5E5D0093536D /* PhysicalObjectFactory.cpp */; };
+		37F3D92A190A72540093536D /* EnergyItem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F3D929190A72540093536D /* EnergyItem.cpp */; };
+		37F3D92D190A7BA70093536D /* RoundObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F3D92C190A7BA70093536D /* RoundObject.cpp */; };
+		37F4DD5D191E206700CC9FD0 /* __roborobo2_icon__.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 37F4DD5C191E206700CC9FD0 /* __roborobo2_icon__.jpg */; };
+		37F4E7E5190BF88500E6EA45 /* GateObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F4E7E4190BF88500E6EA45 /* GateObject.cpp */; };
+		37F4E7E7190C02F900E6EA45 /* SwitchObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F4E7E6190C02F900E6EA45 /* SwitchObject.cpp */; };
+		37F4E7F0190C1D0400E6EA45 /* PhysicalObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F4E7EF190C1D0400E6EA45 /* PhysicalObject.cpp */; };
+		37F4E7F2190C1D1200E6EA45 /* CircleObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F4E7F1190C1D1200E6EA45 /* CircleObject.cpp */; };
+		37F4E7F4190C1D1B00E6EA45 /* SquareObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 37F4E7F3190C1D1B00E6EA45 /* SquareObject.cpp */; };
+		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		002F39FD09D0883400EBEB88 /* Copy Frameworks into .app bundle */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				002F3A0009D0884600EBEB88 /* SDL.framework in Copy Frameworks into .app bundle */,
+			);
+			name = "Copy Frameworks into .app bundle";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		002F39F909D0881F00EBEB88 /* SDL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL.framework; path = /Library/Frameworks/SDL.framework; sourceTree = "<absolute>"; };
+		002F3A2B09D0888800EBEB88 /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SDLMain.h; sourceTree = SOURCE_ROOT; };
+		002F3A2C09D0888800EBEB88 /* SDLMain.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SDLMain.m; sourceTree = SOURCE_ROOT; };
+		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		32CA4F630368D1EE00C91783 /* roborobo_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = roborobo_Prefix.pch; sourceTree = "<group>"; };
+		3701DAAA1382892400B12539 /* Elman.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Elman.cpp; sourceTree = "<group>"; };
+		3701DAAB1382892400B12539 /* LayeredNeuralNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayeredNeuralNetwork.cpp; sourceTree = "<group>"; };
+		3701DAAC1382892400B12539 /* MLP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MLP.cpp; sourceTree = "<group>"; };
+		3701DAAD1382892400B12539 /* NeuralNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NeuralNetwork.cpp; sourceTree = "<group>"; };
+		3701DAAE1382892400B12539 /* NeuralNetworkException.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NeuralNetworkException.cpp; sourceTree = "<group>"; };
+		3701DAAF1382892400B12539 /* Perceptron.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Perceptron.cpp; sourceTree = "<group>"; };
+		3701DAB01382892400B12539 /* ReservoirNeuralNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReservoirNeuralNetwork.cpp; sourceTree = "<group>"; };
+		3701DAB91382893200B12539 /* Elman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Elman.h; sourceTree = "<group>"; };
+		3701DABA1382893200B12539 /* LayeredNeuralNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayeredNeuralNetwork.h; sourceTree = "<group>"; };
+		3701DABB1382893200B12539 /* MLP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLP.h; sourceTree = "<group>"; };
+		3701DABC1382893200B12539 /* NeuralNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NeuralNetwork.h; sourceTree = "<group>"; };
+		3701DABD1382893200B12539 /* NeuralNetworkException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NeuralNetworkException.h; sourceTree = "<group>"; };
+		3701DABE1382893200B12539 /* Perceptron.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Perceptron.h; sourceTree = "<group>"; };
+		3701DABF1382893200B12539 /* ReservoirNeuralNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReservoirNeuralNetwork.h; sourceTree = "<group>"; };
+		370DD54A18E497620084BE83 /* DemoMedeaAgentObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoMedeaAgentObserver.h; sourceTree = "<group>"; };
+		370DD54C18E497620084BE83 /* DemoMedeaController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoMedeaController.h; sourceTree = "<group>"; };
+		370DD54D18E497620084BE83 /* DemoMedeaSharedData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoMedeaSharedData.h; sourceTree = "<group>"; };
+		370DD54E18E497620084BE83 /* DemoMedeaWorldObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoMedeaWorldObserver.h; sourceTree = "<group>"; };
+		370DD55118E497620084BE83 /* DemoMedeaAgentObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoMedeaAgentObserver.cpp; sourceTree = "<group>"; };
+		370DD55318E497620084BE83 /* DemoMedeaController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoMedeaController.cpp; sourceTree = "<group>"; };
+		370DD55418E497620084BE83 /* DemoMedeaSharedData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoMedeaSharedData.cpp; sourceTree = "<group>"; };
+		370DD55518E497620084BE83 /* DemoMedeaWorldObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoMedeaWorldObserver.cpp; sourceTree = "<group>"; };
+		370DD55D18E4A4390084BE83 /* Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Graphics.cpp; sourceTree = "<group>"; };
+		3720BCD40F7D149100D5FF81 /* Agent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Agent.cpp; sourceTree = "<group>"; };
+		3720BCD50F7D149100D5FF81 /* AgentObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AgentObserver.cpp; sourceTree = "<group>"; };
+		3720BCD60F7D149100D5FF81 /* Controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Controller.cpp; sourceTree = "<group>"; };
+		3720BCD70F7D149100D5FF81 /* Observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Observer.cpp; sourceTree = "<group>"; };
+		3720BCD80F7D149100D5FF81 /* InspectorAgent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InspectorAgent.cpp; sourceTree = "<group>"; };
+		3720BCD90F7D149100D5FF81 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		3720BCDA0F7D149100D5FF81 /* Misc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Misc.cpp; sourceTree = "<group>"; };
+		3720BCDB0F7D149100D5FF81 /* roborobo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = roborobo.cpp; sourceTree = "<group>"; };
+		3720BCDC0F7D149100D5FF81 /* Robot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Robot.cpp; sourceTree = "<group>"; };
+		3720BCDD0F7D149100D5FF81 /* RobotWorldModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RobotWorldModel.cpp; sourceTree = "<group>"; };
+		3720BCE10F7D149100D5FF81 /* Timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Timer.cpp; sourceTree = "<group>"; };
+		3720BCE30F7D149100D5FF81 /* World.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = World.cpp; sourceTree = "<group>"; };
+		3720BCE40F7D149100D5FF81 /* WorldObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldObserver.cpp; sourceTree = "<group>"; };
+		3720BCE50F7D149100D5FF81 /* WorldModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldModel.cpp; sourceTree = "<group>"; };
+		3720BCED0F7D149100D5FF81 /* Agent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
+		3720BCEE0F7D149100D5FF81 /* InspectorAgent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorAgent.h; sourceTree = "<group>"; };
+		3720BCEF0F7D149100D5FF81 /* Robot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Robot.h; sourceTree = "<group>"; };
+		3720BCF80F7D149100D5FF81 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		3720BCF90F7D149100D5FF81 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		3720BCFA0F7D149100D5FF81 /* roborobo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = roborobo.h; sourceTree = "<group>"; };
+		3720BCFD0F7D149100D5FF81 /* Misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Misc.h; sourceTree = "<group>"; };
+		3720BD010F7D149100D5FF81 /* Graphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Graphics.h; sourceTree = "<group>"; };
+		3720BD020F7D149100D5FF81 /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLMain.h; sourceTree = "<group>"; };
+		3720BD030F7D149100D5FF81 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
+		3720BD050F7D149100D5FF81 /* RobotWorldModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RobotWorldModel.h; sourceTree = "<group>"; };
+		3720BD060F7D149100D5FF81 /* WorldModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldModel.h; sourceTree = "<group>"; };
+		372B8E4D137B303B00E7276B /* DemoMedeaConfigurationLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoMedeaConfigurationLoader.h; sourceTree = "<group>"; };
+		372B8E4E137B305900E7276B /* DemoMedeaConfigurationLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoMedeaConfigurationLoader.cpp; sourceTree = "<group>"; };
+		3730415018EB1C3E0086A449 /* libSDL_image-1.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libSDL_image-1.2.0.dylib"; path = "../../../../../../../../opt/local/lib/libSDL_image-1.2.0.dylib"; sourceTree = "<group>"; };
+		3730415118EB1C3E0086A449 /* libSDL.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSDL.dylib; path = ../../../../../../../../opt/local/lib/libSDL.dylib; sourceTree = "<group>"; };
+		3730415418EB1C8F0086A449 /* libtbb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libtbb.dylib; path = ../../../../../../../../opt/local/lib/libtbb.dylib; sourceTree = "<group>"; };
+		3749E172195D7EE000DC68AA /* BasicProjectAgentObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicProjectAgentObserver.h; sourceTree = "<group>"; };
+		3749E173195D7EE000DC68AA /* BasicProjectController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicProjectController.h; sourceTree = "<group>"; };
+		3749E174195D7EE000DC68AA /* BasicProjectWorldObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicProjectWorldObserver.h; sourceTree = "<group>"; };
+		3749E175195D7EE900DC68AA /* BasicProjectAgentObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicProjectAgentObserver.cpp; sourceTree = "<group>"; };
+		3749E176195D7EE900DC68AA /* BasicProjectController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicProjectController.cpp; sourceTree = "<group>"; };
+		3749E177195D7EE900DC68AA /* BasicProjectWorldObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicProjectWorldObserver.cpp; sourceTree = "<group>"; };
+		3749E17D195D809C00DC68AA /* SandboxAgentObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SandboxAgentObserver.h; sourceTree = "<group>"; };
+		3749E17E195D809C00DC68AA /* SandboxController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SandboxController.h; sourceTree = "<group>"; };
+		3749E17F195D809C00DC68AA /* SandboxWorldObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SandboxWorldObserver.h; sourceTree = "<group>"; };
+		3749E181195D809C00DC68AA /* SandboxAgentObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SandboxAgentObserver.cpp; sourceTree = "<group>"; };
+		3749E182195D809C00DC68AA /* SandboxController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SandboxController.cpp; sourceTree = "<group>"; };
+		3749E183195D809C00DC68AA /* SandboxWorldObserver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SandboxWorldObserver.cpp; sourceTree = "<group>"; };
+		3749E187195D823900DC68AA /* BasicProjectConfigurationLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BasicProjectConfigurationLoader.cpp; sourceTree = "<group>"; };
+		3749E189195D824900DC68AA /* BasicProjectConfigurationLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BasicProjectConfigurationLoader.h; sourceTree = "<group>"; };
+		3754B7B00FD097C300EAC800 /* World.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = World.h; path = World/World.h; sourceTree = "<group>"; };
+		375B3FED10BA9FC30008A54B /* AgentObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AgentObserver.h; sourceTree = "<group>"; };
+		375B3FEE10BA9FC30008A54B /* Observer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observer.h; sourceTree = "<group>"; };
+		375B3FEF10BA9FC30008A54B /* WorldObserver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldObserver.h; sourceTree = "<group>"; };
+		375BA8511870CBCA00D335FD /* CellularMap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CellularMap.h; sourceTree = "<group>"; };
+		375BA8521870CBF600D335FD /* CellularMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CellularMap.cpp; sourceTree = "<group>"; };
+		375FBD1B11AC13B200597CE9 /* LogManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogManager.h; sourceTree = "<group>"; };
+		375FBD1F11AC145500597CE9 /* LogManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LogManager.cpp; sourceTree = "<group>"; };
+		37764932195D9A34003D82E3 /* SandboxConfigurationLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SandboxConfigurationLoader.h; sourceTree = "<group>"; };
+		37764933195D9ADE003D82E3 /* SandboxConfigurationLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SandboxConfigurationLoader.cpp; sourceTree = "<group>"; };
+		3778DD63132EC3650000F4E6 /* Properties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Properties.cpp; sourceTree = "<group>"; };
+		3778DD64132EC3650000F4E6 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
+		378B2C4D0FE6AF4600B90B67 /* ExtendedProperties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtendedProperties.cpp; sourceTree = "<group>"; };
+		378B2C4F0FE6AF6300B90B67 /* ExtendedProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedProperties.h; sourceTree = "<group>"; };
+		37B2D70F183D7B5A00F364ED /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
+		37C234DB0F821A4400C977FE /* func.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = func.h; sourceTree = "<group>"; };
+		37C234DC0F821A4400C977FE /* Properties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Properties.h; sourceTree = "<group>"; };
+		37C234DD0F821A4400C977FE /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
+		37C234DE0F821A4400C977FE /* strip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strip.h; sourceTree = "<group>"; };
+		37E550CE184DE7400041C388 /* Geometry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Geometry.cpp; sourceTree = "<group>"; };
+		37E550D0184DE7560041C388 /* Geometry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Geometry.h; sourceTree = "<group>"; };
+		37E5B9020EF6D5E200C8A071 /* SDL_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL_image.framework; path = /Library/Frameworks/SDL_image.framework; sourceTree = "<absolute>"; };
+		37ECDD13136AF6200037E7CE /* LandmarkObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LandmarkObject.h; path = World/LandmarkObject.h; sourceTree = "<group>"; };
+		37ECDD16136AF6370037E7CE /* LandmarkObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LandmarkObject.cpp; sourceTree = "<group>"; };
+		37F3D9231909BB2D0093536D /* ConfigurationLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConfigurationLoader.h; sourceTree = "<group>"; };
+		37F3D9241909BB430093536D /* ConfigurationLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConfigurationLoader.cpp; sourceTree = "<group>"; };
+		37F3D926190A5E4F0093536D /* PhysicalObjectFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PhysicalObjectFactory.h; path = World/PhysicalObjectFactory.h; sourceTree = "<group>"; };
+		37F3D927190A5E5D0093536D /* PhysicalObjectFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicalObjectFactory.cpp; sourceTree = "<group>"; };
+		37F3D929190A72540093536D /* EnergyItem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EnergyItem.cpp; sourceTree = "<group>"; };
+		37F3D92B190A72650093536D /* EnergyItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EnergyItem.h; path = World/EnergyItem.h; sourceTree = "<group>"; };
+		37F3D92C190A7BA70093536D /* RoundObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RoundObject.cpp; sourceTree = "<group>"; };
+		37F3D92E190A7BBF0093536D /* RoundObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RoundObject.h; path = World/RoundObject.h; sourceTree = "<group>"; };
+		37F4DD5C191E206700CC9FD0 /* __roborobo2_icon__.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = __roborobo2_icon__.jpg; sourceTree = "<group>"; };
+		37F4E7E3190BF87C00E6EA45 /* GateObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GateObject.h; path = World/GateObject.h; sourceTree = "<group>"; };
+		37F4E7E4190BF88500E6EA45 /* GateObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GateObject.cpp; sourceTree = "<group>"; };
+		37F4E7E6190C02F900E6EA45 /* SwitchObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SwitchObject.cpp; sourceTree = "<group>"; };
+		37F4E7E8190C030200E6EA45 /* SwitchObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SwitchObject.h; path = World/SwitchObject.h; sourceTree = "<group>"; };
+		37F4E7EF190C1D0400E6EA45 /* PhysicalObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PhysicalObject.cpp; sourceTree = "<group>"; };
+		37F4E7F1190C1D1200E6EA45 /* CircleObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CircleObject.cpp; sourceTree = "<group>"; };
+		37F4E7F3190C1D1B00E6EA45 /* SquareObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SquareObject.cpp; sourceTree = "<group>"; };
+		37F4E7F5190C1D4D00E6EA45 /* CircleObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CircleObject.h; path = World/CircleObject.h; sourceTree = "<group>"; };
+		37F4E7F6190C1D4D00E6EA45 /* PhysicalObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PhysicalObject.h; path = World/PhysicalObject.h; sourceTree = "<group>"; };
+		37F4E7F7190C1D4D00E6EA45 /* SquareObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SquareObject.h; path = World/SquareObject.h; sourceTree = "<group>"; };
+		37F6CF4E116A31F800ABAE5D /* GlobalConfigurationLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GlobalConfigurationLoader.h; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* roborobo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = roborobo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3730415218EB1C3E0086A449 /* libSDL_image-1.2.0.dylib in Frameworks */,
+				3730415518EB1C8F0086A449 /* libtbb.dylib in Frameworks */,
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				3730415318EB1C3E0086A449 /* libSDL.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				002F3A2B09D0888800EBEB88 /* SDLMain.h */,
+				002F3A2C09D0888800EBEB88 /* SDLMain.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				002F39F909D0881F00EBEB88 /* SDL.framework */,
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* roborobo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* roborobo */ = {
+			isa = PBXGroup;
+			children = (
+				37F4DD5C191E206700CC9FD0 /* __roborobo2_icon__.jpg */,
+				370BD53711AD82FC00C09541 /* prj */,
+				3720BCEA0F7D149100D5FF81 /* include */,
+				3720BCD20F7D149100D5FF81 /* src */,
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = roborobo;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				32CA4F630368D1EE00C91783 /* roborobo_Prefix.pch */,
+				37E5B9020EF6D5E200C8A071 /* SDL_image.framework */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107310486CEB800E47090 /* Info.plist */,
+				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3701DAA91382892400B12539 /* neuralnetworks */ = {
+			isa = PBXGroup;
+			children = (
+				3701DAAA1382892400B12539 /* Elman.cpp */,
+				3701DAAB1382892400B12539 /* LayeredNeuralNetwork.cpp */,
+				3701DAAC1382892400B12539 /* MLP.cpp */,
+				3701DAAD1382892400B12539 /* NeuralNetwork.cpp */,
+				3701DAAE1382892400B12539 /* NeuralNetworkException.cpp */,
+				3701DAAF1382892400B12539 /* Perceptron.cpp */,
+				3701DAB01382892400B12539 /* ReservoirNeuralNetwork.cpp */,
+			);
+			path = neuralnetworks;
+			sourceTree = "<group>";
+		};
+		3701DAB81382893200B12539 /* neuralnetworks */ = {
+			isa = PBXGroup;
+			children = (
+				3701DAB91382893200B12539 /* Elman.h */,
+				3701DABA1382893200B12539 /* LayeredNeuralNetwork.h */,
+				3701DABB1382893200B12539 /* MLP.h */,
+				3701DABC1382893200B12539 /* NeuralNetwork.h */,
+				3701DABD1382893200B12539 /* NeuralNetworkException.h */,
+				3701DABE1382893200B12539 /* Perceptron.h */,
+				3701DABF1382893200B12539 /* ReservoirNeuralNetwork.h */,
+			);
+			path = neuralnetworks;
+			sourceTree = "<group>";
+		};
+		370BD53711AD82FC00C09541 /* prj */ = {
+			isa = PBXGroup;
+			children = (
+				3730415018EB1C3E0086A449 /* libSDL_image-1.2.0.dylib */,
+				3730415118EB1C3E0086A449 /* libSDL.dylib */,
+				3730415418EB1C8F0086A449 /* libtbb.dylib */,
+				370DD54818E497620084BE83 /* DemoMedea */,
+				374E0CEF11AECDDC0003E446 /* BasicProject */,
+				3749E17B195D809C00DC68AA /* Sandbox */,
+			);
+			path = prj;
+			sourceTree = "<group>";
+		};
+		370DD54818E497620084BE83 /* DemoMedea */ = {
+			isa = PBXGroup;
+			children = (
+				370DD54918E497620084BE83 /* include */,
+				370DD55018E497620084BE83 /* src */,
+			);
+			path = DemoMedea;
+			sourceTree = "<group>";
+		};
+		370DD54918E497620084BE83 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				370DD54A18E497620084BE83 /* DemoMedeaAgentObserver.h */,
+				370DD54C18E497620084BE83 /* DemoMedeaController.h */,
+				370DD54D18E497620084BE83 /* DemoMedeaSharedData.h */,
+				370DD54E18E497620084BE83 /* DemoMedeaWorldObserver.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		370DD55018E497620084BE83 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				370DD55118E497620084BE83 /* DemoMedeaAgentObserver.cpp */,
+				370DD55318E497620084BE83 /* DemoMedeaController.cpp */,
+				370DD55418E497620084BE83 /* DemoMedeaSharedData.cpp */,
+				370DD55518E497620084BE83 /* DemoMedeaWorldObserver.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		370E46510FD41B5B001E0985 /* World */ = {
+			isa = PBXGroup;
+			children = (
+				37F3D92B190A72650093536D /* EnergyItem.h */,
+				37F4E7E3190BF87C00E6EA45 /* GateObject.h */,
+				37ECDD13136AF6200037E7CE /* LandmarkObject.h */,
+				37F3D926190A5E4F0093536D /* PhysicalObjectFactory.h */,
+				37F3D92E190A7BBF0093536D /* RoundObject.h */,
+				37F4E7E8190C030200E6EA45 /* SwitchObject.h */,
+			);
+			name = World;
+			sourceTree = "<group>";
+		};
+		370FF3D2117602FD006697B2 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				37F3D9231909BB2D0093536D /* ConfigurationLoader.h */,
+				3749E189195D824900DC68AA /* BasicProjectConfigurationLoader.h */,
+				372B8E4D137B303B00E7276B /* DemoMedeaConfigurationLoader.h */,
+				37764932195D9A34003D82E3 /* SandboxConfigurationLoader.h */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		3720BCD20F7D149100D5FF81 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3720BCD30F7D149100D5FF81 /* core */,
+				3720BCE60F7D149100D5FF81 /* ext */,
+				37C234DF0F821A5100C977FE /* contrib */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		3720BCD30F7D149100D5FF81 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				3720BCD40F7D149100D5FF81 /* Agent.cpp */,
+				3720BCD50F7D149100D5FF81 /* AgentObserver.cpp */,
+				375BA8521870CBF600D335FD /* CellularMap.cpp */,
+				37F4E7F1190C1D1200E6EA45 /* CircleObject.cpp */,
+				3720BCD60F7D149100D5FF81 /* Controller.cpp */,
+				378B2C4D0FE6AF4600B90B67 /* ExtendedProperties.cpp */,
+				37E550CE184DE7400041C388 /* Geometry.cpp */,
+				370DD55D18E4A4390084BE83 /* Graphics.cpp */,
+				3720BCD80F7D149100D5FF81 /* InspectorAgent.cpp */,
+				375FBD1F11AC145500597CE9 /* LogManager.cpp */,
+				3720BCD90F7D149100D5FF81 /* main.cpp */,
+				3720BCDA0F7D149100D5FF81 /* Misc.cpp */,
+				3720BCD70F7D149100D5FF81 /* Observer.cpp */,
+				37F4E7EF190C1D0400E6EA45 /* PhysicalObject.cpp */,
+				3720BCDC0F7D149100D5FF81 /* Robot.cpp */,
+				3720BCDB0F7D149100D5FF81 /* roborobo.cpp */,
+				3720BCDD0F7D149100D5FF81 /* RobotWorldModel.cpp */,
+				37F4E7F3190C1D1B00E6EA45 /* SquareObject.cpp */,
+				3720BCE10F7D149100D5FF81 /* Timer.cpp */,
+				3720BCE30F7D149100D5FF81 /* World.cpp */,
+				3720BCE50F7D149100D5FF81 /* WorldModel.cpp */,
+				3720BCE40F7D149100D5FF81 /* WorldObserver.cpp */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		3720BCE60F7D149100D5FF81 /* ext */ = {
+			isa = PBXGroup;
+			children = (
+				3749E187195D823900DC68AA /* BasicProjectConfigurationLoader.cpp */,
+				37F3D9241909BB430093536D /* ConfigurationLoader.cpp */,
+				372B8E4E137B305900E7276B /* DemoMedeaConfigurationLoader.cpp */,
+				37F3D929190A72540093536D /* EnergyItem.cpp */,
+				37F4E7E4190BF88500E6EA45 /* GateObject.cpp */,
+				37ECDD16136AF6370037E7CE /* LandmarkObject.cpp */,
+				37F3D927190A5E5D0093536D /* PhysicalObjectFactory.cpp */,
+				37F3D92C190A7BA70093536D /* RoundObject.cpp */,
+				37764933195D9ADE003D82E3 /* SandboxConfigurationLoader.cpp */,
+				37F4E7E6190C02F900E6EA45 /* SwitchObject.cpp */,
+			);
+			path = ext;
+			sourceTree = "<group>";
+		};
+		3720BCEA0F7D149100D5FF81 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				3720BCEB0F7D149100D5FF81 /* core */,
+				3720BD070F7D149100D5FF81 /* ext */,
+				37C234D90F821A4400C977FE /* contrib */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		3720BCEB0F7D149100D5FF81 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				37B2D70E183D7B5A00F364ED /* Controllers */,
+				3720BCEC0F7D149100D5FF81 /* Agents */,
+				37BB804A10B8BF6B00F458FC /* Config */,
+				375B3FEC10BA9FC30008A54B /* Observers */,
+				3720BCF70F7D149100D5FF81 /* RoboroboMain */,
+				3720BCFC0F7D149100D5FF81 /* Utilities */,
+				3754B7AD0FD097A900EAC800 /* World */,
+				3720BD040F7D149100D5FF81 /* WorldModels */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		3720BCEC0F7D149100D5FF81 /* Agents */ = {
+			isa = PBXGroup;
+			children = (
+				3720BCED0F7D149100D5FF81 /* Agent.h */,
+				3720BCEE0F7D149100D5FF81 /* InspectorAgent.h */,
+				3720BCEF0F7D149100D5FF81 /* Robot.h */,
+			);
+			path = Agents;
+			sourceTree = "<group>";
+		};
+		3720BCF70F7D149100D5FF81 /* RoboroboMain */ = {
+			isa = PBXGroup;
+			children = (
+				3720BCF80F7D149100D5FF81 /* common.h */,
+				3720BCF90F7D149100D5FF81 /* main.h */,
+				3720BCFA0F7D149100D5FF81 /* roborobo.h */,
+			);
+			path = RoboroboMain;
+			sourceTree = "<group>";
+		};
+		3720BCFC0F7D149100D5FF81 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				375BA8511870CBCA00D335FD /* CellularMap.h */,
+				378B2C4F0FE6AF6300B90B67 /* ExtendedProperties.h */,
+				37E550D0184DE7560041C388 /* Geometry.h */,
+				375FBD1B11AC13B200597CE9 /* LogManager.h */,
+				3720BCFD0F7D149100D5FF81 /* Misc.h */,
+				3720BD010F7D149100D5FF81 /* Graphics.h */,
+				3720BD020F7D149100D5FF81 /* SDLMain.h */,
+				3720BD030F7D149100D5FF81 /* Timer.h */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		3720BD040F7D149100D5FF81 /* WorldModels */ = {
+			isa = PBXGroup;
+			children = (
+				3720BD050F7D149100D5FF81 /* RobotWorldModel.h */,
+				3720BD060F7D149100D5FF81 /* WorldModel.h */,
+			);
+			path = WorldModels;
+			sourceTree = "<group>";
+		};
+		3720BD070F7D149100D5FF81 /* ext */ = {
+			isa = PBXGroup;
+			children = (
+				370FF3D2117602FD006697B2 /* Config */,
+				370E46510FD41B5B001E0985 /* World */,
+			);
+			path = ext;
+			sourceTree = "<group>";
+		};
+		3749E17B195D809C00DC68AA /* Sandbox */ = {
+			isa = PBXGroup;
+			children = (
+				3749E17C195D809C00DC68AA /* include */,
+				3749E180195D809C00DC68AA /* src */,
+			);
+			path = Sandbox;
+			sourceTree = "<group>";
+		};
+		3749E17C195D809C00DC68AA /* include */ = {
+			isa = PBXGroup;
+			children = (
+				3749E17D195D809C00DC68AA /* SandboxAgentObserver.h */,
+				3749E17E195D809C00DC68AA /* SandboxController.h */,
+				3749E17F195D809C00DC68AA /* SandboxWorldObserver.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		3749E180195D809C00DC68AA /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3749E181195D809C00DC68AA /* SandboxAgentObserver.cpp */,
+				3749E182195D809C00DC68AA /* SandboxController.cpp */,
+				3749E183195D809C00DC68AA /* SandboxWorldObserver.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		374E0CEF11AECDDC0003E446 /* BasicProject */ = {
+			isa = PBXGroup;
+			children = (
+				374E0CF011AECDDC0003E446 /* include */,
+				374E0CF511AECDDC0003E446 /* src */,
+			);
+			path = BasicProject;
+			sourceTree = "<group>";
+		};
+		374E0CF011AECDDC0003E446 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				3749E172195D7EE000DC68AA /* BasicProjectAgentObserver.h */,
+				3749E173195D7EE000DC68AA /* BasicProjectController.h */,
+				3749E174195D7EE000DC68AA /* BasicProjectWorldObserver.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		374E0CF511AECDDC0003E446 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3749E175195D7EE900DC68AA /* BasicProjectAgentObserver.cpp */,
+				3749E176195D7EE900DC68AA /* BasicProjectController.cpp */,
+				3749E177195D7EE900DC68AA /* BasicProjectWorldObserver.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		3754B7AD0FD097A900EAC800 /* World */ = {
+			isa = PBXGroup;
+			children = (
+				37F4E7F5190C1D4D00E6EA45 /* CircleObject.h */,
+				37F4E7F6190C1D4D00E6EA45 /* PhysicalObject.h */,
+				37F4E7F7190C1D4D00E6EA45 /* SquareObject.h */,
+				3754B7B00FD097C300EAC800 /* World.h */,
+			);
+			name = World;
+			sourceTree = "<group>";
+		};
+		375B3FEC10BA9FC30008A54B /* Observers */ = {
+			isa = PBXGroup;
+			children = (
+				375B3FED10BA9FC30008A54B /* AgentObserver.h */,
+				375B3FEE10BA9FC30008A54B /* Observer.h */,
+				375B3FEF10BA9FC30008A54B /* WorldObserver.h */,
+			);
+			path = Observers;
+			sourceTree = "<group>";
+		};
+		3778DD62132EC3650000F4E6 /* zsu */ = {
+			isa = PBXGroup;
+			children = (
+				3778DD63132EC3650000F4E6 /* Properties.cpp */,
+				3778DD64132EC3650000F4E6 /* StringUtils.cpp */,
+			);
+			path = zsu;
+			sourceTree = "<group>";
+		};
+		37B2D70E183D7B5A00F364ED /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				37B2D70F183D7B5A00F364ED /* Controller.h */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		37BB804A10B8BF6B00F458FC /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				37F6CF4E116A31F800ABAE5D /* GlobalConfigurationLoader.h */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		37C234D90F821A4400C977FE /* contrib */ = {
+			isa = PBXGroup;
+			children = (
+				3701DAB81382893200B12539 /* neuralnetworks */,
+				37C234DA0F821A4400C977FE /* zsu */,
+			);
+			path = contrib;
+			sourceTree = "<group>";
+		};
+		37C234DA0F821A4400C977FE /* zsu */ = {
+			isa = PBXGroup;
+			children = (
+				37C234DB0F821A4400C977FE /* func.h */,
+				37C234DC0F821A4400C977FE /* Properties.h */,
+				37C234DD0F821A4400C977FE /* StringUtils.h */,
+				37C234DE0F821A4400C977FE /* strip.h */,
+			);
+			path = zsu;
+			sourceTree = "<group>";
+		};
+		37C234DF0F821A5100C977FE /* contrib */ = {
+			isa = PBXGroup;
+			children = (
+				3701DAA91382892400B12539 /* neuralnetworks */,
+				3778DD62132EC3650000F4E6 /* zsu */,
+			);
+			path = contrib;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D1107260486CEB800E47090 /* roborobo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "roborobo" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+				002F39FD09D0883400EBEB88 /* Copy Frameworks into .app bundle */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = roborobo;
+			productInstallPath = "$(HOME)/Applications";
+			productName = roborobo;
+			productReference = 8D1107320486CEB800E47090 /* roborobo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "roborobo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* roborobo */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* roborobo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				37F4DD5D191E206700CC9FD0 /* __roborobo2_icon__.jpg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				002F3A2E09D0888800EBEB88 /* SDLMain.m in Sources */,
+				3720BD0E0F7D149100D5FF81 /* Agent.cpp in Sources */,
+				370DD55B18E497620084BE83 /* DemoMedeaWorldObserver.cpp in Sources */,
+				3749E186195D809C00DC68AA /* SandboxWorldObserver.cpp in Sources */,
+				37F4E7F0190C1D0400E6EA45 /* PhysicalObject.cpp in Sources */,
+				3720BD0F0F7D149100D5FF81 /* AgentObserver.cpp in Sources */,
+				3720BD100F7D149100D5FF81 /* Controller.cpp in Sources */,
+				3720BD110F7D149100D5FF81 /* Observer.cpp in Sources */,
+				370DD55918E497620084BE83 /* DemoMedeaController.cpp in Sources */,
+				3720BD120F7D149100D5FF81 /* InspectorAgent.cpp in Sources */,
+				3720BD130F7D149100D5FF81 /* main.cpp in Sources */,
+				3720BD140F7D149100D5FF81 /* Misc.cpp in Sources */,
+				3720BD150F7D149100D5FF81 /* roborobo.cpp in Sources */,
+				3720BD160F7D149100D5FF81 /* Robot.cpp in Sources */,
+				3720BD170F7D149100D5FF81 /* RobotWorldModel.cpp in Sources */,
+				3720BD1B0F7D149100D5FF81 /* Timer.cpp in Sources */,
+				37F3D92D190A7BA70093536D /* RoundObject.cpp in Sources */,
+				3720BD1D0F7D149100D5FF81 /* World.cpp in Sources */,
+				37F3D928190A5E5D0093536D /* PhysicalObjectFactory.cpp in Sources */,
+				3720BD1E0F7D149100D5FF81 /* WorldObserver.cpp in Sources */,
+				3720BD1F0F7D149100D5FF81 /* WorldModel.cpp in Sources */,
+				378B2C4E0FE6AF4600B90B67 /* ExtendedProperties.cpp in Sources */,
+				37F3D9251909BB430093536D /* ConfigurationLoader.cpp in Sources */,
+				375FBD2011AC145500597CE9 /* LogManager.cpp in Sources */,
+				3749E17A195D7EE900DC68AA /* BasicProjectWorldObserver.cpp in Sources */,
+				37F4E7F4190C1D1B00E6EA45 /* SquareObject.cpp in Sources */,
+				37E550CF184DE7400041C388 /* Geometry.cpp in Sources */,
+				3749E185195D809C00DC68AA /* SandboxController.cpp in Sources */,
+				3778DD65132EC3650000F4E6 /* Properties.cpp in Sources */,
+				3778DD66132EC3650000F4E6 /* StringUtils.cpp in Sources */,
+				370DD55718E497620084BE83 /* DemoMedeaAgentObserver.cpp in Sources */,
+				375BA8531870CBF600D335FD /* CellularMap.cpp in Sources */,
+				37F4E7E7190C02F900E6EA45 /* SwitchObject.cpp in Sources */,
+				37ECDD17136AF6370037E7CE /* LandmarkObject.cpp in Sources */,
+				372B8E4F137B305900E7276B /* DemoMedeaConfigurationLoader.cpp in Sources */,
+				3701DAB11382892400B12539 /* Elman.cpp in Sources */,
+				370DD55A18E497620084BE83 /* DemoMedeaSharedData.cpp in Sources */,
+				37764934195D9ADE003D82E3 /* SandboxConfigurationLoader.cpp in Sources */,
+				37F4E7F2190C1D1200E6EA45 /* CircleObject.cpp in Sources */,
+				3701DAB21382892400B12539 /* LayeredNeuralNetwork.cpp in Sources */,
+				3749E188195D823900DC68AA /* BasicProjectConfigurationLoader.cpp in Sources */,
+				3701DAB31382892400B12539 /* MLP.cpp in Sources */,
+				37F3D92A190A72540093536D /* EnergyItem.cpp in Sources */,
+				37F4E7E5190BF88500E6EA45 /* GateObject.cpp in Sources */,
+				3701DAB41382892400B12539 /* NeuralNetwork.cpp in Sources */,
+				370DD55E18E4A4390084BE83 /* Graphics.cpp in Sources */,
+				3749E184195D809C00DC68AA /* SandboxAgentObserver.cpp in Sources */,
+				3749E178195D7EE900DC68AA /* BasicProjectAgentObserver.cpp in Sources */,
+				3749E179195D7EE900DC68AA /* BasicProjectController.cpp in Sources */,
+				3701DAB51382892400B12539 /* NeuralNetworkException.cpp in Sources */,
+				3701DAB61382892400B12539 /* Perceptron.cpp in Sources */,
+				3701DAB71382892400B12539 /* ReservoirNeuralNetwork.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C165DFE840E0CC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					prj,
+					include/ext,
+					include/core,
+					include/contrib,
+					/Library/Frameworks/SDL.framework/Headers,
+				);
+				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					/Users/nicolas/Downloads/tbb42_20140122oss/lib,
+					/opt/local/lib,
+				);
+				PRODUCT_NAME = roborobo;
+				SDKROOT = macosx;
+				VALID_ARCHS = "x86_64 i386";
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					prj,
+					include/ext,
+					include/core,
+					include/contrib,
+					/Library/Frameworks/SDL.framework/Headers,
+				);
+				INCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "";
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					/Users/nicolas/Downloads/tbb42_20140122oss/lib,
+					/opt/local/lib,
+				);
+				PRODUCT_NAME = roborobo;
+				SDKROOT = macosx;
+				VALID_ARCHS = "x86_64 i386";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(HOME)/Library/Frameworks",
+					/Library/Frameworks,
+					"$(FRAMEWORK_SEARCH_PATHS)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "";
+				OTHER_LDFLAGS = "";
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = /usr/include;
+				VALID_ARCHS = "i386 x86_64";
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(HOME)/Library/Frameworks",
+					/Library/Frameworks,
+					"$(FRAMEWORK_SEARCH_PATHS)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/include,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "";
+				OTHER_LDFLAGS = "";
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = /usr/include;
+				VALID_ARCHS = "i386 x86_64";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "roborobo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "roborobo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
