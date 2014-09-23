@@ -68,7 +68,7 @@
 
 // =-=-=-=-=
 
-long int gVersion  = 20140917;
+long int gVersion  = 20140923;
 std::string gLogCommentText  = "(under development)"; //
 
 std::string gStartTime = getCurrentTimeAsReadableString();
@@ -90,7 +90,7 @@ std::string gCurrentBuildInfo   = "Ljubljana build";  // display through "-v[ers
 // Paris build -- november 2013 -- roborobo^2 (major revision)
 // Locmaria build -- april 2014 -- roborobo^2 (rc1)
 // Heraklion build -- june 2014 -- roborobo^2 (rc2)
-// Ljubljana build -- sept 2014
+// Ljubljana build -- sept 2014 -- roborobo on githug
 
 ExtendedProperties gProperties;
 
