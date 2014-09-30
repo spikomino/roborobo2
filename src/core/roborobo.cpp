@@ -90,7 +90,7 @@ std::string gCurrentBuildInfo   = "Ljubljana build";  // display through "-v[ers
 // Paris build -- november 2013 -- roborobo^2 (major revision)
 // Locmaria build -- april 2014 -- roborobo^2 (rc1)
 // Heraklion build -- june 2014 -- roborobo^2 (rc2)
-// Ljubljana build -- sept 2014 -- roborobo on githug
+// Ljubljana build -- sept 2014 -- roborobo on github
 
 ExtendedProperties gProperties;
 
