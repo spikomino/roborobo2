@@ -96,6 +96,7 @@ ExtendedProperties gProperties;
 
 bool gVideoRecording = false;
 
+
 bool gTrajectoryMonitor = false;
 int gTrajectoryMonitorMode = 0;
 

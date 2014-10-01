@@ -81,6 +81,10 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-l config/default-medea.properties"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-l config/default-medea-test.properties"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
