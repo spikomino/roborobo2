@@ -349,9 +349,9 @@
 				3730415018EB1C3E0086A449 /* libSDL_image-1.2.0.dylib */,
 				3730415118EB1C3E0086A449 /* libSDL.dylib */,
 				3730415418EB1C8F0086A449 /* libtbb.dylib */,
-				371E5C2919DC44A3009C31B9 /* PrjMateSelection */,
 				370DD54818E497620084BE83 /* DemoMedea */,
 				374E0CEF11AECDDC0003E446 /* BasicProject */,
+				371E5C2919DC44A3009C31B9 /* PrjMateSelection */,
 				3749E17B195D809C00DC68AA /* Sandbox */,
 			);
 			path = prj;

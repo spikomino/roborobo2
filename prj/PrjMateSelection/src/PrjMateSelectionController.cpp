@@ -37,6 +37,8 @@ PrjMateSelectionController::PrjMateSelectionController( RobotWorldModel *wm )
 	_iteration = 0;
 
     _birthdate = 0;
+    
+    _nbGenomeTransmission = 0;
 
     if ( gEnergyLevel )
         _wm->setEnergyLevel(gEnergyInit);
@@ -135,7 +137,6 @@ void PrjMateSelectionController::stepBehaviour()
                 int nbOfTypes = PhysicalObjectFactory::getNbOfTypes();
                 for ( int i = 0 ; i != nbOfTypes ; i++ )
                 {
-                    // if ( i == ( objectId - gPhysicalObjectIndexStartOffset ) ) // [bug]: discovered by Inaki F. -- solved 2014-09-21
                     if ( i == gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]->getType() )
                         (*inputs)[inputToUse] = 1; // match
                     else
@@ -315,6 +316,7 @@ void PrjMateSelectionController::stepEvolution()
 	if( dynamic_cast<PrjMateSelectionWorldObserver*>(gWorld->getWorldObserver())->getLifeIterationCount() >= PrjMateSelectionSharedData::gEvaluationTime-1 )
 	{
         loadNewGenome();
+        _nbGenomeTransmission = 0;
     }
     
     if ( getNewGenomeStatus() ) // check for new NN parameters
@@ -355,12 +357,41 @@ void PrjMateSelectionController::selectRandomGenome()
     }
 }
 
-
-void PrjMateSelectionController::storeGenome(std::vector<double> genome, int senderId, int senderBirthdate, float sigma)
+void PrjMateSelectionController::selectFirstGenome()
 {
-	_genomesList[senderId] = genome;
-    _sigmaList[senderId] = sigma;
-    _birthdateList[senderId] = senderBirthdate;
+    if(_genomesList.size() != 0)
+    {
+        _currentGenome = (*_genomesList.begin()).second;
+        
+        mutate(_sigmaList[(*_genomesList.begin()).first]);
+        
+        setNewGenomeStatus(true);
+        
+        _birthdate = gWorld->getIterations();
+        
+        // Logging
+        std::string s = std::string("");
+        s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] descends from [" + std::to_string((*_genomesList.begin()).first) + "::" + std::to_string(_birthdateList[(*_genomesList.begin()).first]) + "]\n";
+        gLogManager->write(s);
+        gLogManager->flush();
+        
+        _genomesList.clear();
+    }
+}
+
+bool PrjMateSelectionController::storeGenome(std::vector<double> genome, int senderId, int senderBirthdate, float sigma)
+{
+    std::map<int,int>::const_iterator it = _birthdateList.find(senderBirthdate);
+
+    if (  it != _birthdateList.end() && _birthdateList[senderId] == senderBirthdate ) // this exact agent's genome is already stored.
+        return false;
+    else
+    {
+        _genomesList[senderId] = genome;
+        _sigmaList[senderId] = sigma;
+        _birthdateList[senderId] = senderBirthdate;
+        return true;
+    }
 }
 
 
@@ -457,7 +488,8 @@ void PrjMateSelectionController::broadcastGenome()
 {
     if ( _wm->isAlive() == true )  	// only if agent is active (ie. not just revived) and deltaE>0.
     {
-        for( int i = 0 ; i < _wm->_cameraSensorsNb; i++)
+        // remarque \todo: limiting genome transmission is sensitive to sensor order. (but: assume ok)
+        for( int i = 0 ; i < _wm->_cameraSensorsNb && _nbGenomeTransmission < PrjMateSelectionSharedData::gMaxNbGenomeTransmission ; i++)
         {
             int targetIndex = _wm->getObjectIdFromCameraSensor(i);
             
@@ -499,7 +531,10 @@ void PrjMateSelectionController::broadcastGenome()
                     }
                 }
                 
-                targetRobotController->storeGenome(_currentGenome, _wm->getId(), _birthdate, sigmaSendValue); // other agent stores my genome.
+                bool success = targetRobotController->storeGenome(_currentGenome, _wm->getId(), _birthdate, sigmaSendValue); // other agent stores my genome.
+                
+                if ( success == true )
+                    _nbGenomeTransmission++;
             }
         }
     }

@@ -36,7 +36,9 @@ PrjMateSelectionWorldObserver::PrjMateSelectionWorldObserver( World* world ) : W
 	gProperties.checkAndGetPropertyValue("gSnapshots",&PrjMateSelectionSharedData::gSnapshots,false);
 	gProperties.checkAndGetPropertyValue("gSnapshotsFrequency",&PrjMateSelectionSharedData::gSnapshotsFrequency,false);
 
-    gProperties.checkAndGetPropertyValue("gControllerType",&PrjMateSelectionSharedData::gControllerType,false);
+    gProperties.checkAndGetPropertyValue("gControllerType",&PrjMateSelectionSharedData::gControllerType,true);
+    
+    gProperties.checkAndGetPropertyValue("gMaxNbGenomeTransmission",&PrjMateSelectionSharedData::gMaxNbGenomeTransmission,true);
 
     
 	// ====

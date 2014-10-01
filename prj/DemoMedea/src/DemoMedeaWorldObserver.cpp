@@ -36,7 +36,7 @@ DemoMedeaWorldObserver::DemoMedeaWorldObserver( World* world ) : WorldObserver( 
 	gProperties.checkAndGetPropertyValue("gSnapshots",&DemoMedeaSharedData::gSnapshots,false);
 	gProperties.checkAndGetPropertyValue("gSnapshotsFrequency",&DemoMedeaSharedData::gSnapshotsFrequency,false);
 
-    gProperties.checkAndGetPropertyValue("gControllerType",&DemoMedeaSharedData::gControllerType,false);
+    gProperties.checkAndGetPropertyValue("gControllerType",&DemoMedeaSharedData::gControllerType,true);
 
     
 	// ====

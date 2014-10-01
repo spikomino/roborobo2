@@ -30,3 +30,4 @@ bool PrjMateSelectionSharedData::gSnapshots = true; // take snapshots
 int PrjMateSelectionSharedData::gSnapshotsFrequency = 50; // every N generations
 
 int PrjMateSelectionSharedData::gControllerType = -1; // cf. header for description
+int PrjMateSelectionSharedData::gMaxNbGenomeTransmission = -1;

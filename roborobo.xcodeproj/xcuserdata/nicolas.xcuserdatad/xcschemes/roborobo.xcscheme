@@ -84,7 +84,7 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-l config/default-medea-test.properties"
+            argument = "-l config/prj-medea-mateselection.properties"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

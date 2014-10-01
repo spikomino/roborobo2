@@ -27,6 +27,7 @@ class PrjMateSelectionController : public Controller
 		int _iteration;
         int _birthdate; // evaluation when this controller was initialized.
     
+        int _nbGenomeTransmission;
 
 		std::vector<double> _parameters;
 		std::string _nnType;
@@ -40,6 +41,8 @@ class PrjMateSelectionController : public Controller
         bool _isNewGenome;
     
         void selectRandomGenome();
+        void selectFirstGenome();
+    
         void mutate(float sigma);
 
         void stepBehaviour();
@@ -70,7 +73,7 @@ class PrjMateSelectionController : public Controller
         unsigned int _nbHiddenLayers;
         std::vector<unsigned int>* _nbNeuronsPerHiddenLayer;
     
-        void storeGenome(std::vector<double> genome, int senderId, int senderBirthdate, float sigma);
+        bool storeGenome(std::vector<double> genome, int senderId, int senderBirthdate, float sigma);
         void resetRobot();
     
 	public:
