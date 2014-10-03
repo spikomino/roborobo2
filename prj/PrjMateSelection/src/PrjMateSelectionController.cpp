@@ -38,6 +38,8 @@ PrjMateSelectionController::PrjMateSelectionController( RobotWorldModel *wm )
 
     _birthdate = 0;
     
+    _isListening = true;
+    
     _nbGenomeTransmission = 0;
 
     if ( gEnergyLevel )
@@ -70,7 +72,9 @@ void PrjMateSelectionController::reset()
 void PrjMateSelectionController::step()
 {
 	_iteration++;
+    
     stepEvolution();
+    
     if ( _wm->isAlive() )
 	{
         stepBehaviour();
@@ -307,7 +311,8 @@ unsigned int PrjMateSelectionController::computeRequiredNumberOfWeights()
 void PrjMateSelectionController::stepEvolution()
 {
     // * broadcasting genome : robot broadcasts its genome to all neighbors (contact-based wrt proximity sensors)
-    if  ( gRadioNetwork )
+
+    if ( _wm->isAlive() == true && gRadioNetwork )  	// only if agent is active (ie. not just revived) and deltaE>0.
     {
         broadcastGenome();
     }
@@ -486,10 +491,9 @@ void PrjMateSelectionController::resetRobot()
 
 void PrjMateSelectionController::broadcastGenome()
 {
-    if ( _wm->isAlive() == true )  	// only if agent is active (ie. not just revived) and deltaE>0.
-    {
         // remarque \todo: limiting genome transmission is sensitive to sensor order. (but: assume ok)
-        for( int i = 0 ; i < _wm->_cameraSensorsNb && _nbGenomeTransmission < PrjMateSelectionSharedData::gMaxNbGenomeTransmission ; i++)
+        
+        for( int i = 0 ; i < _wm->_cameraSensorsNb && ( PrjMateSelectionSharedData::gLimitGenomeTransmission == false || ( PrjMateSelectionSharedData::gLimitGenomeTransmission == true && _nbGenomeTransmission < PrjMateSelectionSharedData::gMaxNbGenomeTransmission ) ); i++)
         {
             int targetIndex = _wm->getObjectIdFromCameraSensor(i);
             
@@ -501,43 +505,46 @@ void PrjMateSelectionController::broadcastGenome()
                 
                 if ( ! targetRobotController )
                 {
-                    std::cerr << "Error from robot " << _wm->getId() << " : the observer of robot " << targetIndex << " is not compatible" << std::endl;
+                    std::cerr << "Error from robot " << _wm->getId() << " : the observer of robot " << targetIndex << " is not compatible." << std::endl;
                     exit(-1);
                 }
                 
-                float dice = float(rand()%100) / 100.0;
-                float sigmaSendValue = _currentSigma;
-                
-                if ( dice <= PrjMateSelectionSharedData::gProbaMutation )
+                if ( targetRobotController->isListening() )
                 {
-                    dice = float(rand() %100) / 100.0;
-                    if ( dice < 0.5 )
+                    float dice = float(rand()%100) / 100.0;
+                    float sigmaSendValue = _currentSigma;
+                    
+                    if ( dice <= PrjMateSelectionSharedData::gProbaMutation )
                     {
-                        sigmaSendValue = _currentSigma * ( 1 + PrjMateSelectionSharedData::gUpdateSigmaStep ); // increase sigma
-                        
-                        if (sigmaSendValue > PrjMateSelectionSharedData::gSigmaMax)
+                        dice = float(rand() %100) / 100.0;
+                        if ( dice < 0.5 )
                         {
-                            sigmaSendValue = PrjMateSelectionSharedData::gSigmaMax;
+                            sigmaSendValue = _currentSigma * ( 1 + PrjMateSelectionSharedData::gUpdateSigmaStep ); // increase sigma
+                            
+                            if (sigmaSendValue > PrjMateSelectionSharedData::gSigmaMax)
+                            {
+                                sigmaSendValue = PrjMateSelectionSharedData::gSigmaMax;
+                            }
                         }
-                    }
-                    else
-                    {
-                        sigmaSendValue = _currentSigma * ( 1 - PrjMateSelectionSharedData::gUpdateSigmaStep ); // decrease sigma
-                        
-                        if ( sigmaSendValue < PrjMateSelectionSharedData::gSigmaMin )
+                        else
                         {
-                            sigmaSendValue = PrjMateSelectionSharedData::gSigmaMin;
+                            sigmaSendValue = _currentSigma * ( 1 - PrjMateSelectionSharedData::gUpdateSigmaStep ); // decrease sigma
+                            
+                            if ( sigmaSendValue < PrjMateSelectionSharedData::gSigmaMin )
+                            {
+                                sigmaSendValue = PrjMateSelectionSharedData::gSigmaMin;
+                            }
                         }
+                        
                     }
+                    
+                    bool success = targetRobotController->storeGenome(_currentGenome, _wm->getId(), _birthdate, sigmaSendValue); // other agent stores my genome.
+                    
+                    if ( success == true )
+                        _nbGenomeTransmission++;
                 }
-                
-                bool success = targetRobotController->storeGenome(_currentGenome, _wm->getId(), _birthdate, sigmaSendValue); // other agent stores my genome.
-                
-                if ( success == true )
-                    _nbGenomeTransmission++;
             }
         }
-    }
 }
 
 void PrjMateSelectionController::loadNewGenome()
@@ -555,7 +562,18 @@ void PrjMateSelectionController::loadNewGenome()
         {
             // case: 1+ genome(s) imported, random pick.
             
-            selectRandomGenome();
+            switch ( PrjMateSelectionSharedData::gSelectionMethod )
+            {
+                case 0:
+                    selectRandomGenome();
+                    break;
+                case 1:
+                    selectFirstGenome();
+                    break;
+                default:
+                    std::cerr << "[ERROR] unknown selection method (gSelectionMethod = " << PrjMateSelectionSharedData::gSelectionMethod << ")\n";
+                    exit(-1);
+            }
             
             _wm->setAlive(true);
             if ( _wm->getEnergyLevel() == 0 )
@@ -565,7 +583,7 @@ void PrjMateSelectionController::loadNewGenome()
         }
         else
         {
-            // case: no imported genome - wait for new genome.
+            // case: no imported genome - robot is set to inactive (which means: robot is put off-line (if gDeathState is true), then wait for new genome (if gListenState is true))
             
             // Logging
             std::string s = std::string("");
@@ -577,6 +595,12 @@ void PrjMateSelectionController::loadNewGenome()
             
             _wm->setAlive(false); // inactive robot *must* import a genome from others (ie. no restart).
             _wm->setRobotLED_colorValues(0, 0, 255);
+            
+            if ( PrjMateSelectionSharedData::gDeafState )
+            {
+                _isListening = false;
+                // TODO!!!! il faut un compteur pour quitter le mode deafstate, et vérifier ailleurs le switch deaf=>listening=>deaf(-1).
+            }
         }
         
         // log the genome

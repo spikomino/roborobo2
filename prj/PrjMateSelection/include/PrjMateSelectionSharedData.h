@@ -39,6 +39,14 @@ class PrjMateSelectionSharedData {
     static int gControllerType; // controller type (0: MLP, 1: Perceptron, 2: Elman)
     
     static int gMaxNbGenomeTransmission; // max. nb of genome transmission per individual per lifetime.
+    static bool gLimitGenomeTransmission; // enable/disable limiting transmission
+    
+    static int gSelectionMethod; // check PrjMateSelectionController::loadNewGenome() for authorized values.
+    
+    static bool gDeafState;
+    static int gDeafStateDelay; // -1: infinite
+    static bool gListenState;
+    static int gListenStateDelay;  // -1: infinite
     
     // -----
     

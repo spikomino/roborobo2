@@ -27,6 +27,8 @@ class PrjMateSelectionController : public Controller
 		int _iteration;
         int _birthdate; // evaluation when this controller was initialized.
     
+        bool _isListening;
+    
         int _nbGenomeTransmission;
 
 		std::vector<double> _parameters;
@@ -86,11 +88,8 @@ class PrjMateSelectionController : public Controller
     
         int getBirthdate() { return _birthdate; }
     
-        //bool isAlive() { return _isAlive; }
-
-
+        bool isListening() { return _isListening; }
     
-
 };
 
 

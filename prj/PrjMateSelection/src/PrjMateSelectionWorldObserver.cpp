@@ -38,7 +38,9 @@ PrjMateSelectionWorldObserver::PrjMateSelectionWorldObserver( World* world ) : W
 
     gProperties.checkAndGetPropertyValue("gControllerType",&PrjMateSelectionSharedData::gControllerType,true);
     
-    gProperties.checkAndGetPropertyValue("gMaxNbGenomeTransmission",&PrjMateSelectionSharedData::gMaxNbGenomeTransmission,true);
+    gProperties.checkAndGetPropertyValue("gMaxNbGenomeTransmission",&PrjMateSelectionSharedData::gMaxNbGenomeTransmission,false);
+    gProperties.checkAndGetPropertyValue("gLimitGenomeTransmission",&PrjMateSelectionSharedData::gLimitGenomeTransmission,false);
+    gProperties.checkAndGetPropertyValue("gSelectionMethod",&PrjMateSelectionSharedData::gSelectionMethod,false);
 
     
 	// ====

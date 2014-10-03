@@ -30,4 +30,13 @@ bool PrjMateSelectionSharedData::gSnapshots = true; // take snapshots
 int PrjMateSelectionSharedData::gSnapshotsFrequency = 50; // every N generations
 
 int PrjMateSelectionSharedData::gControllerType = -1; // cf. header for description
-int PrjMateSelectionSharedData::gMaxNbGenomeTransmission = -1;
+
+bool PrjMateSelectionSharedData::gLimitGenomeTransmission = false; // default: do not limit.
+int PrjMateSelectionSharedData::gMaxNbGenomeTransmission = 65535; // default: arbitrarily set to 65535.
+
+int PrjMateSelectionSharedData::gSelectionMethod = 0; // default: random selection
+
+bool PrjMateSelectionSharedData::gDeafState = false;
+int PrjMateSelectionSharedData::gDeafStateDelay = 0; // -1: infinite
+bool PrjMateSelectionSharedData::gListenState = true;
+int PrjMateSelectionSharedData::gListenStateDelay = -1;  // -1: infinite
