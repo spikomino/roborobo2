@@ -39,6 +39,8 @@ PrjMateSelectionController::PrjMateSelectionController( RobotWorldModel *wm )
     _birthdate = 0;
     
     _isListening = true;
+    _notListeningDelay = PrjMateSelectionSharedData::gNotListeningStateDelay;
+    _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
     
     _nbGenomeTransmission = 0;
 
@@ -73,6 +75,35 @@ void PrjMateSelectionController::step()
 {
 	_iteration++;
     
+    if (  PrjMateSelectionSharedData::gListeningState )
+    {
+        assert ( _notListeningDelay >= -1 ); // -1 means infinity
+        
+        if ( _notListeningDelay > 0 )
+        {
+            _notListeningDelay--;
+            
+            if ( _notListeningDelay == 0 )
+            {
+                _isListening = true;
+                _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
+            }
+        }
+        else
+            if ( _listeningDelay >= 0 && _notListeningDelay != -1)
+            {
+                assert ( _isListening == true );
+                
+                _listeningDelay--;
+                
+                if ( _listeningDelay == 0 )
+                {
+                    _isListening = false;
+                    _notListeningDelay = -1; // agent will not be able to be active anymore
+                }
+            }
+    }
+
     stepEvolution();
     
     if ( _wm->isAlive() )
@@ -388,7 +419,7 @@ bool PrjMateSelectionController::storeGenome(std::vector<double> genome, int sen
 {
     std::map<int,int>::const_iterator it = _birthdateList.find(senderBirthdate);
 
-    if (  it != _birthdateList.end() && _birthdateList[senderId] == senderBirthdate ) // this exact agent's genome is already stored.
+    if ( !_isListening || ( it != _birthdateList.end() && _birthdateList[senderId] == senderBirthdate ) ) // this agent is not listening OR this exact agent's genome is already stored.
         return false;
     else
     {
@@ -596,10 +627,11 @@ void PrjMateSelectionController::loadNewGenome()
             _wm->setAlive(false); // inactive robot *must* import a genome from others (ie. no restart).
             _wm->setRobotLED_colorValues(0, 0, 255);
             
-            if ( PrjMateSelectionSharedData::gDeafState )
+            if ( PrjMateSelectionSharedData::gListeningState )
             {
                 _isListening = false;
-                // TODO!!!! il faut un compteur pour quitter le mode deafstate, et vérifier ailleurs le switch deaf=>listening=>deaf(-1).
+                _notListeningDelay = PrjMateSelectionSharedData::gNotListeningStateDelay;
+                _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
             }
         }
         

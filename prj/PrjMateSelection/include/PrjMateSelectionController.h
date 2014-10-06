@@ -28,6 +28,8 @@ class PrjMateSelectionController : public Controller
         int _birthdate; // evaluation when this controller was initialized.
     
         bool _isListening;
+        int _notListeningDelay;
+        int _listeningDelay;
     
         int _nbGenomeTransmission;
 

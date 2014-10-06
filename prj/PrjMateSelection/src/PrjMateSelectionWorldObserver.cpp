@@ -42,6 +42,10 @@ PrjMateSelectionWorldObserver::PrjMateSelectionWorldObserver( World* world ) : W
     gProperties.checkAndGetPropertyValue("gLimitGenomeTransmission",&PrjMateSelectionSharedData::gLimitGenomeTransmission,false);
     gProperties.checkAndGetPropertyValue("gSelectionMethod",&PrjMateSelectionSharedData::gSelectionMethod,false);
 
+    gProperties.checkAndGetPropertyValue("gListeningState",&PrjMateSelectionSharedData::gListeningState,false);
+    gProperties.checkAndGetPropertyValue("gNotListeningStateDelay",&PrjMateSelectionSharedData::gNotListeningStateDelay,false);
+    gProperties.checkAndGetPropertyValue("gListeningStateDelay",&PrjMateSelectionSharedData::gListeningStateDelay,false);
+
     
 	// ====
 

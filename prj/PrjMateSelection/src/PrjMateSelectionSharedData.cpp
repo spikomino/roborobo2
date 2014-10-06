@@ -36,7 +36,6 @@ int PrjMateSelectionSharedData::gMaxNbGenomeTransmission = 65535; // default: ar
 
 int PrjMateSelectionSharedData::gSelectionMethod = 0; // default: random selection
 
-bool PrjMateSelectionSharedData::gDeafState = false;
-int PrjMateSelectionSharedData::gDeafStateDelay = 0; // -1: infinite
-bool PrjMateSelectionSharedData::gListenState = true;
-int PrjMateSelectionSharedData::gListenStateDelay = -1;  // -1: infinite
+bool PrjMateSelectionSharedData::gListeningState = true;
+int PrjMateSelectionSharedData::gNotListeningStateDelay = 0; // -1: infinite
+int PrjMateSelectionSharedData::gListeningStateDelay = -1;  // -1: infinite

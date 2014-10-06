@@ -43,10 +43,9 @@ class PrjMateSelectionSharedData {
     
     static int gSelectionMethod; // check PrjMateSelectionController::loadNewGenome() for authorized values.
     
-    static bool gDeafState;
-    static int gDeafStateDelay; // -1: infinite
-    static bool gListenState;
-    static int gListenStateDelay;  // -1: infinite
+    static bool gListeningState;
+    static int gNotListeningStateDelay; // -1: infinite
+    static int gListeningStateDelay;  // -1: infinite
     
     // -----
     
