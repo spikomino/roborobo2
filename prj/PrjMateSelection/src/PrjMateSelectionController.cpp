@@ -75,36 +75,11 @@ void PrjMateSelectionController::step()
 {
 	_iteration++;
     
-    if (  PrjMateSelectionSharedData::gListeningState )
-    {
-        assert ( _notListeningDelay >= -1 ); // -1 means infinity
-        
-        if ( _notListeningDelay > 0 )
-        {
-            _notListeningDelay--;
-            
-            if ( _notListeningDelay == 0 )
-            {
-                _isListening = true;
-                _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
-            }
-        }
-        else
-            if ( _listeningDelay >= 0 && _notListeningDelay != -1)
-            {
-                assert ( _isListening == true );
-                
-                _listeningDelay--;
-                
-                if ( _listeningDelay == 0 )
-                {
-                    _isListening = false;
-                    _notListeningDelay = -1; // agent will not be able to be active anymore
-                }
-            }
-    }
-
+    // * step evolution
+    
     stepEvolution();
+    
+    // * step controller
     
     if ( _wm->isAlive() )
 	{
@@ -116,6 +91,48 @@ void PrjMateSelectionController::step()
         _wm->_desiredRotationalVelocity = 0.0;
     }
 
+    // * updating listening state
+    
+    if ( _wm->isAlive() == false )
+    {
+        assert ( _notListeningDelay >= -1 ); // -1 means infinity
+        
+        if ( _notListeningDelay > 0 )
+        {
+            _notListeningDelay--;
+            
+            if ( _notListeningDelay == 0 )
+            {
+                _isListening = true;
+                _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
+                _wm->setRobotLED_colorValues(0, 255, 0); // is listening
+            }
+        }
+        else
+            if ( _notListeningDelay != -1 && _listeningDelay > 0 )
+            {
+                assert ( _isListening == true );
+                
+                _listeningDelay--;
+                
+                if ( _listeningDelay == 0 )
+                {
+                    _isListening = false;
+                    _notListeningDelay = -1; // agent will not be able to be active anymore
+                    _wm->setRobotLED_colorValues(0, 0, 255); // is not listening
+                    
+                    // Logging
+                    std::string s = std::string("");
+                    s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] is indefinitely inactive (no genome + listen time out).\n";
+                    gLogManager->write(s);
+                    gLogManager->flush();
+                    
+                    resetRobot(); // destroy then create a new NN
+                    
+                    _wm->setAlive(false);
+                }
+            }
+    }
 }
 
 
@@ -580,7 +597,7 @@ void PrjMateSelectionController::broadcastGenome()
 
 void PrjMateSelectionController::loadNewGenome()
 {
-    if ( _wm->isAlive() || gEnergyRefill )
+    if ( _wm->isAlive() || gEnergyRefill )  // ( gEnergyRefill == true ) enables revive
     {
         // Logging
         std::string s = "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] [energy:" +  std::to_string(_wm->getEnergyLevel()) + "] [genomeList:" + std::to_string(_genomesList.size()) + "]\n";
@@ -614,24 +631,30 @@ void PrjMateSelectionController::loadNewGenome()
         }
         else
         {
-            // case: no imported genome - robot is set to inactive (which means: robot is put off-line (if gDeathState is true), then wait for new genome (if gListenState is true))
-            
-            // Logging
-            std::string s = std::string("");
-            s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] no_genome.\n";
-            gLogManager->write(s);
-            gLogManager->flush();
-            
-            resetRobot(); // destroy then create a new NN
-            
-            _wm->setAlive(false); // inactive robot *must* import a genome from others (ie. no restart).
-            _wm->setRobotLED_colorValues(0, 0, 255);
-            
-            if ( PrjMateSelectionSharedData::gListeningState )
+            // case: no imported genome and the robot is/was active - robot is set to inactive (which means: robot is put off-line (if gDeathState is true), then wait for new genome (if gListenState is true))
+
+            if ( _wm->isAlive() == true )
             {
-                _isListening = false;
-                _notListeningDelay = PrjMateSelectionSharedData::gNotListeningStateDelay;
-                _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
+                
+                // Logging
+                std::string s = std::string("");
+                s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] no_genome.\n";
+                gLogManager->write(s);
+                gLogManager->flush();
+                
+                resetRobot(); // destroy then create a new NN
+                
+                _wm->setAlive(false); // inactive robot *must* import a genome from others (ie. no restart).
+                
+                if ( PrjMateSelectionSharedData::gNotListeningStateDelay != 0 ) // ie. -1 (infinite) or >0 (temporary)
+                {
+                    _isListening = false;
+                    _notListeningDelay = PrjMateSelectionSharedData::gNotListeningStateDelay;
+                    _listeningDelay = PrjMateSelectionSharedData::gListeningStateDelay;
+                    _wm->setRobotLED_colorValues(0, 0, 255); // is not listening
+                }
+                else
+                    _wm->setRobotLED_colorValues(0, 255, 0); // is listening
             }
         }
         
