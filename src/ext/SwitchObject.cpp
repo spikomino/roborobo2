@@ -9,16 +9,20 @@
 SwitchObject::SwitchObject( int __id ) : CircleObject( __id ) // should only be called by PhysicalObjectFactory
 {
     setType(3);
-
-	std::string s = "";
-	std::stringstream out;
-	out << getId();
-
+    int defaultSendMessageTo = -1;
+    std::string s = "";
+    std::stringstream out;
+    out << getId();
+    
     s = "physicalObject[";
-	s += out.str();
-	s += "].sendMessageTo";
-	if ( gProperties.hasProperty( s ) )
-		convertFromString<int>(sendMessageTo, gProperties.getProperty( s ), std::dec);
+    s += out.str();
+    s += "].sendMessageTo";
+    if ( gProperties.hasProperty( s ) )
+      convertFromString<int>(sendMessageTo, gProperties.getProperty( s ), std::dec);
+    else if(defaultSendMessageTo == -1)
+      {
+	sendMessageTo = -1;
+      }
     else
     {
         std::cerr << "[CRITICAL] Physical object #" << _id << " (switch) missing sendMessageTo value (integer, >0).\n";

@@ -999,7 +999,7 @@ Genome *Genome::duplicate(int new_id) {
 
 	//Finally, return the genome
 	newgenome=new Genome(new_id,traits_dup,nodes_dup,genes_dup);
-	//	newgenome->previous_id = this->genome_id;
+
 	return newgenome;
 
 }
@@ -1530,17 +1530,17 @@ bool Genome::mutate_add_node(std::vector<Innovation*> &innovs,int &curnode_id,do
 		else ++theinnov;
 	}
 
-std::cout << "BEFORE ADDGENE" << std::endl;
+
 	//Now add the new NNode and new Genes to the Genome
 	//genes.push_back(newgene1);   //Old way to add genes- may result in genes becoming out of order
 	//genes.push_back(newgene2);
 	add_gene(genes,newgene1);  //Add genes in correct order
-	std::cout << "AFTER ADDGENE --- innovNum1:" << newgene1->innovation_num << std::endl;
+
 	add_gene(genes,newgene2);
-	std::cout << "AFTER ADDGENE --- innovNum2:" << newgene2->innovation_num << std::endl;
+
 
 	node_insert(nodes,newnode);
-std::cout << "AFTER NODEINSERT" << std::endl;
+
 
 	return true;
 
@@ -1985,9 +1985,8 @@ void Genome::add_gene(std::vector<Gene*> &glist,Gene *g) {
     //Con::printf("looking gene %f", (*curgene)->innovation_num);
   }
 
-  std::cout << "BEGIN ADDGENE" << std::endl;
   glist.insert(curgene,g);
-std::cout << "END ADDGENE" << std::endl;  
+
 }
 
 

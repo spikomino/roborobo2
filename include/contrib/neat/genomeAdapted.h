@@ -34,13 +34,15 @@ namespace NEAT
     int _mom;
     int _dad;
 
-
   public:
     
     GenomeAdapted(int num_in,int num_out,int num_hidden,int type);
-    int getIdTrace();
-    int getMom();
-    int getDad();
+    GenomeAdapted(const GenomeAdapted& genome);
+    GenomeAdapted(int id, std::vector<Trait*> t, std::vector<NNode*> n, std::vector<Gene*> g);
+    ~GenomeAdapted();
+    int getIdTrace() const;
+    int getMom() const;
+    int getDad() const;
     
     // Duplicate this Genome to create a new one with the specified id 
     GenomeAdapted* duplicate(int new_id, int idTr);//,int mom, int dad);

@@ -103,6 +103,7 @@ void TopEDOController::resetRobot()
 
  _genome->setIdTrace(_wm->getId());
  _genome->setMom(-1);
+ _genome->setDad(-1);
  _genome->genome_id = _wm->getId();
  
   _genome->mutate_link_weights(1.0,1.0,COLDGAUSSIAN);
@@ -125,13 +126,10 @@ void TopEDOController::resetRobot()
   _genomesList.clear();
   _fitnessList.clear();
   
-  /*_genomesList[0] = _genome;
-    _fitnessList[0] = -10000.0;*/
- 
 
   //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
     innovNum = (double) nn->linkcount();
-  nodeId = _nbInputs + _nbOutputs;
+  nodeId = 1 + _nbInputs + _nbOutputs;
 
   //std::cout << "NbIn: " << _nbInputs << " - NbOut: " << _nbOutputs << " - NbGenes: " << nn->linkcount() << std::endl ;
   
@@ -355,9 +353,9 @@ void TopEDOController::stepEvolution()
       /*if((gWorld->getIterations()/TopEDOSharedData::gEvaluationTime) > 200)
 	nn->drawNetGraphViz("logs/gen" + std::to_string((gWorld->getIterations()/TopEDOSharedData::gEvaluationTime))  + "r" + std::to_string(_wm->getId()) + ".dot");
       */
- std::cout << "BEFORE LOADGENOME"<< std::endl;  
+
 	  loadNewGenome();
-std::cout << "AFTER LOADGENOME"<< std::endl;  
+
 	}
 
   //}
@@ -563,7 +561,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
       mate_baby=false;
       
       outside=false;
-      int newId =_wm->getId() + 10000 * ((gWorld->getIterations() / TopEDOSharedData::gEvaluationTime )) ;
+      int newId =_wm->getId() + 10000 * ( 1 + (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime )) ;
       //Debug Trap
       if (expected_offspring > NEAT::pop_size) 
 	{
@@ -577,6 +575,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
       //mom=(*curorg).second;
       //NOTE: default NEAT method (randomly) replaced  by previous selection
       mom = _genome;
+
       //	  new_genome=(mom)->duplicate(count);
       //NOTE: set genome_id for new genome as mom's genome_id
       //new_genome=(mom)->duplicate(mom->genome_id);
@@ -584,7 +583,9 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 
       //NOTE: set genome_id for new genome as robot ID times generation
       //set the previous_id to mom's
-      new_genome=(mom)->duplicate(newId, newId);
+      //TOFIX: nextLine to be replaced by the following one (GenomeAdapt)
+      //new_genome=(GenomeAdapted*)(mom)->duplicate(count);
+      new_genome=(mom)->duplicate(count, newId);
       /************************************************/
       
 
@@ -622,12 +623,12 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 	      /*int node_id = 0;
 		double innov_num = 0.0;*/
 	      std::vector<Innovation*> innovations;
-std::cout << "BEFORE ADDNODE" << std::endl;
+
 	      if(new_genome->mutate_add_node(innovations,nodeId,innovNum))
 		{
 		  //std::cout << "Mutate add node " << nodeId - 1 << std::endl;
 		}
-std::cout << "AFTER ADDNODE" << std::endl;
+
 	      mut_struct_baby=true;
 	    }
 	  else if (randfloat()<NEAT::mutate_add_link_prob) 
@@ -933,7 +934,7 @@ std::cout << "AFTER ADDNODE" << std::endl;
        
        (genes[i]->lnk)->weight = value;
        }*/
-  std::cout << "END MUTATE" << std::endl;
+
     _currentGenome = _genome;
     createNN();
    
@@ -1069,9 +1070,9 @@ void TopEDOController::loadNewGenome()
       // std::cout << _currentSigma << std::endl;
       // std::cout << _currentFitness << std::endl;
       _genome = _currentGenome;
-std::cout << "BEFORE MUTATE" << std::endl;
+
       mutate(_currentSigma);
-std::cout << "AFTER MUTATE" << std::endl;
+
       _currentFitness = 0.0;
       setNewGenomeStatus(true);
       _birthdate = gWorld->getIterations();

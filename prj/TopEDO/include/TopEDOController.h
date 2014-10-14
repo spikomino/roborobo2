@@ -73,7 +73,8 @@ class TopEDOController : public Controller
         // evolutionary engine
         //std::vector<double> _genome; // todo: accessing
 	GenomeAdapted* _genome;
-        std::map<int, GenomeAdapted* > _genomesList;
+        
+	std::map<int, GenomeAdapted* > _genomesList;
         std::map<int, float > _sigmaList;
 	std::map<int, float > _fitnessList;
         std::map<int,int> _birthdateList; // store the birthdate of the received controllers (useful for monitoring).
