@@ -53,7 +53,7 @@ namespace NEAT {
 
 		friend class Network;
 		friend class Genome;
-
+		friend class GenomeAdapted;
 	protected:
 
 		int activation_count;  // keeps track of which activation the node is currently in

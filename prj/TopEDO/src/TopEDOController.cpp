@@ -585,7 +585,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
       //set the previous_id to mom's
       //TOFIX: nextLine to be replaced by the following one (GenomeAdapt)
       //new_genome=(GenomeAdapted*)(mom)->duplicate(count);
-      new_genome=(mom)->duplicate(count, newId);
+      new_genome=(mom)->duplicateAdapted(count, newId);
       /************************************************/
       
 
@@ -1044,10 +1044,7 @@ void TopEDOController::loadNewGenome()
       s += "\n";
       std::cout << s;*/
 
-      _genomesList.clear();
-      _fitnessList.clear();
-      _sigmaList.clear();
-      _birthdateList.clear();
+    
       
       //_genomesList[0] = _currentGenome;
       //_fitnessList[0] = _currentFitness;
@@ -1076,7 +1073,10 @@ void TopEDOController::loadNewGenome()
       _currentFitness = 0.0;
       setNewGenomeStatus(true);
       _birthdate = gWorld->getIterations();
-
+      _genomesList.clear();
+      _fitnessList.clear();
+      _sigmaList.clear();
+      _birthdateList.clear();
       /* s = std::string("");
       s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] new_genome: ";
       for(unsigned int i=0; i<_genome.size(); i++)

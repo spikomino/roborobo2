@@ -392,6 +392,7 @@ Genome::Genome(int num_in,int num_out,int num_hidden,int type) {
 	std::vector<NNode*>::iterator curnode2; //Node iterator2
 	std::vector<NNode*>::iterator curnode3; //Node iterator3
 
+
 	//For creating the new genes
 	NNode *newnode;
 	Gene *newgene;
@@ -1991,16 +1992,17 @@ void Genome::add_gene(std::vector<Gene*> &glist,Gene *g) {
 
 
 void Genome::node_insert(std::vector<NNode*> &nlist,NNode *n) {
-	std::vector<NNode*>::iterator curnode;
 
-	int id=n->node_id;
+
+    std::vector<NNode*>::iterator curnode;
+    int id=n->node_id;
 
 	curnode=nlist.begin();
-	while ((curnode!=nlist.end())&&
+    while ((curnode!=nlist.end())&&
 		(((*curnode)->node_id)<id)) 
-		++curnode;
+        ++curnode;
 
-	nlist.insert(curnode,n);
+    nlist.insert(curnode,n);
 
 }
 

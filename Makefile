@@ -1,7 +1,7 @@
 DEBUG = 1
 MODULES =  TopEDO
 CC           = g++ 
-CCFLAGS      = -Wall -O3 -std=c++0x
+CCFLAGS      = -Wall -std=c++0x -DNDEBUG
 LDFLAGS      = `sdl-config --cflags --libs`
 RM           = rm -f 
 MAKE         = make 
@@ -102,6 +102,4 @@ snapshot:
 	@echo =-=-=-=
 	@echo =-=-=-=
 	@echo =-=-=-=
-
-	
 
