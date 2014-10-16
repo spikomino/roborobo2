@@ -17,12 +17,6 @@
 
 #include <neat/genome.h>
 #include "neat/genomeAdapted.h"
-//#include <neat/gene.h>
-//#include <neat/network.h>
-//#include <neat/link.h>
-//#include <neat/nnode.h>
-//#include <neat/organism.h>
-
 
 using namespace Neural;
 using namespace NEAT;
@@ -54,10 +48,6 @@ TopEDOController::TopEDOController( RobotWorldModel *wm )
   
   _birthdate = 0;
   
-  _lastSwitch = -1;
-  
-  if ( gEnergyLevel )
-    _wm->setEnergyLevel(gEnergyInit);
   
   _wm->updateLandmarkSensor();
   
@@ -68,15 +58,13 @@ TopEDOController::TopEDOController( RobotWorldModel *wm )
 
 TopEDOController::~TopEDOController()
 {
-  delete _parameters;
+
   delete nn;
   nn = NULL;
 }
 
 void TopEDOController::reset()
 {
-  _parameters = NULL;
-  _parameters = _genome;
   _currentFitness = 0.0;
   _behavior.clear();
 }
@@ -107,7 +95,6 @@ void TopEDOController::resetRobot()
  
   _genome->mutate_link_weights(1.0,1.0,COLDGAUSSIAN);
   
-  _parameters = _genome;
 
   createNN();
 
@@ -120,7 +107,6 @@ void TopEDOController::resetRobot()
 
 
   
-  _currentGenome = _genome;
   setNewGenomeStatus(true);
   _genomesList.clear();
   _fitnessList.clear();
@@ -308,7 +294,7 @@ void TopEDOController::stepEvolution()
       std::cout << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << " "  << _wm->getId() << " " << _currentFitness << " " << _genome -> getIdTrace() << " " << _genome -> getMom() << std::endl;
       
       //Output for tracing genome lineage
-      //std::cout << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << " " << _currentGenome->previous_id << " " << _currentGenome->genome_id << " " << () << std::endl;
+      //std::cout << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << " " << _genome->previous_id << " " << _genome->genome_id << " " << () << std::endl;
       
       //Log .dot file for NN drawing
       /*if((gWorld->getIterations()/TopEDOSharedData::gEvaluationTime) > 200)
@@ -356,8 +342,8 @@ double TopEDOController::dist(std::vector<std::pair< std::vector<double>, std::v
 {
   if(b1.size() != b2.size())
     {
-      //std::cout << "[ERROR] Behaviors of different sizes: b1 (" << b1.size() << "), b2 (" << b2.size() << ")"<< std::endl;
-      //exit(-1);
+      std::cout << "[ERROR] Behaviors of different sizes: b1 (" << b1.size() << "), b2 (" << b2.size() << ")"<< std::endl;
+      exit(-1);
     }
   double res = 0.0;
   double aux = 0.0;
@@ -393,7 +379,7 @@ void TopEDOController::selectRandomGenome()
 	  randomIndex --;
         }
       
-      _currentGenome = (*it).second;
+      _genome = (*it).second;
       
       mutate(_sigmaList[(*it).first]);
       
@@ -443,35 +429,8 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
   GenomeAdapted *baby;  //The new Organism
   
   GenomeAdapted *new_genome;  //For holding baby's genes
-
-
-  
-  //std::vector<Species*>::iterator curspecies;  //For adding baby
-  //Species *newspecies; //For babies in new Species
-  //Genome *comporg;  //For Species determination through comparison
-  
-  //Species *randspecies;  //For mating outside the Species
-  //double randmult;
-  //int randspeciesnum;
-  //int spcount;  
-  //std::vector<Species*>::iterator cursp;
   
   Network *net_analogue;  //For adding link to test for recurrency
-  //int pause;
-  
-  bool outside;
-  
-  //bool found;  //When a Species is found
-  
-  //bool champ_done=false; //Flag the preservation of the champion  
-  
-  //Genome *thechamp;
-  
-  //int giveup; //For giving up finding a mate outside the species
-  
-  //bool mut_struct_baby;
-  //bool mate_baby;
-
 
   
   NEAT::weight_mut_power = 1.0;
@@ -489,11 +448,6 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
   //since each robot can have one offspring (at most, i.e. if it does not die)
   int expected_offspring = 1;
 
-  /*if ((expected_offspring > 0) && (_genomesList.size() == 0)) 
-    {
-      std::cerr << "[ERROR]  ATTEMPT TO REPRODUCE OUT OF EMPTY SPECIES" << std::endl;
-      exit(-1);
-      }*/
   
   poolsize=_genomesList.size()-1;
 
@@ -503,10 +457,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
   //one at a time
   for (count=0; count < expected_offspring ;count++) 
     {
-      //mut_struct_baby=false;
-      //mate_baby=false;
-      
-      outside=false;
+
       int newId =_wm->getId() + 10000 * ( 1 + (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime )) ;
 
       //Debug Trap
@@ -517,25 +468,15 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 	}
       
       /************************************************/
-      //NOTE: this used to be further in the class. Used here to trace ALL genomes 
-      //in the evolution
-
       //NOTE: default NEAT method (randomly) replaced  by previous selection (best)
       mom = _genome;
 
-      //NOTE: set genome_id for new genome as mom's genome_id
-      
-      //NOTE: set genome_id for new genome as robot ID times generation
-      //set the previous_id to mom's
-      //TOFIX: nextLine to be replaced by the following one (GenomeAdapt)
       new_genome=(mom)->duplicate(count, newId);
       
       /************************************************/
       
 
-      //NOTE: super_champ functionality erased
-      
-      //NOTE: champ functionality erased
+
 
       //First, decide whether to mate or mutate
       //If there is only one organism in the pool, then always mutate
@@ -550,19 +491,12 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 	  
 	  ////NOTE: (commented) Roulette Wheel functionality erased
 	  
-	  /*******************************************************/
-	  //PREVIOUS "mom" code used to be here
-	  /*******************************************************/
-
-	  //Do the mutation depending on probabilities of various mutations
-	  
+	  //Do the mutation depending on probabilities of various mutations  
 	  if (randfloat()<NEAT::mutate_add_node_prob) 
 	    {
 	      
-	      //NOTE: pop->innovations deleted. pop->cur_node_id deleted
-	      //pop->cur_innov_num deleted
-	      //Bogus variables used instead
-	      //08/10/14  Bogus variables deactivated, perRobot innovNum and 
+	      //08/10/14  Bogus variables for innovations deactivated 
+	      //perRobot innovNum and 
 	      //nodeId used instead
 	     
 	      std::vector<Innovation*> innovations;
@@ -571,8 +505,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 		{
 		  //std::cout << "Mutate add node " << nodeId - 1 << std::endl;
 		}
-
-	      //mut_struct_baby=true;
+	      
 	    }
 	  else if (randfloat()<NEAT::mutate_add_link_prob) 
 	    {	     
@@ -580,20 +513,17 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 	      int generation = 0; 
 	      //No further repercusion of this parameter
 	      net_analogue=new_genome->genesis(generation);
-	      //NOTE: pop->innovations deleted
-	      //pop->cur_innov_num deleted
-	      //Bogus variables used instead
-	      //double innov_num;
+
 	      std::vector<Innovation*> innovations;
 	      if(new_genome->mutate_add_link(innovations,innovNum,NEAT::newlink_tries))
 		{
 		  //std::cout << "Mutate add link" << std::endl;
 		}
 	      delete net_analogue;
-	      //mut_struct_baby=true;
+
 	    }
-	  //NOTE:  A link CANNOT be added directly after a node was added because the phenotype
-	  //       will not be appropriately altered to reflect the change
+	  //NOTE:links CANNOT be added directly after a node  because the phenotype
+	  // will not be appropriately altered to reflect the change
 	  else 
 	    {
 	      //If we didn't do a structural mutation, we do the other kinds
@@ -837,19 +767,9 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
     }//end for expected_offspring
 
 
-  /*    _currentSigma = sigma;
-    
-    //NOTE: when _currentSigma is passed to mutate_link_weights, it does not 
-    //represent the variance of gaussian mutation, but the amplitude of
-    //a uniform distribution (-_currentSigma/2, +_currentSigma/2)
-    _genome->mutate_link_weights(_currentSigma, 1.0,GAUSSIAN);*/
-    
-
-
-
     //ERASED Old Mutation method (mEDEA)
   
-    _currentGenome = _genome;
+
     createNN();
    
     // Logging
@@ -912,7 +832,7 @@ void TopEDOController::broadcastGenome()
                 
 		// other agent stores my genome.
 		
-                targetRobotController->storeGenome(_currentGenome, _wm->getId(), _birthdate, sigmaSendValue, _currentFitness);
+                targetRobotController->storeGenome(_genome, _wm->getId(), _birthdate, sigmaSendValue, _currentFitness);
 		
             }
         }
@@ -926,7 +846,7 @@ void TopEDOController::loadNewGenome()
   gLogManager->write(s);
   gLogManager->flush();
   
-  _genomesList[_wm->getId()] = _currentGenome;
+  _genomesList[_wm->getId()] = _genome;
   _fitnessList[_wm->getId()] = _currentFitness;
   _sigmaList[_wm->getId()] = _currentSigma;
   _birthdateList[_wm->getId()] = _birthdate;
@@ -937,12 +857,11 @@ void TopEDOController::loadNewGenome()
       {
 	
 	selected = selectBest(_fitnessList);
-	_currentGenome = _genomesList[selected];
+	_genome = _genomesList[selected];
 	_currentFitness = _fitnessList[selected];
 
 	//ERASED Adaptation of sigma in mEDEA 
 
-      _genome = _currentGenome;
 
       mutate(_currentSigma);
 
