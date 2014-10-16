@@ -63,8 +63,7 @@ TopEDOController::TopEDOController( RobotWorldModel *wm )
   
   _wm->setAlive(true);
   _wm->setRobotLED_colorValues(255, 0, 0);
-  //
-  //_behavior =(* new std::vector<std::pair<std::vector<double>,std::vector<double>>>(0));
+ 
 }
 
 TopEDOController::~TopEDOController()
@@ -114,7 +113,7 @@ void TopEDOController::resetRobot()
 
 
 
-  std::string filename = "logs/net" + std::to_string(gWorld->getIterations()) + ".dot";
+  std::string filename = "logs/net" + std::to_string(gWorld->getIterations()) + "-" + std::to_string(_wm -> getId()) + ".dot";
   nn->drawNetGraphViz(filename);  
   if ( gVerbose )
     std::cout << std::flush ;
@@ -128,7 +127,7 @@ void TopEDOController::resetRobot()
   
 
   //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    innovNum = (double) nn->linkcount();
+  innovNum = (double) nn->linkcount();
   nodeId = 1 + _nbInputs + _nbOutputs;
 
   //std::cout << "NbIn: " << _nbInputs << " - NbOut: " << _nbOutputs << " - NbGenes: " << nn->linkcount() << std::endl ;
@@ -206,7 +205,6 @@ void TopEDOController::stepBehaviour()
     
     // ---- compute and read out ----
     
-    //nn->setWeigths(_parameters); // create NN
     
   nn->load_sensors((&(*inputs)[0]));
         
@@ -230,7 +228,9 @@ void TopEDOController::stepBehaviour()
     _wm->_desiredRotationalVelocity = _wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
     
     _currentFitness += updateFitness(*inputs,outputs);
+
     // storeBehavior(*inputs,outputs);
+
     delete (inputs);
 }
 void TopEDOController::storeBehavior(std::vector<double> in,std::vector<double> out)
@@ -249,51 +249,9 @@ float TopEDOController::updateFitness(std::vector<double> in,std::vector<double>
   if ( PhysicalObject::isInstanceOf(targetIndex) ) 
     {
       deltaFit += 1.0;
-      //targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
-      //_lastSwitch = targetIndex;
     }
     
-  /* double red = in[13];
-  double green = in[14];
-  double blue = in[15];
-  if((green >= 1.0) && (red < 1.0) && (blue < 1.0) )
-    deltaFit = 100;
-  else
-  deltaFit = green - (red + blue)/2;*/
   return deltaFit;
-  /*
-  int targetIndex = _wm->getGroundSensorValue();
-  if(_wm -> getXReal() > 800)
-    {
-      deltaFit += 100 * out[0]*out[1];
-      return deltaFit;
-    }
-  else
-  if ( PhysicalObject::isInstanceOf(targetIndex) ) 
-    {
-      deltaFit += 10;
-      return deltaFit;
-    }
-  else 
-    {
-      deltaFit += 1 - (dist(_wm -> getXReal() / ((float) gScreenWidth), _wm -> getYReal() / ((float) gScreenHeight), 800.0 / ((float) gScreenWidth), 750.0 / ((float) gScreenHeight)))/sqrt(2);
-      //std::cout << 1 - deltaFit << std::endl;
-      return deltaFit/100;
-      }
-
-
-  if(_wm -> getXReal() > 800)
-    deltaFit += 2;
-  else
-    deltaFit += 1 
-                - (dist(
-			_wm -> getXReal() / ((float) gScreenWidth), _wm -> getYReal() / ((float) gScreenHeight), 
-			800.0 / ((float) gScreenWidth), 750.0 / ((float) gScreenHeight)))/sqrt(2);
-  
-  // std::cout << "Width: " << gScreenWidth << " - Height: " << gScreenHeight << std::endl;
-  // std::cout << "Position: (" << _wm -> getXReal() << " , " << _wm -> getYReal() << ")" << std::endl << "DistToDoor: " << dist(_wm -> getXReal() / ((float) gScreenWidth), _wm -> getYReal() / ((float) gScreenHeight), 800.0 / ((float) gScreenWidth), 750.0 / ((float) gScreenHeight)) << std::endl;
-  // std::cout << 1 - deltaFit << std::endl;
-  return deltaFit;*/
 }
 
 float TopEDOController::dist(float x1, float y1, float x2, float y2)
@@ -336,10 +294,10 @@ unsigned int TopEDOController::computeRequiredNumberOfWeights()
 
 void TopEDOController::stepEvolution()
 {
-  // * broadcasting genome : robot broadcasts its genome to all neighbors (contact-based wrt proximity sensors)
+  // broadcasting genome : robot broadcasts its genome to all neighbors (contact-based wrt proximity sensors)
   if  ( gRadioNetwork )
     {
-    broadcastGenome();
+      broadcastGenome();
     }
   
   // * lifetime ended: replace genome (if possible)
@@ -347,18 +305,20 @@ void TopEDOController::stepEvolution()
     {
      
       //GENERATION ID-ROBOT FITNESS
-      std::cout << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << " "  << _wm->getId() << " " << _currentFitness  << std::endl;
+      std::cout << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << " "  << _wm->getId() << " " << _currentFitness << " " << _genome -> getIdTrace() << " " << _genome -> getMom() << std::endl;
+      
       //Output for tracing genome lineage
       //std::cout << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << " " << _currentGenome->previous_id << " " << _currentGenome->genome_id << " " << () << std::endl;
+      
+      //Log .dot file for NN drawing
       /*if((gWorld->getIterations()/TopEDOSharedData::gEvaluationTime) > 200)
 	nn->drawNetGraphViz("logs/gen" + std::to_string((gWorld->getIterations()/TopEDOSharedData::gEvaluationTime))  + "r" + std::to_string(_wm->getId()) + ".dot");
       */
+      
+      loadNewGenome();
+      
+    }
 
-	  loadNewGenome();
-
-	}
-
-  //}
   
   if ( getNewGenomeStatus() ) // check for new NN parameters
     {
@@ -389,10 +349,7 @@ void TopEDOController::feedBehaviorBase(std::vector<std::pair< std::vector<doubl
       _behBase[i] = b;
       _behBaseCounter[i] = 1;
     }
-   //_currentFitness = minDist;
-   //std::cout << "Novelty: " << _currentFitness << std::endl;
 
-   // std::cout << "Size of the behavior base: " << _behBase.size() << std::endl;
 }
 
 double TopEDOController::dist(std::vector<std::pair< std::vector<double>, std::vector<double> > > b1, std::vector<std::pair< std::vector<double>, std::vector<double> > > b2)
@@ -420,7 +377,6 @@ double TopEDOController::dist(std::vector<std::pair< std::vector<double>, std::v
      res += sqrt(aux);
     }
 
-  // std::cout << "Distance between behaviors: " << res << std::endl;
 
   return res;
 }
@@ -466,21 +422,15 @@ void TopEDOController::storeGenome( GenomeAdapted* genome, int senderId, int sen
   _birthdateList[senderId] = senderBirthdate;
   _fitnessList[senderId] = fitness;
   
-
-  // std::cout << "Population size: " << _genomesList.size() << " ----- Fitness size: " << _fitnessList.size() << "\nBirthdate size: " << _birthdateList.size() << " ----- Sigma size: " << _sigmaList.size()  << std::endl;
 }
 
 
 void TopEDOController::mutate( float sigma) // mutate within bounds.
 {
 
-  //_genome.clear();
-
-  //std::cout << "\"Population size\": " << _genomesList.size() << std::endl;
   //TODO: NEAT mutations
 
-  /*
-    bool Species::reproduce(int generation, Population *pop,std::vector<Species*> &sorted_species) {*/
+
   int count;
   std::map<int,GenomeAdapted*>::iterator curorg;
   
@@ -519,8 +469,8 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
   
   //int giveup; //For giving up finding a mate outside the species
   
-  bool mut_struct_baby;
-  bool mate_baby;
+  //bool mut_struct_baby;
+  //bool mate_baby;
 
 
   
@@ -545,11 +495,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
       exit(-1);
       }*/
   
-  //poolsize=organisms.size()-1;
   poolsize=_genomesList.size()-1;
-
-  //TOCHECK: genomesList has to be sorted
-  //thechamp=(*(_genomesList.begin())).second;
 
   expected_offspring = 1;
 
@@ -557,35 +503,33 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
   //one at a time
   for (count=0; count < expected_offspring ;count++) 
     {
-      mut_struct_baby=false;
-      mate_baby=false;
+      //mut_struct_baby=false;
+      //mate_baby=false;
       
       outside=false;
       int newId =_wm->getId() + 10000 * ( 1 + (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime )) ;
+
       //Debug Trap
       if (expected_offspring > NEAT::pop_size) 
 	{
-	std::cerr << "[ERROR] EXPECTED OFFSPRING = " << expected_offspring << " BIGGER THAN POPULATION = " << NEAT::pop_size << std::endl;
-	exit(-1);
-      }
+	  std::cerr << "[ERROR] EXPECTED OFFSPRING = " << expected_offspring << " BIGGER THAN POPULATION = " << NEAT::pop_size << std::endl;
+	  exit(-1);
+	}
       
       /************************************************/
       //NOTE: this used to be further in the class. Used here to trace ALL genomes 
       //in the evolution
-      //mom=(*curorg).second;
-      //NOTE: default NEAT method (randomly) replaced  by previous selection
+
+      //NOTE: default NEAT method (randomly) replaced  by previous selection (best)
       mom = _genome;
 
-      //	  new_genome=(mom)->duplicate(count);
       //NOTE: set genome_id for new genome as mom's genome_id
-      //new_genome=(mom)->duplicate(mom->genome_id);
-
-
+      
       //NOTE: set genome_id for new genome as robot ID times generation
       //set the previous_id to mom's
       //TOFIX: nextLine to be replaced by the following one (GenomeAdapt)
-      //new_genome=(GenomeAdapted*)(mom)->duplicate(count);
       new_genome=(mom)->duplicateAdapted(count, newId);
+      
       /************************************************/
       
 
@@ -620,8 +564,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 	      //Bogus variables used instead
 	      //08/10/14  Bogus variables deactivated, perRobot innovNum and 
 	      //nodeId used instead
-	      /*int node_id = 0;
-		double innov_num = 0.0;*/
+	     
 	      std::vector<Innovation*> innovations;
 
 	      if(new_genome->mutate_add_node(innovations,nodeId,innovNum))
@@ -687,7 +630,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 		}
 	    }
 	  
-	  baby =  new_genome;//=new Organism(0.0,new_genome,generation);
+	  baby =  new_genome;
 	  _genome = baby; 
 	}
  
@@ -904,37 +847,8 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 
 
 
-    //Old Mutation method (mEDEA)
-    /* std::vector<Gene*> genes = _genome->genes;
-       
-       for (unsigned int i = 0 ; i != genes.size() ; i++ )
-       {
-       double value = (genes[i]->lnk)->weight + getGaussianRand(0,_currentSigma);
-       // bouncing upper/lower bounds
-       if ( value < _minValue )
-       {
-       double range = _maxValue - _minValue;
-       double overflow = - ( (double)value - _minValue );
-       overflow = overflow - 2*range * (int)( overflow / (2*range) );
-       if ( overflow < range )
-       value = _minValue + overflow;
-       else // overflow btw range and range*2
-       value = _minValue + range - (overflow-range);
-       }
-       else if ( value > _maxValue )
-       {
-       double range = _maxValue - _minValue;
-       double overflow = (double)value - _maxValue;
-       overflow = overflow - 2*range * (int)( overflow / (2*range) );
-       if ( overflow < range )
-       value = _maxValue - overflow;
-       else // overflow btw range and range*2
-       value = _maxValue - range + (overflow-range);
-       }
-       
-       (genes[i]->lnk)->weight = value;
-       }*/
-
+    //ERASED Old Mutation method (mEDEA)
+  
     _currentGenome = _genome;
     createNN();
    
@@ -997,7 +911,7 @@ void TopEDOController::broadcastGenome()
                 }
                 
 		// other agent stores my genome.
-		//TODO add sending fitness
+		
                 targetRobotController->storeGenome(_currentGenome, _wm->getId(), _birthdate, sigmaSendValue, _currentFitness);
 		
             }
@@ -1012,11 +926,6 @@ void TopEDOController::loadNewGenome()
   gLogManager->write(s);
   gLogManager->flush();
   
-  //_genomesList.clear();
-  //_genomesList[0] = _currentGenome;
-  //_fitnessList[0] = _currentFitness;
-  //  _genomesList[1] = _currentGenome;
-  //  _fitnessList[1] = _currentFitness;
   _genomesList[_wm->getId()] = _currentGenome;
   _fitnessList[_wm->getId()] = _currentFitness;
   _sigmaList[_wm->getId()] = _currentSigma;
@@ -1027,45 +936,12 @@ void TopEDOController::loadNewGenome()
     if (_genomesList.size() > 0)
       {
 	
-	//	std::cout << "Champion: " << 0 << " - Fitness: " << _fitnessList[0]  << std::endl;
-	//std::cout << "Challenger: " << 1 << " - Fitness: " << _fitnessList[1]  << std::endl;
-	
-	
 	selected = selectBest(_fitnessList);
 	_currentGenome = _genomesList[selected];
 	_currentFitness = _fitnessList[selected];
 
-	/*s = std::string("");
-      s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] new_genome: ";
-      for(unsigned int i=0; i<_genome.size(); i++)
-	{
-	  s += std::to_string(_genome[i]) + " ";	
-	}
-      s += "\n";
-      std::cout << s;*/
+	//ERASED Adaptation of sigma in mEDEA 
 
-    
-      
-      //_genomesList[0] = _currentGenome;
-      //_fitnessList[0] = _currentFitness;
- 
-      /*if(selected == 0)
-	{
-	  _currentSigma = std::min((double)_currentSigma * 2, TopEDOSharedData::gSigmaMax);
-	}
-      else 
-	if(selected == 1)
-	{
-	  _currentSigma = TopEDOSharedData::gSigmaMin;
-	}
-	else //DEBUG
-	  {
-	    std::cout << "[ERROR] (1 + 1)- Online - ES. (Only a parent and an offspring). Selected number " << selected << std::endl;
-	    exit(-1);
-	  }
-      */
-      // std::cout << _currentSigma << std::endl;
-      // std::cout << _currentFitness << std::endl;
       _genome = _currentGenome;
 
       mutate(_currentSigma);
@@ -1077,20 +953,9 @@ void TopEDOController::loadNewGenome()
       _fitnessList.clear();
       _sigmaList.clear();
       _birthdateList.clear();
-      /* s = std::string("");
-      s += "{" + std::to_string(gWorld->getIterations()) + "} [" + std::to_string(_wm->getId()) + "::" + std::to_string(_birthdate) + "] new_genome: ";
-      for(unsigned int i=0; i<_genome.size(); i++)
-	{
-	  s += std::to_string(_genome[i]) + " ";	
-	}
-      s += "\n";
 
-      std::cout << s;*/
 
       //  _wm->setRobotLED_colorValues(rand()%255, 0, 0);
-	//std::string filename = "logs/net" + std::to_string(gWorld->getIterations()) + ".dot";
-	//std::string filename = "logs/net" + std::to_string(_wm->getId()) + "-" + std::to_string(gWorld->getIterations()) + ".dot";
-	//nn->drawNetGraphViz(filename);  	  
     }
   
   // log the genome
