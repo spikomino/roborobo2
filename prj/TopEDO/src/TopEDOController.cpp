@@ -100,8 +100,8 @@ void TopEDOController::resetRobot()
 
 
 
-  std::string filename = "logs/net" + std::to_string(gWorld->getIterations()) + "-" + std::to_string(_wm -> getId()) + ".dot";
-  nn->drawNetGraphViz(filename);  
+  //std::string filename = "logs/net" + std::to_string(gWorld->getIterations()) + "-" + std::to_string(_wm -> getId()) + ".dot";
+  //nn->drawNetGraphViz(filename);  
   if ( gVerbose )
     std::cout << std::flush ;
 
