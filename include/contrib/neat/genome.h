@@ -89,7 +89,7 @@ namespace NEAT {
 		static Genome *new_Genome_load(char *filename);
 
 		//Destructor kills off all lists (including the trait vector)
-		virtual ~Genome();
+		 ~Genome();
 
 		//Generate a network phenotype from this Genome with specified id
 		Network *genesis(int);
@@ -102,7 +102,7 @@ namespace NEAT {
 		void print_to_filename(char *filename);
 
 		// Duplicate this Genome to create a new one with the specified id 
-		virtual Genome *duplicate(int new_id);
+		 Genome *duplicate(int new_id);
 
 		// For debugging: A number of tests can be run on a genome to check its
 		// integrity

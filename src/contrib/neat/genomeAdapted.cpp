@@ -41,8 +41,10 @@ int GenomeAdapted::getDad() const
 {
   return _dad;
 }
-    
-Genome *GenomeAdapted::duplicate(int new_id)
+ 
+// Duplicate this Genome to create a new one with the specified id 
+// and give mom id value
+GenomeAdapted *GenomeAdapted::duplicate(int new_id, int idTr )
 {
 	//Collections for the new Genome
 	std::vector<Trait*> traits_dup;
@@ -116,28 +118,13 @@ Genome *GenomeAdapted::duplicate(int new_id)
 
 	//Finally, return the genome
 	newgenome=new GenomeAdapted(new_id,traits_dup,nodes_dup,genes_dup);
-
-
-
+	newgenome -> setIdTrace(idTr);
+	newgenome -> setMom(this -> getIdTrace());
+	newgenome -> setDad(-1);  
+		
 	return newgenome;
- 
 }
-// Duplicate this Genome to create a new one with the specified id 
-// and give mom id value
-GenomeAdapted *GenomeAdapted::duplicateAdapted(int new_id, int idTr)
-{
-  
-  GenomeAdapted* result = (GenomeAdapted*) duplicate(new_id);
-  
-  
-  result -> setIdTrace(idTr);
-  result -> setMom(this -> getIdTrace());
-  result -> setDad(-1);  
-    
-  return result;
-  
 
-}
 
 void GenomeAdapted::setIdTrace(int id)
 {

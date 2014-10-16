@@ -528,7 +528,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
       //NOTE: set genome_id for new genome as robot ID times generation
       //set the previous_id to mom's
       //TOFIX: nextLine to be replaced by the following one (GenomeAdapt)
-      new_genome=(mom)->duplicateAdapted(count, newId);
+      new_genome=(mom)->duplicate(count, newId);
       
       /************************************************/
       
@@ -572,7 +572,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 		  //std::cout << "Mutate add node " << nodeId - 1 << std::endl;
 		}
 
-	      mut_struct_baby=true;
+	      //mut_struct_baby=true;
 	    }
 	  else if (randfloat()<NEAT::mutate_add_link_prob) 
 	    {	     
@@ -590,7 +590,7 @@ void TopEDOController::mutate( float sigma) // mutate within bounds.
 		  //std::cout << "Mutate add link" << std::endl;
 		}
 	      delete net_analogue;
-	      mut_struct_baby=true;
+	      //mut_struct_baby=true;
 	    }
 	  //NOTE:  A link CANNOT be added directly after a node was added because the phenotype
 	  //       will not be appropriately altered to reflect the change

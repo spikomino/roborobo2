@@ -45,8 +45,7 @@ namespace NEAT
     int getDad() const;
     
     // Duplicate this Genome to create a new one with the specified id 
-    virtual Genome* duplicate(int new_id);
-    GenomeAdapted* duplicateAdapted(int new_id, int idTr);
+    GenomeAdapted* duplicate(int new_id, int idTr);
 
     void setIdTrace(int id);
     void setMom(int idMom);
