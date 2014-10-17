@@ -574,7 +574,11 @@ TopEDOController::loadNewGenome ()
   s += "\n";
   gLogManager->write (s);
   gLogManager->flush ();
-
+  /*  std::string filename = "logs/genomes/";
+  filename += std::to_string(_genome -> getIdTrace());
+  char* fName = NULL;
+  strcpy(fName,filename.c_str());
+  _genome -> print_to_filename(fName);*/
 }
 
 int
