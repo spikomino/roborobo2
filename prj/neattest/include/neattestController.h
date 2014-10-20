@@ -3,15 +3,15 @@
  *
  */
 
-#ifndef TOPEDOCONTROLLER_H
-#define TOPEDOCONTROLLER_H
+#ifndef NEATTESTCONTROLLER_H
+#define NEATTESTCONTROLLER_H
 
 #include "RoboroboMain/common.h"
 #include "RoboroboMain/roborobo.h"
 #include "Utilities/Graphics.h"
 #include "Controllers/Controller.h"
 #include "WorldModels/RobotWorldModel.h"
-#include "TopEDO/include/TopEDOAgentObserver.h"
+#include "neattest/include/neattestAgentObserver.h"
 #include <neuralnetworks/NeuralNetwork.h>
 #include <neat/gene.h>
 #include <neat/genome.h>
@@ -22,7 +22,7 @@
 using namespace Neural;
 using namespace NEAT;
 
-class TopEDOController:public Controller
+class neattestController:public Controller
 {
 private:
   int _iteration;
@@ -88,8 +88,8 @@ private:
 
 public:
 
-  TopEDOController (RobotWorldModel * wm);
-  ~TopEDOController ();
+  neattestController (RobotWorldModel * wm);
+  ~neattestController ();
 
   void reset ();
   void step ();

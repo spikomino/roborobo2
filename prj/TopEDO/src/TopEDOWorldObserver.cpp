@@ -14,44 +14,32 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
 {
     _world = world;
 
-	// ==== loading project-specific properties
 
-	gProperties.checkAndGetPropertyValue("gSigmaRef",&TopEDOSharedData::gSigmaRef,true);
-	gProperties.checkAndGetPropertyValue("gSigmaMin",&TopEDOSharedData::gSigmaMin,true);
-	gProperties.checkAndGetPropertyValue("gSigmaMax",&TopEDOSharedData::gSigmaMax,true);
-
-	gProperties.checkAndGetPropertyValue("gProbaMutation",&TopEDOSharedData::gProbaMutation,true);
-	gProperties.checkAndGetPropertyValue("gUpdateSigmaStep",&TopEDOSharedData::gUpdateSigmaStep,true);
-	gProperties.checkAndGetPropertyValue("gEvaluationTime",&TopEDOSharedData::gEvaluationTime,true);
-	gProperties.checkAndGetPropertyValue("gSynchronization",&TopEDOSharedData::gSynchronization,true);
-
-    gProperties.checkAndGetPropertyValue("gEnergyRequestOutput",&TopEDOSharedData::gEnergyRequestOutput,false);
-    
-	gProperties.checkAndGetPropertyValue("gMonitorPositions",&TopEDOSharedData::gMonitorPositions,true);
-
-    gProperties.checkAndGetPropertyValue("gNbHiddenLayers",&TopEDOSharedData::gNbHiddenLayers,true);
-	gProperties.checkAndGetPropertyValue("gNbNeuronsPerHiddenLayer",&TopEDOSharedData::gNbNeuronsPerHiddenLayer,true);
-	gProperties.checkAndGetPropertyValue("gNeuronWeightRange",&TopEDOSharedData::gNeuronWeightRange,true);
-    
-	gProperties.checkAndGetPropertyValue("gSnapshots",&TopEDOSharedData::gSnapshots,false);
-	gProperties.checkAndGetPropertyValue("gSnapshotsFrequency",&TopEDOSharedData::gSnapshotsFrequency,false);
+    gProperties.checkAndGetPropertyValue("gEvaluationTime",&TopEDOSharedData::gEvaluationTime,true);
+    gProperties.checkAndGetPropertyValue("gGenomeLogFolder",&TopEDOSharedData::gGenomeLogFolder,true);
+    gProperties.checkAndGetPropertyValue("gEvolutionLogFile",&TopEDOSharedData::gEvolutionLogFile,true);
 
     gProperties.checkAndGetPropertyValue("gControllerType",&TopEDOSharedData::gControllerType,false);
 
+    TopEDOSharedData::gEvoLog.open(TopEDOSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
+    if(!TopEDOSharedData::gEvoLog)
+      {
+	std::cerr << "[ERROR] Could not open log file " << TopEDOSharedData::gEvolutionLogFile << std::endl;
+	exit(-1);
+      }
+    // ====
+
+    if ( !gRadioNetwork)
+      {
+	std::cout << "Error : gRadioNetwork must be true." << std::endl;
+	exit(-1);
+      }
     
-	// ====
-
-	if ( !gRadioNetwork)
-	{
-		std::cout << "Error : gRadioNetwork must be true." << std::endl;
-		exit(-1);
-	}
-
-	// * iteration and generation counters
-
-	_lifeIterationCount = -1;
-	_generationCount = -1;
-
+    // * iteration and generation counters
+    
+    _lifeIterationCount = -1;
+    _generationCount = -1;
+    
 }
 
 TopEDOWorldObserver::~TopEDOWorldObserver()
@@ -156,6 +144,9 @@ void TopEDOWorldObserver::updateMonitoring()
         }
     }
     */
-    
+    if ( gWorld->getIterations() == gMaxIt-1 )
+      {
+	TopEDOSharedData::gEvoLog.close();
+      } 
 }
 

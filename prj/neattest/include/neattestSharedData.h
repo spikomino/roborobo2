@@ -5,19 +5,16 @@
 
 
 
-#ifndef TOPEDOSHAREDDATA_H
-#define TOPEDOSHAREDDATA_H
+#ifndef NEATTESTSHAREDDATA_H
+#define NEATTESTSHAREDDATA_H
 #include <string>
-#include <fstream>
 
-class TopEDOSharedData {
+class neattestSharedData {
 	
  public: 
   
   // -----
   static std::string gGenomeLogFolder;
-  static std::string gEvolutionLogFile;
-  static std::ofstream gEvoLog;
   
   static double gSigmaMin; //! used with gDynamicSigma defined to true
   static double gUpdateSigmaStep; //!step used in the drecrease or increas of the value of sigma

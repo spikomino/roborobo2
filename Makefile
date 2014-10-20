@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 MODULES = BasicProject DemoMedea TopEDO
+=======
+DEBUG = 1
+MODULES =  neattest
+>>>>>>> 19dbbe03fafa9c579bc47fc9586b795584f2e5c7
 CC           = g++ 
 CCFLAGS      = -Wall -O3 -std=c++0x -D__unix__ -I/opt/local/include
 LDFLAGS      = `sdl-config  --libs`

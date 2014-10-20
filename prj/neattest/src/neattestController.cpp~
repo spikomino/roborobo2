@@ -3,8 +3,8 @@
  * 
  */
 
-#include "TopEDO/include/TopEDOController.h"
-#include "TopEDO/include/TopEDOWorldObserver.h"
+#include "neattest/include/neattestController.h"
+#include "neattest/include/neattestWorldObserver.h"
 
 #include "World/World.h"
 #include "Utilities/Misc.h"
@@ -21,15 +21,15 @@
 using namespace Neural;
 using namespace NEAT;
 
-TopEDOController::TopEDOController (RobotWorldModel * wm)
+neattestController::neattestController (RobotWorldModel * wm)
 {
 
   _wm = wm;
 
   nn = NULL;
-  NEAT::load_neat_params ("prj/TopEDO/src/explo.ne", false);
+  NEAT::load_neat_params ("prj/neattest/src/explo.ne", false);
 
-  _currentSigma = TopEDOSharedData::gSigmaRef;
+  _currentSigma = neattestSharedData::gSigmaRef;
 
   initRobot ();
 
@@ -39,14 +39,14 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
   _wm->setAlive (true);
 }
 
-TopEDOController::~TopEDOController ()
+neattestController::~neattestController ()
 {
   delete nn;
   nn = NULL;
 }
 
 void
-TopEDOController::reset ()
+neattestController::reset ()
 {
   _currentFitness = 0.0;
   _birthdate = gWorld->getIterations ();
@@ -59,7 +59,7 @@ TopEDOController::reset ()
 }
 
 void
-TopEDOController::initRobot ()
+neattestController::initRobot ()
 {
   _nbInputs = 1;		// Bias constant input (1.0)
 
@@ -101,7 +101,7 @@ TopEDOController::initRobot ()
 
 
 void
-TopEDOController::createNN ()
+neattestController::createNN ()
 {
   if (nn != NULL)
     delete nn;
@@ -111,22 +111,22 @@ TopEDOController::createNN ()
 }
 
 unsigned int
-TopEDOController::computeRequiredNumberOfWeights ()
+neattestController::computeRequiredNumberOfWeights ()
 {
   unsigned int res = nn->linkcount ();
   return res;
 }
 
 void
-TopEDOController::step ()
+neattestController::step ()
 {
   _iteration++;
   stepBehaviour ();
   
   if (dynamic_cast <
-      TopEDOWorldObserver *
+      neattestWorldObserver *
       >(gWorld->getWorldObserver ())->getLifeIterationCount () >=
-      TopEDOSharedData::gEvaluationTime - 1){
+      neattestSharedData::gEvaluationTime - 1){
 
       stepEvolution ();
       reset();
@@ -140,7 +140,7 @@ TopEDOController::step ()
 // ################ ######################## ################
 
 void
-TopEDOController::stepBehaviour ()
+neattestController::stepBehaviour ()
 {
   std::pair<std::vector<double>,std::vector<double>> io = act();
 
@@ -165,7 +165,7 @@ TopEDOController::stepBehaviour ()
   broadcastGenome ();
 }
 
-std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
+std::pair<std::vector<double>,std::vector<double>> neattestController::act()
   {
   // ---- Build inputs ----
 
@@ -239,7 +239,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
 
 
 float
-TopEDOController::updateFitness (std::vector < double >in,
+neattestController::updateFitness (std::vector < double >in,
 				 std::vector < double >out)
 {
   float deltaFit = 0.0;
@@ -254,7 +254,7 @@ TopEDOController::updateFitness (std::vector < double >in,
 }
 
 void
-TopEDOController::broadcastGenome ()
+neattestController::broadcastGenome ()
 {
   // only if agent is active (ie. not just revived) and deltaE>0.
   if (_wm->isAlive () == true)
@@ -269,9 +269,9 @@ TopEDOController::broadcastGenome ()
 	      // convert image registering index into robot id.
 	      targetIndex = targetIndex - gRobotIndexStartOffset;
 
-	      TopEDOController *targetRobotController =
+	      neattestController *targetRobotController =
 		dynamic_cast <
-		TopEDOController *
+		neattestController *
 		>(gWorld->getRobot (targetIndex)->getController ());
 
 	      if (!targetRobotController)
@@ -294,7 +294,7 @@ TopEDOController::broadcastGenome ()
     }
 }
 void
-TopEDOController::storeGenome (GenomeAdapted * genome, int senderId,
+neattestController::storeGenome (GenomeAdapted * genome, int senderId,
 			       int senderBirthdate, float sigma,
 			       float fitness)
 {
@@ -311,7 +311,7 @@ TopEDOController::storeGenome (GenomeAdapted * genome, int senderId,
 // ################ ######################## ################
 
 void
-TopEDOController::stepEvolution ()
+neattestController::stepEvolution ()
 {
 
     logGenome();
@@ -331,7 +331,7 @@ TopEDOController::stepEvolution ()
     int newId =
 	_wm->getId () + 10000 * (1 +
 				 (gWorld->getIterations () /
-				  TopEDOSharedData::gEvaluationTime));
+				  neattestSharedData::gEvaluationTime));
     
     _genome = _genome -> mutate (_currentSigma,
 				 _wm->getId (), newId, nodeId, innovNumber);
@@ -341,19 +341,18 @@ TopEDOController::stepEvolution ()
 }
 
 
-void TopEDOController::logGenome()
+void neattestController::logGenome()
 {
-  
   //GENERATION ID-ROBOT FITNESS IDGENOME IDMOM
-  TopEDOSharedData::gEvoLog << (gWorld->getIterations () /
-    TopEDOSharedData::
+  std::cout << (gWorld->getIterations () /
+    neattestSharedData::
     gEvaluationTime) << " " << _wm->getId () << " " <<
     _currentFitness << " " << _genome->getIdTrace () << " " << _genome->
     getMom () << std::endl;
   
   
-  std::string filename; 
-  filename = TopEDOSharedData::gGenomeLogFolder;
+  std::string filename = "logs/genomes/"; 
+  filename = neattestSharedData::gGenomeLogFolder;
   filename += std::to_string(_genome -> getIdTrace());
   
   _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
@@ -364,7 +363,7 @@ void TopEDOController::logGenome()
 
 
 int
-TopEDOController::selectBest (std::map < int, float >lFitness)
+neattestController::selectBest (std::map < int, float >lFitness)
 {
   std::map < int, float >::iterator it = lFitness.begin();
 
@@ -384,7 +383,7 @@ TopEDOController::selectBest (std::map < int, float >lFitness)
 }
 
 int
-TopEDOController::selectRandom(std::map < int, float >lFitness)
+neattestController::selectRandom(std::map < int, float >lFitness)
 {       
   return  rand () % lFitness.size ();
   
