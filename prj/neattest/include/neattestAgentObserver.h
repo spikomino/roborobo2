@@ -13,17 +13,14 @@
 #include "WorldModels/RobotWorldModel.h"
 #include "neattest/include/neattestSharedData.h"
 
-#include <iomanip>
+class neattestAgentObserver : public AgentObserver{
 
-class neattestAgentObserver : public AgentObserver
-{
-	public:
-		neattestAgentObserver(RobotWorldModel *wm);
-		~neattestAgentObserver();
-
-		void reset();
-		void step();
-
+public:
+    neattestAgentObserver(RobotWorldModel *wm);
+    ~neattestAgentObserver();
+    
+    void reset();
+    void step();  
 };
 
 #endif

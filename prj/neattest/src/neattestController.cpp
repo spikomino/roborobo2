@@ -18,26 +18,67 @@
 using namespace NEAT;
 
 neattestController::neattestController (RobotWorldModel * wm){
-
-  _wm = wm;
-  nn = NULL;
+  this->_wm              = wm;
+  this->_iteration       = 0;
+  this->_birthdate       = 0;
+  this->_neurocontroller = NULL;
+  this->_currentSigma    = neattestSharedData::gSigmaRef;
+  this->_wm->setAlive (true);
 
   load_neat_params ("prj/neattest/src/explo.ne", false);
-
-  _currentSigma = neattestSharedData::gSigmaRef;
-
-  initRobot ();
-
-  _iteration = 0;
-  _birthdate = 0;
-
-  _wm->setAlive (true);
+  this->initRobot ();
 }
 
 neattestController::~neattestController (){
-    delete nn;
-    nn = NULL;
+    delete _neurocontroller;
+    _neurocontroller = NULL;
 }
+
+
+
+void neattestController::initRobot (){
+
+    // setup the number of input and outputs 
+
+    _nbInputs = 1;		                   // bias 
+    if (gExtendedSensoryInputs)
+	_nbInputs += (1) * _wm->_cameraSensorsNb;  // switch sensor
+    _nbInputs += _wm->_cameraSensorsNb;	           // proximity sensors
+    _nbOutputs = 2;                                // motor output
+
+    // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
+
+    _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
+    _genome->setIdTrace (_wm->getId ());
+    _genome->genome_id = _wm->getId ();
+    _genome->setMom (-1);
+    _genome->setDad (-1);  
+    _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
+
+    // create a neuro controller from this genome
+    createNeuroController();
+
+    if (gVerbose)
+	std::cout << std::flush;
+    
+    //setNewGenomeStatus (true);
+
+    emptyGenomeList();
+    
+
+    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
+    innovNumber = (double) _neurocontroller->linkcount ();
+    nodeId = 1 + _nbInputs + _nbOutputs;
+}
+
+void neattestController::emptyGenomeList(){
+    _genomesList.clear ();
+    _fitnessList.clear ();
+    _sigmaList.clear ();
+    _birthdateList.clear ();
+}
+
+
 
 void neattestController::reset (){
     _currentFitness = 0.0;
@@ -49,52 +90,26 @@ void neattestController::reset (){
     _birthdateList.clear ();
 }
 
-void neattestController::initRobot (){
-    _nbInputs = 1;		// Bias constant input (1.0)
-    
-    if (gExtendedSensoryInputs)
-	_nbInputs += (1) * _wm->_cameraSensorsNb;  // Switch
-       
-    _nbInputs += _wm->_cameraSensorsNb;	// proximity sensors
-    _nbOutputs = 2;
 
-    
-    // Inputs, outputs, 0 hidden neurons, fully connected. 
-    // Start with Simple Perceptron 
-    _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
 
-    _genome->setIdTrace (_wm->getId ());
-    _genome->genome_id = _wm->getId ();
-    _genome->setMom (-1);
-    _genome->setDad (-1);
-      
-    _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
-
-    createNN ();
-
-    if (gVerbose)
-	std::cout << std::flush;
-    
-    setNewGenomeStatus (true);
-    _genomesList.clear ();
-    _fitnessList.clear ();
-    
-    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    innovNumber = (double) nn->linkcount ();
-    nodeId = 1 + _nbInputs + _nbOutputs;
+void neattestController::createNeuroController (){
+  if (_neurocontroller != NULL)
+    delete _neurocontroller;
+  _neurocontroller = _genome->genesis (_wm->_id);
 }
 
+//unsigned int neattestController::computeRequiredNumberOfWeights (){
+//  unsigned int res = _neurocontroller->linkcount ();
+//  return res;
+//}
 
-void neattestController::createNN (){
-  if (nn != NULL)
-    delete nn;
-  nn = _genome->genesis (_wm->_id);
+
+bool neattestController::lifeTimeOver(){
+    return dynamic_cast <neattestWorldObserver*> 
+	(gWorld->getWorldObserver())->getLifeIterationCount() 
+	>= neattestSharedData::gEvaluationTime - 1;
 }
 
-unsigned int neattestController::computeRequiredNumberOfWeights (){
-  unsigned int res = nn->linkcount ();
-  return res;
-}
 
 void neattestController::step (){
   _iteration++;
@@ -102,11 +117,7 @@ void neattestController::step (){
   stepBehaviour ();
   broadcastGenome ();
 
-  if (dynamic_cast <
-      neattestWorldObserver *
-      >(gWorld->getWorldObserver ())->getLifeIterationCount () >=
-      neattestSharedData::gEvaluationTime - 1){
-
+  if (lifeTimeOver()){
       stepEvolution ();
       reset();
   }
@@ -126,8 +137,8 @@ void neattestController::stepBehaviour () {
     std::vector <double> outputs = io.second;
     std::vector <double> inputs  = io.first;
     
-    _wm->_desiredTranslationalValue = outputs[0];
-    _wm->_desiredRotationalVelocity = 2 * (outputs[1] - 0.5); // [-1, 1]
+    _wm->_desiredTranslationalValue = outputs[0]; 
+    _wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); // [-1, 1]
 
     // normalize to motor interval values
     _wm->_desiredTranslationalValue =
@@ -138,12 +149,12 @@ void neattestController::stepBehaviour () {
     _currentFitness += updateFitness (inputs, outputs);
 }
 
-std::pair<std::vector<double>,std::vector<double>> neattestController::act(){
+std::pair<std::vector<double>, std::vector<double>> neattestController::act(){
     // ---- Build inputs ----
-    std::vector < double >*inputs = new std::vector < double >(_nbInputs);
+    std::vector<double>* inputs = new std::vector<double>(_nbInputs);
     int inputToUse = 0;
     
-    (*inputs)[inputToUse++] = 1.0;
+    (*inputs)[inputToUse++] = 1.0; // bias
     
     // distance sensors
     for (int i = 0; i < _wm->_cameraSensorsNb; i++){
@@ -162,10 +173,10 @@ std::pair<std::vector<double>,std::vector<double>> neattestController::act(){
 		    if (i == (gPhysicalObjects
 			      [objectId -
 			       gPhysicalObjectIndexStartOffset]->getType ())){
-			(*inputs)[inputToUse] = 1;	// match
+			(*inputs)[inputToUse] = 1.0;	// match
 		    }
 		    else
-			(*inputs)[inputToUse] = 0;
+			(*inputs)[inputToUse] = 0.0;
 		    inputToUse++;
 		}
 	    }
@@ -180,17 +191,19 @@ std::pair<std::vector<double>,std::vector<double>> neattestController::act(){
 	}
     }
 
-    // ---- compute and read out ----
-    nn->load_sensors ((&(*inputs)[0]));
-
-    if (!(nn->activate ())) {
+    // step the neuro controller
+    _neurocontroller->load_sensors ((&(*inputs)[0]));
+    if (!_neurocontroller->activate()){
 	std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
 	exit (-1);
     }
-
-    std::vector < double >outputs;
-    for (std::vector < NNode * >::iterator out_iter = nn->outputs.begin ();
-	 out_iter != nn->outputs.end (); out_iter++)
+    
+    // read output
+    std::vector<double> outputs;
+    std::vector<NNode*>::iterator out_iter;
+    for (out_iter = _neurocontroller->outputs.begin ();
+	 out_iter != _neurocontroller->outputs.end (); 
+	 out_iter++)
 	outputs.push_back ((*out_iter)->activation);
     
     return std::make_pair(*inputs,outputs);
@@ -278,7 +291,7 @@ void neattestController::stepEvolution () {
 				 newId, 
 				 nodeId, 
 				 innovNumber);
-    createNN ();
+    createNeuroController ();
 }
 
 
