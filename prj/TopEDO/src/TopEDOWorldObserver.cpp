@@ -144,6 +144,9 @@ void TopEDOWorldObserver::updateMonitoring()
         }
     }
     */
-    
+    if ( gWorld->getIterations() == gMaxIt-1 )
+      {
+	TopEDOSharedData::gEvoLog.close();
+      } 
 }
 
