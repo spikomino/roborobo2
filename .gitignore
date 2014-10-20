@@ -2,3 +2,7 @@
 aide.txt
 Makefile
 Makefile.modular
+*.o
+*~
+roborobo
+
