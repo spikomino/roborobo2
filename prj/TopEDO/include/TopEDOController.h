@@ -3,8 +3,6 @@
  *
  */
 
-
-
 #ifndef TOPEDOCONTROLLER_H
 #define TOPEDOCONTROLLER_H
 
@@ -33,24 +31,28 @@ private:
   Network *nn;
 
   void createNN ();
+  unsigned int computeRequiredNumberOfWeights ();
+  void initRobot ();
 
   bool _isNewGenome;
 
-  int selectBest (std::map < int, float >lFitness);
-  void selectRandomGenome ();
-  void mutate (float sigma);
-
   void stepBehaviour ();
-  void stepEvolution ();
-
+  std::pair<std::vector<double>,std::vector<double>> act();
+  float updateFitness (std::vector < double >in, std::vector < double >out);
   void broadcastGenome ();
+  void storeGenome (GenomeAdapted * genome, int senderId, int senderBirthdate,
+		    float sigma, float fitness);  
+
+
+
+
+  void stepEvolution ();
+  void logGenome();
   void loadNewGenome ();
 
-  float dist (float x1, float y1, float x2, float y2);
-  float updateFitness (std::vector < double >in, std::vector < double >out);
-
-
-  unsigned int computeRequiredNumberOfWeights ();
+  int selectBest (std::map < int, float >lFitness);
+  int selectRandom (std::map < int, float >lFitness);
+  void mutate (float sigma);
 
   bool getNewGenomeStatus ()
   {
@@ -74,17 +76,15 @@ private:
   float _currentFitness;
   float _currentSigma;
 
-  //TOFIX NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
-  double innovNum;
+  //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
+  double innovNumber;
   int nodeId;
 
   // ANN
   unsigned int _nbInputs;
   unsigned int _nbOutputs;
 
-  void storeGenome (GenomeAdapted * genome, int senderId, int senderBirthdate,
-		    float sigma, float fitness);
-  void resetRobot ();
+  
 
 public:
 

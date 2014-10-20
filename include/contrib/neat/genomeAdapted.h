@@ -10,7 +10,7 @@ This can allow to rebuild and trace back the lineage of a given genome
 #include "gene.h"
 #include "innovation.h"
 #include "genome.h"
-
+#include <map>
 namespace NEAT 
 {
   //A Genome is the primary source of genotype information used to create   
@@ -46,7 +46,7 @@ namespace NEAT
     
     // Duplicate this Genome to create a new one with the specified id 
     GenomeAdapted* duplicate(int new_id, int idTr);
-
+    GenomeAdapted* mutate(float sigma, int idRobot ,int newId, int &nodeId, double &innovNumber);
     void setIdTrace(int id);
     void setMom(int idMom);
     void setDad(int idDad);
