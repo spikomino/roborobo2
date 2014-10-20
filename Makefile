@@ -1,8 +1,7 @@
-DEBUG = 1
-MODULES =  TopEDO
+MODULES = BasicProject DemoMedea TopEDO
 CC           = g++ 
-CCFLAGS      = -Wall -std=c++0x -DNDEBUG
-LDFLAGS      = `sdl-config --cflags --libs`
+CCFLAGS      = -Wall -O3 -std=c++0x -D__unix__ -I/opt/local/include
+LDFLAGS      = `sdl-config  --libs`
 RM           = rm -f 
 MAKE         = make 
 INCLUDE      = -Iinclude/ext -Iinclude/contrib -Iinclude/core -Iprj/
@@ -88,7 +87,7 @@ snapshot:
 	echo Now: $(DATE_TIME)
 	make distclean
 	rm -f roborobo-snapshot*.tar
-	cd .. ; export COPYFILE_DISABLE=TRUE ; tar --exclude='._*' --exclude='perso' --exclude='.DS_Store' --exclude='datalog_*' --exclude='properties_*' --exclude='roborobo-snapshot*' --exclude='.svn' --exclude='logs/*' -cvf $(DIR_NAME)/roborobo-snapshot-$(DATE_TIME).tar $(DIR_NAME)
+	cd .. ; export COPYFILE_DISABLE=TRUE ; tar --exclude='._*' --exclude='Makefile' --exclude='perso' --exclude='.DS_Store' --exclude='datalog_*' --exclude='properties_*' --exclude='roborobo-snapshot*' --exclude='.svn' --exclude='logs/*' -cvf $(DIR_NAME)/roborobo-snapshot-$(DATE_TIME).tar $(DIR_NAME)
 	@echo =-=-=-= 
 	@echo =-=-=-=
 	@echo =-=-=-=
@@ -102,4 +101,6 @@ snapshot:
 	@echo =-=-=-=
 	@echo =-=-=-=
 	@echo =-=-=-=
+
+	
 
