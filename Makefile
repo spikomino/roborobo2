@@ -1,5 +1,5 @@
 DEBUG = 1
-MODULES =  TopEDO
+MODULES =  neattest
 CC           = g++ 
 CCFLAGS      = -Wall -std=c++0x -DNDEBUG
 LDFLAGS      = `sdl-config --cflags --libs`
