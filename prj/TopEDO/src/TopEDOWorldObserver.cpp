@@ -15,25 +15,31 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
     _world = world;
 
 
-	gProperties.checkAndGetPropertyValue("gEvaluationTime",&TopEDOSharedData::gEvaluationTime,true);
-	gProperties.checkAndGetPropertyValue("gGenomeLogFolder",&TopEDOSharedData::gGenomeLogFolder,true);
+    gProperties.checkAndGetPropertyValue("gEvaluationTime",&TopEDOSharedData::gEvaluationTime,true);
+    gProperties.checkAndGetPropertyValue("gGenomeLogFolder",&TopEDOSharedData::gGenomeLogFolder,true);
+    gProperties.checkAndGetPropertyValue("gEvolutionLogFile",&TopEDOSharedData::gEvolutionLogFile,true);
 
     gProperties.checkAndGetPropertyValue("gControllerType",&TopEDOSharedData::gControllerType,false);
 
+    TopEDOSharedData::gEvoLog.open(TopEDOSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
+    if(!TopEDOSharedData::gEvoLog)
+      {
+	std::cerr << "[ERROR] Could not open log file " << TopEDOSharedData::gEvolutionLogFile << std::endl;
+	exit(-1);
+      }
+    // ====
+
+    if ( !gRadioNetwork)
+      {
+	std::cout << "Error : gRadioNetwork must be true." << std::endl;
+	exit(-1);
+      }
     
-	// ====
-
-	if ( !gRadioNetwork)
-	{
-		std::cout << "Error : gRadioNetwork must be true." << std::endl;
-		exit(-1);
-	}
-
-	// * iteration and generation counters
-
-	_lifeIterationCount = -1;
-	_generationCount = -1;
-
+    // * iteration and generation counters
+    
+    _lifeIterationCount = -1;
+    _generationCount = -1;
+    
 }
 
 TopEDOWorldObserver::~TopEDOWorldObserver()

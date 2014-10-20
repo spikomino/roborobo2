@@ -8,6 +8,8 @@
 #include "TopEDO/include/TopEDOSharedData.h"
 
 std::string TopEDOSharedData::gGenomeLogFolder = "";
+std::string TopEDOSharedData::gEvolutionLogFile = "";
+std::ofstream TopEDOSharedData::gEvoLog;
 
 double TopEDOSharedData::gSigmaMin = 0.0;
 double TopEDOSharedData::gProbaMutation = 0.0;
