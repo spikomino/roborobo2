@@ -106,16 +106,8 @@ TopEDOController::createNN ()
   if (nn != NULL)
     delete nn;
 
-  switch (TopEDOSharedData::gControllerType)
-    {
-    case 0:
- 	nn = _genome->genesis (_wm->_id);
-	break;
-    default:			// default: no controller
-      std::cerr << "[ERROR] gController type unknown (value: " <<
-	TopEDOSharedData::gControllerType << ").\n";
-      exit (-1);
-    };
+  nn = _genome->genesis (_wm->_id);
+
 }
 
 unsigned int
@@ -129,10 +121,16 @@ void
 TopEDOController::step ()
 {
   _iteration++;
-
-  stepEvolution ();
-
   stepBehaviour ();
+  
+  if (dynamic_cast <
+      TopEDOWorldObserver *
+      >(gWorld->getWorldObserver ())->getLifeIterationCount () >=
+      TopEDOSharedData::gEvaluationTime - 1){
+
+      stepEvolution ();
+      reset();
+  }
 }
 
 
@@ -315,29 +313,33 @@ TopEDOController::storeGenome (GenomeAdapted * genome, int senderId,
 void
 TopEDOController::stepEvolution ()
 {
-  // lifetime ended: replace genome 
-  if (dynamic_cast <
-      TopEDOWorldObserver *
-      >(gWorld->getWorldObserver ())->getLifeIterationCount () >=
-      TopEDOSharedData::gEvaluationTime - 1)
-    {
-      logGenome();
 
-      //L = L + A
-      _genomesList[_wm->getId ()] = _genome;
-      _fitnessList[_wm->getId ()] = _currentFitness;
-      _sigmaList[_wm->getId ()] = _currentSigma;
-      _birthdateList[_wm->getId ()] = _birthdate;
-
-      loadNewGenome ();
-
-      if (getNewGenomeStatus ())
-	{
-	  reset ();
-	  setNewGenomeStatus (false);
-	}
-    }
+    logGenome();
+    
+    //L = L + A
+    _genomesList[_wm->getId ()] = _genome;
+    _fitnessList[_wm->getId ()] = _currentFitness;
+    _sigmaList[_wm->getId ()] = _currentSigma;
+    _birthdateList[_wm->getId ()] = _birthdate;
+    
+    int selected = selectBest (_fitnessList);
+    
+    _genome = _genomesList[selected];
+    _currentFitness = _fitnessList[selected];
+   
+    
+    int newId =
+	_wm->getId () + 10000 * (1 +
+				 (gWorld->getIterations () /
+				  TopEDOSharedData::gEvaluationTime));
+    
+    _genome = _genome -> mutate (_currentSigma,
+				 _wm->getId (), newId, nodeId, innovNumber);
+    
+    createNN ();
+    
 }
+
 
 void TopEDOController::logGenome()
 {
@@ -358,29 +360,6 @@ void TopEDOController::logGenome()
 }
 
 
-void
-TopEDOController::loadNewGenome ()
-{
-
-  int selected;
-
-  if (_genomesList.size () > 0)
-    {
-
-      selected = selectBest (_fitnessList);
-
-      _genome = _genomesList[selected];
-      _currentFitness = _fitnessList[selected];
-
-      mutate (_currentSigma);
-
-
-      setNewGenomeStatus (true);
-        
-    }
-
-
-}
 
 
 int
@@ -408,30 +387,5 @@ TopEDOController::selectRandom(std::map < int, float >lFitness)
 {       
   return  rand () % lFitness.size ();
   
-}
-
-void
-TopEDOController::mutate (float sigma)
-{
-
-  int newId =
-    _wm->getId () + 10000 * (1 +
-			     (gWorld->getIterations () /
-			      TopEDOSharedData::gEvaluationTime));
- 
-  GenomeAdapted* new_genome = _genome -> mutate (sigma,_wm->getId (), newId, nodeId, innovNumber);
-  
-  _genome = new_genome;
-
-  createNN ();
-
-  // Logging
-  std::string s = std::string ("");
-  s +=
-    "{" + std::to_string (gWorld->getIterations ()) + "} [" +
-    std::to_string (_wm->getId ()) + "::" + std::to_string (_birthdate) +
-    "] [sigma=" + std::to_string (_currentSigma) + "]\n";
-  gLogManager->write (s);
-  gLogManager->flush ();
 }
 
