@@ -7,12 +7,14 @@
 
 #ifndef TOPEDOSHAREDDATA_H
 #define TOPEDOSHAREDDATA_H
+#include <string>
 
 class TopEDOSharedData {
 	
  public: 
   
   // -----
+  static std::string gGenomeLogFolder;
   
   static double gSigmaMin; //! used with gDynamicSigma defined to true
   static double gUpdateSigmaStep; //!step used in the drecrease or increas of the value of sigma

@@ -343,20 +343,20 @@ TopEDOController::stepEvolution ()
 
 void TopEDOController::logGenome()
 {
-      //GENERATION ID-ROBOT FITNESS IDGENOME IDMOM
-      std::cout << (gWorld->getIterations () /
-		    TopEDOSharedData::
-		    gEvaluationTime) << " " << _wm->getId () << " " <<
-	_currentFitness << " " << _genome->getIdTrace () << " " << _genome->
-	getMom () << std::endl;
-
-
-  /*  std::string filename = "logs/genomes/";
+  //GENERATION ID-ROBOT FITNESS IDGENOME IDMOM
+  std::cout << (gWorld->getIterations () /
+    TopEDOSharedData::
+    gEvaluationTime) << " " << _wm->getId () << " " <<
+    _currentFitness << " " << _genome->getIdTrace () << " " << _genome->
+    getMom () << std::endl;
+  
+  
+  std::string filename = "logs/genomes/"; 
+  filename = TopEDOSharedData::gGenomeLogFolder;
   filename += std::to_string(_genome -> getIdTrace());
-  char* fName = NULL;
-  strcpy(fName,filename.c_str());
-  _genome -> print_to_filename(fName);*/      
-
+  
+  _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
+  
 }
 
 

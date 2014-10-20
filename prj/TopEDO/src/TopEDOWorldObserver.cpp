@@ -14,27 +14,9 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
 {
     _world = world;
 
-	// ==== loading project-specific properties
 
-	gProperties.checkAndGetPropertyValue("gSigmaRef",&TopEDOSharedData::gSigmaRef,true);
-	gProperties.checkAndGetPropertyValue("gSigmaMin",&TopEDOSharedData::gSigmaMin,true);
-	gProperties.checkAndGetPropertyValue("gSigmaMax",&TopEDOSharedData::gSigmaMax,true);
-
-	gProperties.checkAndGetPropertyValue("gProbaMutation",&TopEDOSharedData::gProbaMutation,true);
-	gProperties.checkAndGetPropertyValue("gUpdateSigmaStep",&TopEDOSharedData::gUpdateSigmaStep,true);
 	gProperties.checkAndGetPropertyValue("gEvaluationTime",&TopEDOSharedData::gEvaluationTime,true);
-	gProperties.checkAndGetPropertyValue("gSynchronization",&TopEDOSharedData::gSynchronization,true);
-
-    gProperties.checkAndGetPropertyValue("gEnergyRequestOutput",&TopEDOSharedData::gEnergyRequestOutput,false);
-    
-	gProperties.checkAndGetPropertyValue("gMonitorPositions",&TopEDOSharedData::gMonitorPositions,true);
-
-    gProperties.checkAndGetPropertyValue("gNbHiddenLayers",&TopEDOSharedData::gNbHiddenLayers,true);
-	gProperties.checkAndGetPropertyValue("gNbNeuronsPerHiddenLayer",&TopEDOSharedData::gNbNeuronsPerHiddenLayer,true);
-	gProperties.checkAndGetPropertyValue("gNeuronWeightRange",&TopEDOSharedData::gNeuronWeightRange,true);
-    
-	gProperties.checkAndGetPropertyValue("gSnapshots",&TopEDOSharedData::gSnapshots,false);
-	gProperties.checkAndGetPropertyValue("gSnapshotsFrequency",&TopEDOSharedData::gSnapshotsFrequency,false);
+	gProperties.checkAndGetPropertyValue("gGenomeLogFolder",&TopEDOSharedData::gGenomeLogFolder,true);
 
     gProperties.checkAndGetPropertyValue("gControllerType",&TopEDOSharedData::gControllerType,false);
 
