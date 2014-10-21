@@ -21,6 +21,8 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
 
     gProperties.checkAndGetPropertyValue("gControllerType",&TopEDOSharedData::gControllerType,false);
 
+    gProperties.checkAndGetPropertyValue("gSelectionMethod",&TopEDOSharedData::gSelectionMethod,true);
+
     TopEDOSharedData::gEvoLog.open(TopEDOSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
     if(!TopEDOSharedData::gEvoLog)
       {

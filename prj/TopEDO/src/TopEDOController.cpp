@@ -35,8 +35,6 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 
   _iteration = 0;
   _birthdate = 0;
-
-  _wm->setAlive (true);
 }
 
 TopEDOController::~TopEDOController ()
@@ -169,58 +167,47 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
   {
   // ---- Build inputs ----
 
-  std::vector < double >*inputs = new std::vector < double >(_nbInputs);
+    std::vector < double >inputs(_nbInputs);
   int inputToUse = 0;
 
-  (*inputs)[inputToUse++] = 1.0;
+  inputs[inputToUse++] = 1.0;
 
   // distance sensors
   for (int i = 0; i < _wm->_cameraSensorsNb; i++)
     {
-      (*inputs)[inputToUse] =
+      inputs[inputToUse] =
 	_wm->getDistanceValueFromCameraSensor (i) /
 	_wm->getCameraSensorMaximumDistanceValue (i);
       inputToUse++;
-
+      
       if (gExtendedSensoryInputs)
 	{
 	  int objectId = _wm->getObjectIdFromCameraSensor (i);
-
+	  
 	  // input: physical object? which type?
 	  if (PhysicalObject::isInstanceOf (objectId))
 	    {
-	      int nbOfTypes = 5;	//Only type 4 (Switch)
-	      for (int i = 4; i != nbOfTypes; i++)
+	      //Switch is type 3
+	      if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
+		   ->getType ()) == 3)
 		{
-		  if (i ==
-		      (gPhysicalObjects
-		       [objectId -
-			gPhysicalObjectIndexStartOffset]->getType ()))
-		    {
-		      (*inputs)[inputToUse] = 1;	// match
-		    }
-		  else
-		    (*inputs)[inputToUse] = 0;
-		  inputToUse++;
+		  inputs[inputToUse] = 1;	// match
 		}
-	    }
-	  else
-	    {
-	      // not a physical object.Should still fill in the inputs (with zeroes)
-	      int nbOfTypes = 5;
-
-	      for (int i = 4; i != nbOfTypes; i++)
-		{
-		  (*inputs)[inputToUse] = 0;
-		  inputToUse++;
-		}
+	      else
+		inputs[inputToUse] = 0;
+	      inputToUse++;
+	    }	 
+	  else //Not physical object
+	    {	      
+	      inputs[inputToUse] = 0;
+	      inputToUse++;
 	    }
 
 	}
     }
-
+ 
   // ---- compute and read out ----
-  nn->load_sensors ((&(*inputs)[0]));
+  nn->load_sensors (&(inputs[0]));
 
   if (!(nn->activate ()))
     {
@@ -234,7 +221,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
     {
       outputs.push_back ((*out_iter)->activation);
     }
-  return std::make_pair(*inputs,outputs);
+  return std::make_pair(inputs,outputs);
 }
 
 
@@ -247,7 +234,9 @@ TopEDOController::updateFitness (std::vector < double >in,
 
   if (PhysicalObject::isInstanceOf (targetIndex))
     {
-      deltaFit += 1.0;
+      if((gPhysicalObjects[targetIndex - gPhysicalObjectIndexStartOffset]
+		   ->getType ()) == 3)
+	deltaFit += 1.0;
     }
 
   return deltaFit;
@@ -257,41 +246,39 @@ void
 TopEDOController::broadcastGenome ()
 {
   // only if agent is active (ie. not just revived) and deltaE>0.
-  if (_wm->isAlive () == true)
+  for (int i = 0; i < _wm->_cameraSensorsNb; i++)
     {
-      for (int i = 0; i < _wm->_cameraSensorsNb; i++)
+      int targetIndex = _wm->getObjectIdFromCameraSensor (i);
+
+      // sensor ray bumped into a robot : communication is possible
+      if (targetIndex >= gRobotIndexStartOffset)
 	{
-	  int targetIndex = _wm->getObjectIdFromCameraSensor (i);
-
-	  // sensor ray bumped into a robot : communication is possible
-	  if (targetIndex >= gRobotIndexStartOffset)
+	  // convert image registering index into robot id.
+	  targetIndex = targetIndex - gRobotIndexStartOffset;
+	  
+	  TopEDOController *targetRobotController =
+	    dynamic_cast <
+	    TopEDOController *
+	    >(gWorld->getRobot (targetIndex)->getController ());
+	  
+	  if (!targetRobotController)
 	    {
-	      // convert image registering index into robot id.
-	      targetIndex = targetIndex - gRobotIndexStartOffset;
-
-	      TopEDOController *targetRobotController =
-		dynamic_cast <
-		TopEDOController *
-		>(gWorld->getRobot (targetIndex)->getController ());
-
-	      if (!targetRobotController)
-		{
-		  std::
-		    cerr << "Error from robot " << _wm->getId () <<
-		    " : the observer of robot " << targetIndex <<
-		    " is not compatible" << std::endl;
-		  exit (-1);
-		}
-
-	      // other agent stores my genome.
-
-	      targetRobotController->storeGenome (_genome, _wm->getId (),
-						  _birthdate, _currentSigma,
-						  _currentFitness);
-
+	      std::
+		cerr << "Error from robot " << _wm->getId () <<
+		" : the observer of robot " << targetIndex <<
+		" is not compatible" << std::endl;
+	      exit (-1);
 	    }
+	  
+	  // other agent stores my genome.
+
+	  targetRobotController->storeGenome (_genome, _wm->getId (),
+					      _birthdate, _currentSigma,
+					      _currentFitness);
+	  
 	}
     }
+  
 }
 void
 TopEDOController::storeGenome (GenomeAdapted * genome, int senderId,
@@ -322,7 +309,25 @@ TopEDOController::stepEvolution ()
     _sigmaList[_wm->getId ()] = _currentSigma;
     _birthdateList[_wm->getId ()] = _birthdate;
     
-    int selected = selectBest (_fitnessList);
+    int selected =-1;
+    switch(TopEDOSharedData::gSelectionMethod)
+      {
+      case 1:
+	selected = selectBest (_fitnessList);
+	break;
+      case 2:
+	selected = selectRankBased (_fitnessList);
+	break;
+      case 3: 
+	selected = selectBinaryTournament (_fitnessList);
+	break;
+      case 4:
+	selected = selectRandom(_fitnessList);
+	break;
+      default: 
+	   std::cerr << "[ERROR] Selection method unknown (value: " << TopEDOSharedData::gSelectionMethod << ").\n";
+            exit(-1);
+      }
     
     _genome = _genomesList[selected];
     _currentFitness = _fitnessList[selected];
@@ -382,7 +387,56 @@ TopEDOController::selectBest (std::map < int, float >lFitness)
     }
   return idx;
 }
+int
+TopEDOController::selectRankBased(std::map < int, float >lFitness)
+{       
+  std::map < int, float >::iterator it = lFitness.begin();
+  float totalFitness = 0.0;
+  int result = -1;
 
+  for (it->first; it != lFitness.end (); it++)
+    {
+      totalFitness += it->second; 
+
+    }
+  float random = randfloat() * totalFitness;
+  it = lFitness.begin();
+
+  while((random > 0.0) && (it != lFitness.end()))
+    {
+      it++;
+    }
+  if(it != lFitness.end())
+    result = it->first;
+  else
+    {
+      it--;
+      result = it->first;
+    }
+  return result;
+}
+int
+TopEDOController::selectBinaryTournament(std::map < int, float >lFitness)
+{
+  int result = -1;
+  if(lFitness.size() > 1)
+    {
+      int ind1 =  rand () % lFitness.size ();
+      int ind2 =  rand () % lFitness.size ();
+      while(ind1 == ind2)
+	{
+	  ind2 =  rand () % lFitness.size ();
+	}
+      if(lFitness[ind1] >= lFitness[ind2])
+	result = ind1;
+      else
+	result = ind2;
+    }
+  else 
+    result = lFitness.begin()->first;
+
+  return result;
+}
 int
 TopEDOController::selectRandom(std::map < int, float >lFitness)
 {       

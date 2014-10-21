@@ -51,6 +51,8 @@ private:
   void loadNewGenome ();
 
   int selectBest (std::map < int, float >lFitness);
+  int selectRankBased(std::map < int, float >lFitness);
+  int selectBinaryTournament (std::map < int, float >lFitness);
   int selectRandom (std::map < int, float >lFitness);
   void mutate (float sigma);
 

@@ -10,6 +10,7 @@
 std::string TopEDOSharedData::gGenomeLogFolder = "";
 std::string TopEDOSharedData::gEvolutionLogFile = "";
 std::ofstream TopEDOSharedData::gEvoLog;
+int TopEDOSharedData::gSelectionMethod = -1;
 
 double TopEDOSharedData::gSigmaMin = 0.0;
 double TopEDOSharedData::gProbaMutation = 0.0;
