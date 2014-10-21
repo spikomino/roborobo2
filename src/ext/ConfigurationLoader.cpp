@@ -7,6 +7,7 @@
 #include "Config/TestConfigurationLoader.h"
 #include "Config/TopEDOConfigurationLoader.h"
 #include "Config/neattestConfigurationLoader.h"
+#include "Config/neatestConfigurationLoader.h"
 //###DO-NOT-DELETE-THIS-LINE###TAG:INCLUDE###//
 
 
@@ -60,6 +61,12 @@ ConfigurationLoader* ConfigurationLoader::make_ConfigurationLoader (std::string 
 	else if (configurationLoaderObjectName == "neattestConfigurationLoader" )
 	{
 		return new neattestConfigurationLoader();
+	}
+#endif
+#if defined PRJ_NEATEST || !defined MODULAR
+	else if (configurationLoaderObjectName == "neatestConfigurationLoader" )
+	{
+		return new neatestConfigurationLoader();
 	}
 #endif
     //###DO-NOT-DELETE-THIS-LINE###TAG:SWITCH###//

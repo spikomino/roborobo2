@@ -12,31 +12,31 @@
 #include "neat/genome.h"
 #include "neat/genomeAdapted.h"
 
-#include "neattest/include/neattestController.h"
-#include "neattest/include/neattestWorldObserver.h"
+#include "neatest/include/neatestController.h"
+#include "neatest/include/neatestWorldObserver.h"
 
 using namespace NEAT;
 
-neattestController::neattestController (RobotWorldModel * wm){
+neatestController::neatestController (RobotWorldModel * wm){
   _wm              = wm;
   _iteration       = 0;
   _birthdate       = 0;
   _neurocontroller = NULL;
-  _currentSigma    = neattestSharedData::gSigmaRef;
+  _currentSigma    = neatestSharedData::gSigmaRef;
   _wm->setAlive (true);
 
-  load_neat_params ("prj/neattest/src/explo.ne", false);
+  load_neat_params ("prj/neatest/src/explo.ne", false);
   initRobot ();
 }
 
-neattestController::~neattestController (){
+neatestController::~neatestController (){
     delete _neurocontroller;
     _neurocontroller = NULL;
 }
 
 
 
-void neattestController::initRobot (){
+void neatestController::initRobot (){
 
     // setup the number of input and outputs 
 
@@ -70,7 +70,7 @@ void neattestController::initRobot (){
     nodeId = 1 + _nbInputs + _nbOutputs;
 }
 
-void neattestController::emptyGenomeList(){
+void neatestController::emptyGenomeList(){
     _genomesList.clear ();
     _fitnessList.clear ();
     _sigmaList.clear ();
@@ -79,7 +79,7 @@ void neattestController::emptyGenomeList(){
 
 
 
-void neattestController::reset (){
+void neatestController::reset (){
     _currentFitness = 0.0;
     _birthdate = gWorld->getIterations ();
     
@@ -91,26 +91,26 @@ void neattestController::reset (){
 
 
 
-void neattestController::createNeuroController (){
+void neatestController::createNeuroController (){
   if (_neurocontroller != NULL)
     delete _neurocontroller;
   _neurocontroller = _genome->genesis (_wm->_id);
 }
 
-//unsigned int neattestController::computeRequiredNumberOfWeights (){
+//unsigned int neatestController::computeRequiredNumberOfWeights (){
 //  unsigned int res = _neurocontroller->linkcount ();
 //  return res;
 //}
 
 
-bool neattestController::lifeTimeOver(){
-    return dynamic_cast <neattestWorldObserver*> 
+bool neatestController::lifeTimeOver(){
+    return dynamic_cast <neatestWorldObserver*> 
 	(gWorld->getWorldObserver())->getLifeIterationCount() 
-	>= neattestSharedData::gEvaluationTime - 1;
+	>= neatestSharedData::gEvaluationTime - 1;
 }
 
 
-void neattestController::step (){
+void neatestController::step (){
   _iteration++;
 
   stepBehaviour ();
@@ -128,7 +128,7 @@ void neattestController::step (){
 // ################ BEHAVIOUR METHOD(S)      ################
 // ################ ######################## ################
 
-void neattestController::stepBehaviour () {
+void neatestController::stepBehaviour () {
 
     // step the neural controller and read outputs 
     std::pair<std::vector<double>, std::vector<double>> io = act();
@@ -148,7 +148,7 @@ void neattestController::stepBehaviour () {
     _currentFitness += updateFitness (inputs, outputs);
 }
 
-std::pair<std::vector<double>, std::vector<double>> neattestController::act(){
+std::pair<std::vector<double>, std::vector<double>> neatestController::act(){
     // ---- Build inputs ----
     std::vector<double>* inputs = new std::vector<double>(_nbInputs);
     int inputToUse = 0;
@@ -209,7 +209,7 @@ std::pair<std::vector<double>, std::vector<double>> neattestController::act(){
 }
 
 
-float neattestController::updateFitness (std::vector < double >in,
+float neatestController::updateFitness (std::vector < double >in,
 					 std::vector < double >out){
     float deltaFit = 0.0;
     int targetIndex = _wm->getGroundSensorValue ();
@@ -218,7 +218,7 @@ float neattestController::updateFitness (std::vector < double >in,
     return deltaFit;
 }
 
-void neattestController::broadcastGenome () {
+void neatestController::broadcastGenome () {
     // only if agent is active (ie. not just revived) and deltaE>0.
     if (_wm->isAlive () == true){
 	for (int i = 0; i < _wm->_cameraSensorsNb; i++)	{
@@ -229,9 +229,9 @@ void neattestController::broadcastGenome () {
 		// convert image registering index into robot id.
 		targetIndex = targetIndex - gRobotIndexStartOffset;
 		
-		neattestController *targetRobotController =
+		neatestController *targetRobotController =
 		    dynamic_cast <
-		    neattestController *
+		    neatestController *
 		    >(gWorld->getRobot (targetIndex)->getController ());
 
 		if (!targetRobotController){
@@ -251,7 +251,7 @@ void neattestController::broadcastGenome () {
     }
 }
 
-void neattestController::storeGenome (GenomeAdapted * genome, int senderId,
+void neatestController::storeGenome (GenomeAdapted * genome, int senderId,
 				      int senderBirthdate, float sigma,
 				      float fitness){
     //08/10/14 (storeGenome Adaptedto NEAT, I think)
@@ -265,7 +265,7 @@ void neattestController::storeGenome (GenomeAdapted * genome, int senderId,
 // ################ EVOLUTION ENGINE METHODS ################
 // ################ ######################## ################
 
-void neattestController::stepEvolution () {
+void neatestController::stepEvolution () {
 
     // save genome in file / log 
     logGenome();
@@ -284,7 +284,7 @@ void neattestController::stepEvolution () {
     // mutate the offspring 
     int newId = _wm->getId () + 10000 * 
 	(1 + (gWorld->getIterations () /
-	      neattestSharedData::gEvaluationTime));
+	      neatestSharedData::gEvaluationTime));
     _genome = _genome->mutate (_currentSigma,
 				 _wm->getId (), 
 				 newId, 
@@ -294,9 +294,9 @@ void neattestController::stepEvolution () {
 }
 
 
-void neattestController::logGenome() {
+void neatestController::logGenome() {
     //GENERATION ID-ROBOT FITNESS IDGENOME IDMOM
-    std::cout << gWorld->getIterations()/neattestSharedData::gEvaluationTime
+    std::cout << gWorld->getIterations()/neatestSharedData::gEvaluationTime
 	      << " " << _wm->getId () 
 	      << " " <<	_currentFitness 
 	      << " " << _genome->getIdTrace () 
@@ -304,7 +304,7 @@ void neattestController::logGenome() {
 	      << std::endl;
     
     std::string filename = "logs/genomes/"; 
-    filename = neattestSharedData::gGenomeLogFolder;
+    filename = neatestSharedData::gGenomeLogFolder;
     filename += std::to_string(_genome -> getIdTrace());
     _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
 }
@@ -312,7 +312,7 @@ void neattestController::logGenome() {
 
 
 
-int neattestController::selectBest (std::map < int, float >lFitness) {
+int neatestController::selectBest (std::map < int, float >lFitness) {
     std::map < int, float >::iterator it = lFitness.begin();
     float bestFit = it->second;
     int idx = it->first;
@@ -324,7 +324,7 @@ int neattestController::selectBest (std::map < int, float >lFitness) {
     return idx;
 }
 
-int  neattestController::selectRandom(std::map < int, float >lFitness){       
+int  neatestController::selectRandom(std::map < int, float >lFitness){       
     return  rand () % lFitness.size ();
 }
 
