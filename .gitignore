@@ -1,2 +1,9 @@
 .DS_store
 aide.txt
+Makefile
+Makefile.modular
+*.o
+*~
+roborobo
+logs
+
