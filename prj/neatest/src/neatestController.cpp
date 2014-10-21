@@ -17,7 +17,7 @@
 
 using namespace NEAT;
 
-neatestController::neatestController (RobotWorldModel * wm){
+neatestController::neatestController(RobotWorldModel * wm){
   _wm              = wm;
   _iteration       = 0;
   _birthdate       = 0;
@@ -34,10 +34,7 @@ neatestController::~neatestController (){
     _neurocontroller = NULL;
 }
 
-
-
 void neatestController::initRobot (){
-
     // setup the number of input and outputs 
 
     _nbInputs = 1;		                   // bias 
@@ -57,39 +54,31 @@ void neatestController::initRobot (){
     // create a neuro controller from this genome
     createNeuroController();
 
+    // empty the genome list 
+    emptyGenomeList();
+
     if (gVerbose)
 	std::cout << std::flush;
     
     //setNewGenomeStatus (true);
-
-    emptyGenomeList();
-    
-
+      
     //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    innovNumber = (double) _neurocontroller->linkcount ();
-    nodeId = 1 + _nbInputs + _nbOutputs;
+    //innovNumber = (double) _neurocontroller->linkcount ();
+    //nodeId = 1 + _nbInputs + _nbOutputs;
 }
 
 void neatestController::emptyGenomeList(){
-    _genomesList.clear ();
-    _fitnessList.clear ();
-    _sigmaList.clear ();
-    _birthdateList.clear ();
+    _genomesList.clear();
+    _fitnessList.clear();
+    _sigmaList.clear();
+    _birthdateList.clear();
 }
 
-
-
-void neatestController::reset (){
+void neatestController::reset(){
     _currentFitness = 0.0;
     _birthdate = gWorld->getIterations ();
-    
-    _genomesList.clear ();
-    _fitnessList.clear ();
-    _sigmaList.clear ();
-    _birthdateList.clear ();
+    emptyGenomeList();
 }
-
-
 
 void neatestController::createNeuroController (){
   if (_neurocontroller != NULL)
@@ -251,9 +240,9 @@ void neatestController::broadcastGenome () {
     }
 }
 
-void neatestController::storeGenome (GenomeAdapted * genome, int senderId,
-				      int senderBirthdate, float sigma,
-				      float fitness){
+void neatestController::storeGenome(GenomeAdapted * genome, int senderId,
+				    int senderBirthdate, float sigma,
+				    float fitness){
     //08/10/14 (storeGenome Adaptedto NEAT, I think)
     _genomesList[senderId]   = genome;
     _sigmaList[senderId]     = sigma;
@@ -270,11 +259,9 @@ void neatestController::stepEvolution () {
     // save genome in file / log 
     logGenome();
     
-    // store our genome 
-    _genomesList[_wm->getId ()]   = _genome;
-    _fitnessList[_wm->getId ()]   = _currentFitness;
-    _sigmaList[_wm->getId ()]     = _currentSigma;
-    _birthdateList[_wm->getId ()] = _birthdate;
+    // store our genome in the list 
+    storeGenome(_genome, _wm->getId(), _birthdate, 
+		_currentSigma, _currentFitness);
     
     // select an offspring 
     int selected = selectBest (_fitnessList);
@@ -286,11 +273,11 @@ void neatestController::stepEvolution () {
 	(1 + (gWorld->getIterations () /
 	      neatestSharedData::gEvaluationTime));
     _genome = _genome->mutate (_currentSigma,
-				 _wm->getId (), 
+				 _wm->getId(), 
 				 newId, 
 				 nodeId, 
 				 innovNumber);
-    createNeuroController ();
+    createNeuroController();
 }
 
 
