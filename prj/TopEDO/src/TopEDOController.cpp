@@ -205,11 +205,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
 
 	}
     }
-  for(unsigned int i = 0; i < inputs.size();i++)
-    {
-      std::cout << inputs[i] << " ";
-    }
-  std::cout << std::endl;
+ 
   // ---- compute and read out ----
   nn->load_sensors (&(inputs[0]));
 
