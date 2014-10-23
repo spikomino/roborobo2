@@ -50,9 +50,6 @@ namespace NEAT
     void setIdTrace(int id);
     void setMom(int idMom);
     void setDad(int idDad);
-    
-
-
 
   };
 } // namespace NEAT

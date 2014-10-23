@@ -124,3 +124,4 @@ void Trait::mutate() {
 		}
 	}
 }
+

@@ -84,7 +84,7 @@ private:
 
     void mutate (float sigma);
 
-
+    void printRobot();
 
 
 public:

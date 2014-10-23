@@ -45,10 +45,10 @@ void neatestController::initRobot (){
 
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
-    _genome->setIdTrace (_wm->getId ());
-    _genome->genome_id = _wm->getId ();
-    _genome->setMom (-1);
-    _genome->setDad (-1);  
+    _genome->setIdTrace (_wm->getId());
+    _genome->genome_id = _wm->getId();
+    _genome->setMom(-1);
+    _genome->setDad(-1);  
     _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
 
     // create a neuro controller from this genome
@@ -57,8 +57,15 @@ void neatestController::initRobot (){
     // empty the genome list 
     emptyGenomeList();
 
-    if (gVerbose)
-	std::cout << std::flush;
+    if (gVerbose){
+	std::cout << "[initRobot] " 
+		  << "id="  << _wm->getId() << " "
+		  << "in="  << _nbInputs    << " "
+		  << "out=" << _nbOutputs 
+		  << std::endl;
+	printRobot();
+    }
+    
     
     //setNewGenomeStatus (true);
       
@@ -66,6 +73,34 @@ void neatestController::initRobot (){
     //innovNumber = (double) _neurocontroller->linkcount ();
     //nodeId = 1 + _nbInputs + _nbOutputs;
 }
+
+void neatestController::printRobot(){
+    std::string s;
+    
+    std::cout << "[Robot #"        + to_string(_wm->getId())    + "]\n"
+	      << "\t iteration = " + to_string(_iteration)      + "\n"
+	      << "\t birthdate = " + to_string(_birthdate)      + "\n"
+	      << "\t fitness   = " + to_string(_currentFitness) + "\n"
+	      << "\t sigma     = " + to_string(_currentSigma)   + "\n"
+	      << "\t [Genome] \n" 
+	      << "\t\t id  = " + to_string(_genome->getIdTrace()) + "\n"
+	      << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
+	      << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
+	
+    
+    //_genome->print_to_file(std::cout);
+    
+    std::cout << "\t [Genome list]\n";
+    std::map <int, GenomeAdapted*> ::iterator it;
+    for (it=_genomesList.begin() ; it != _genomesList.end(); it++){
+	std::cout << "\t\t Id="+ to_string(it->second->getIdTrace())
+		  << "\t fitness="+ to_string(_fitnessList[it->first])
+		  << "\t sigma="+   to_string(_sigmaList[it->first])
+		  << "\t birthdate="+to_string(_birthdateList[it->first])+"\n";
+    }
+}
+
+
 
 void neatestController::emptyGenomeList(){
     _genomesList.clear();
@@ -106,7 +141,10 @@ void neatestController::step (){
   broadcastGenome ();
 
   if (lifeTimeOver()){
+      
       stepEvolution ();
+      std::cout << "------------------------ Gen \n";
+      printRobot();
       reset();
   }
 }
@@ -283,12 +321,7 @@ void neatestController::stepEvolution () {
 
 void neatestController::logGenome() {
     //GENERATION ID-ROBOT FITNESS IDGENOME IDMOM
-    std::cout << gWorld->getIterations()/neatestSharedData::gEvaluationTime
-	      << " " << _wm->getId () 
-	      << " " <<	_currentFitness 
-	      << " " << _genome->getIdTrace () 
-	      << " " << _genome->getMom () 
-	      << std::endl;
+    
     
     std::string filename = "logs/genomes/"; 
     filename = neatestSharedData::gGenomeLogFolder;
