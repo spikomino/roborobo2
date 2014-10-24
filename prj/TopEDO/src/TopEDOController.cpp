@@ -125,7 +125,7 @@ TopEDOController::step ()
       TopEDOWorldObserver *
       >(gWorld->getWorldObserver ())->getLifeIterationCount () >=
       TopEDOSharedData::gEvaluationTime - 1){
-
+    //std::cout << _currentFitness / (gWorld -> getIterations() + 1 - _birthdate)  << std::endl;
       stepEvolution ();
       reset();
   }
@@ -191,15 +191,16 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
 	      if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
 		   ->getType ()) == 3)
 		{
-		  inputs[inputToUse] = 1;	// match
+		  inputs[inputToUse] = 	_wm->getDistanceValueFromCameraSensor (i) /
+		    _wm->getCameraSensorMaximumDistanceValue (i);//Match
 		}
 	      else
-		inputs[inputToUse] = 0;
+		inputs[inputToUse] = 1.0;
 	      inputToUse++;
 	    }	 
 	  else //Not physical object
 	    {	      
-	      inputs[inputToUse] = 0;
+	      inputs[inputToUse] = 1.0;
 	      inputToUse++;
 	    }
 
@@ -273,7 +274,7 @@ TopEDOController::broadcastGenome ()
 	  // other agent stores my genome.
 
 	  targetRobotController->storeGenome (_genome, _wm->getId (),
-					      _birthdate, _currentSigma,
+					      _birthdate, _currentFitness / (gWorld -> getIterations() + 1 - _birthdate),
 					      _currentFitness);
 	  
 	}
@@ -302,10 +303,11 @@ TopEDOController::stepEvolution ()
 {
 
     logGenome();
-    
+  
     //L = L + A
     _genomesList[_wm->getId ()] = _genome;
-    _fitnessList[_wm->getId ()] = _currentFitness;
+    //_fitnessList[_wm->getId ()] = _currentFitness;
+    _fitnessList[_wm->getId()] = _currentFitness / (gWorld -> getIterations() + 1 - _birthdate);
     _sigmaList[_wm->getId ()] = _currentSigma;
     _birthdateList[_wm->getId ()] = _birthdate;
     
@@ -328,7 +330,9 @@ TopEDOController::stepEvolution ()
 	   std::cerr << "[ERROR] Selection method unknown (value: " << TopEDOSharedData::gSelectionMethod << ").\n";
             exit(-1);
       }
-    
+
+    std::cout << "SELECTED " << selected << std::endl;
+
     _genome = _genomesList[selected];
     _currentFitness = _fitnessList[selected];
    
@@ -353,7 +357,7 @@ void TopEDOController::logGenome()
   TopEDOSharedData::gEvoLog << (gWorld->getIterations () /
     TopEDOSharedData::
     gEvaluationTime) << " " << _wm->getId () << " " <<
-    _currentFitness << " " << _genome->getIdTrace () << " " << _genome->
+    _currentFitness / (gWorld -> getIterations() + 1 - _birthdate) << " " << _genome->getIdTrace () << " " << _genome->
     getMom () << std::endl;
   
   
@@ -396,7 +400,7 @@ TopEDOController::selectRankBased(std::map < int, float >lFitness)
 
   for (it->first; it != lFitness.end (); it++)
     {
-      totalFitness += it->second; 
+      totalFitness += it->second + 1; 
 
     }
   float random = randfloat() * totalFitness;
@@ -405,6 +409,7 @@ TopEDOController::selectRankBased(std::map < int, float >lFitness)
   while((random > 0.0) && (it != lFitness.end()))
     {
       it++;
+      random -= (1.0 + it ->second);
     }
   if(it != lFitness.end())
     result = it->first;
@@ -434,6 +439,11 @@ TopEDOController::selectBinaryTournament(std::map < int, float >lFitness)
     }
   else 
     result = lFitness.begin()->first;
+  if(result == -1)
+    {
+      std::cerr << "[ERROR] No individual selected by binary tournament." << std::endl << std::flush;
+      exit(-1);
+    }
 
   return result;
 }
