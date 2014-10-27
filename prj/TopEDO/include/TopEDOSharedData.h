@@ -19,6 +19,7 @@ class TopEDOSharedData {
   static std::string gEvolutionLogFile;
   static std::ofstream gEvoLog;
   static int gSelectionMethod;
+  static int gFitness;
   
   static double gSigmaMin; //! used with gDynamicSigma defined to true
   static double gUpdateSigmaStep; //!step used in the drecrease or increas of the value of sigma
