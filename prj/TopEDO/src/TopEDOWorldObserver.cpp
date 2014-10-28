@@ -23,6 +23,7 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
 
     gProperties.checkAndGetPropertyValue("gSelectionMethod",&TopEDOSharedData::gSelectionMethod,true);
     gProperties.checkAndGetPropertyValue("gFitness",&TopEDOSharedData::gFitness,true);
+    gProperties.checkAndGetPropertyValue("gSigmaRef",&TopEDOSharedData::gSigmaRef,true);
 
     TopEDOSharedData::gEvoLog.open(TopEDOSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
     if(!TopEDOSharedData::gEvoLog)

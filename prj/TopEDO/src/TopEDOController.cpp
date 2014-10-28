@@ -32,7 +32,7 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
   NEAT::load_neat_params ("prj/TopEDO/src/explo.ne", false);
 
   _currentSigma = TopEDOSharedData::gSigmaRef;
-
+  
   initRobot ();
 
   _iteration = 0;
@@ -337,7 +337,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::actFTopo()
 	  outputs.push_back(NEAT::fsigmoid(aux,4.924273,2.4621365));
     }
   _previousOut = outputs;
-      
+ 
   return std::make_pair(inputs,outputs);
 }
 
