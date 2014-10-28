@@ -26,10 +26,10 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
 					 false);
     
     // ====
-    if ( !gRadioNetwork){
-	std::cout << "Error : gRadioNetwork must be true." << std::endl;
-	exit(-1);
-    }
+    //if ( !gRadioNetwork){
+    //	std::cout << "Error : gRadioNetwork must be true." << std::endl;
+    //	exit(-1);
+    //  }
 
     // * iteration and generation counters
     _lifeIterationCount = -1;
