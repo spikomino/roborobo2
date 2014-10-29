@@ -64,6 +64,7 @@ private:
 
     bool lifeTimeOver();
 
+    std::vector<double>  stepNeuralController();
     pair<vector<double>, vector<double>> act();
     float updateFitness (vector<double> in, vector<double> out);
 

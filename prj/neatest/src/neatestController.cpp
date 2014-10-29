@@ -158,10 +158,7 @@ void neatestController::step (){
 void neatestController::stepBehaviour () {
 
     // step the neural controller and read outputs 
-    std::pair<std::vector<double>, std::vector<double>> io = act();
-    
-    std::vector <double> outputs = io.second;
-    std::vector <double> inputs  = io.first;
+    std::vector<double> outputs= stepNeuralController();
     
     _wm->_desiredTranslationalValue = outputs[0]; 
     _wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); // [-1, 1]
@@ -172,8 +169,91 @@ void neatestController::stepBehaviour () {
     _wm->_desiredRotationalVelocity =
 	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
     
-    _currentFitness += updateFitness (inputs, outputs);
+
+    //_wm->_desiredTranslationalValue = 0.0;
+    //_wm->_desiredRotationalVelocity = 0.0;
+    
+    //_currentFitness += updateFitness (inputs, outputs);
 }
+
+/*
+ * Step the neuro controller return the output (motor activation) 
+ *
+ */
+std::vector<double> neatestController::stepNeuralController(){
+    double inputs[_nbInputs]; 
+    int inputToUse = 0;
+    
+    inputs[inputToUse++] = 1.0; // bias
+
+    // distance sensors 
+    for(int i = 0; i < _wm->_cameraSensorsNb; i++)
+	inputs[inputToUse++] = _wm->getDistanceValueFromCameraSensor (i) /
+	    _wm->getCameraSensorMaximumDistanceValue (i);
+
+    // object sensors 
+    if(gExtendedSensoryInputs) {
+	// Round objects (type 0)
+	for(int i = 0; i < _wm->_cameraSensorsNb; i++){
+	    int objectId = _wm->getObjectIdFromCameraSensor (i);
+	    // if physical object, and of type 0 
+	    if(PhysicalObject::isInstanceOf(objectId)){
+		int type = gPhysicalObjects
+		    [objectId-gPhysicalObjectIndexStartOffset]->getType();
+		if(type == 0)
+		    inputs[inputToUse] = 1.0;	// match 
+		else
+		    inputs[inputToUse] = 0.0;
+		inputToUse++;
+	    }
+	    else{// Physical object but not interesting 
+		inputs[inputToUse] = 0.0;
+		inputToUse++;
+	    }
+	}
+    }
+    // some output 
+    if(gVerbose){
+	std::cout << "[Robot #" + to_string(_wm->getId()) + "]\n"
+		  << "\t[Inputs : " ;
+	for(int i = 0; i < _nbInputs; i++){
+	    std::cout << to_string(inputs[i]) + " ";
+	    if ((i % _wm->_cameraSensorsNb) == 0)
+		std::cout << "]" <<  std::endl << "\t\t[ ";
+	}
+	std::cout <<  std::endl;
+    }
+	
+    // step the neuro controller
+    _neurocontroller->load_sensors(inputs);
+    if (!_neurocontroller->activate()){
+	std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
+	exit (-1);
+    }
+    
+    // read output
+    std::vector<double> outputs;
+    std::vector<NNode*>::iterator out_iter;
+    for (out_iter = _neurocontroller->outputs.begin ();
+	 out_iter != _neurocontroller->outputs.end (); 
+	 out_iter++)
+	outputs.push_back ((*out_iter)->activation);
+
+    // more output 
+    if(gVerbose){
+	std::cout <<  "\t[Outputs : " ;
+	std::vector<double>::iterator itr;
+	for(itr = outputs.begin (); itr != outputs.end (); itr++)
+	    std::cout << to_string(*itr) + " ";
+	std::cout << "]"
+		  << std::endl;
+    }
+    
+    return outputs;
+}
+
+
+
 
 std::pair<std::vector<double>, std::vector<double>> neatestController::act(){
     // ---- Build inputs ----
