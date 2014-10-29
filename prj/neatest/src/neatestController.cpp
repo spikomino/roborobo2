@@ -170,8 +170,8 @@ void neatestController::stepBehaviour () {
 	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
     
 
-    //_wm->_desiredTranslationalValue = 0.0;
-    //_wm->_desiredRotationalVelocity = 0.0;
+    _wm->_desiredTranslationalValue = 0.0;
+    _wm->_desiredRotationalVelocity = 0.0;
     
     //_currentFitness += updateFitness (inputs, outputs);
 }
@@ -216,7 +216,7 @@ std::vector<double> neatestController::stepNeuralController(){
     if(gVerbose){
 	std::cout << "[Robot #" + to_string(_wm->getId()) + "]\n"
 		  << "\t[Inputs : " ;
-	for(int i = 0; i < _nbInputs; i++){
+	for(unsigned int i = 0; i < _nbInputs; i++){
 	    std::cout << to_string(inputs[i]) + " ";
 	    if ((i % _wm->_cameraSensorsNb) == 0)
 		std::cout << "]" <<  std::endl << "\t\t[ ";
