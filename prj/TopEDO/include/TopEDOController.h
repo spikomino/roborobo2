@@ -27,7 +27,7 @@ class TopEDOController:public Controller
 private:
   int _iteration;
   int _birthdate;		// evaluation when this controller was initialized.
-
+  
   Network *nn;
 
   void createNN ();
@@ -35,16 +35,17 @@ private:
   void initRobot ();
 
   bool _isNewGenome;
+  bool _isFixedTopo;
 
   void stepBehaviour ();
   std::pair<std::vector<double>,std::vector<double>> act();
+  std::pair<std::vector<double>,std::vector<double>> actFTopo();
   float updateFitness (std::vector < double >in, std::vector < double >out);
   void broadcastGenome ();
   void storeGenome (GenomeAdapted * genome, int senderId, int senderBirthdate,
 		    float sigma, float fitness);  
-
-
-
+  void storeGenomeF (std::vector<double> genome, int senderId, int senderBirthdate,
+		    float sigma, float fitness);  
 
   void stepEvolution ();
   void logGenome();
@@ -54,7 +55,9 @@ private:
   int selectRankBased(std::map < int, float >lFitness);
   int selectBinaryTournament (std::map < int, float >lFitness);
   int selectRandom (std::map < int, float >lFitness);
-  void mutate (float sigma);
+  static bool compareFitness(std::pair<int,float> i,std::pair<int,float> j);
+
+  std::vector<double> mutateF(std::vector<double> g, float sigma);
 
   bool getNewGenomeStatus ()
   {
@@ -68,8 +71,11 @@ private:
   // evolutionary engine
 
   GenomeAdapted *_genome;
-
+  std::vector<double> _genomeF;
+  std::vector<double> _previousOut;
+  
   std::map < int, GenomeAdapted * >_genomesList;
+  std::map <int, std::vector<double>> _genomesFList;
   std::map < int, float >_sigmaList;
   std::map < int, float >_fitnessList;
   std::map < int, int >_birthdateList;	// store the birthdate of the received controllers (useful for monitoring).
