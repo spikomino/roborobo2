@@ -20,25 +20,25 @@
 
 //class World;
 
-class neatestWorldObserver : public WorldObserver
-{
-	private:
-		void updateEnvironment();
-        void updateMonitoring();
+class neatestWorldObserver : public WorldObserver{
 
-	protected:
-		int _generationCount;
-		int _lifeIterationCount;
-
-	public:
-		neatestWorldObserver(World *world);
-		~neatestWorldObserver();
-
-		void reset();
-		void step();
-
-		int getLifeIterationCount() { return _lifeIterationCount; }
-
+private:
+    void updateEnvironment();
+    void updateMonitoring();
+    
+protected:
+    int _generationCount;
+    int _lifeIterationCount;
+    
+public:
+    neatestWorldObserver(World *world);
+    ~neatestWorldObserver();
+    
+    void reset();
+    void step();
+    
+    int getLifeIterationCount() { return _lifeIterationCount; }
+		
 };
 
 #endif

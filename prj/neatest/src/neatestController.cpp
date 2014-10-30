@@ -110,7 +110,7 @@ void neatestController::emptyGenomeList(){
 }
 
 void neatestController::reset(){
-    _currentFitness = 0.0;
+    _fitness = 0.0;
     _birthdate = gWorld->getIterations ();
     emptyGenomeList();
 }
@@ -170,10 +170,9 @@ void neatestController::stepBehaviour () {
 	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
     
 
-    _wm->_desiredTranslationalValue = 0.0;
-    _wm->_desiredRotationalVelocity = 0.0;
+    //_wm->_desiredTranslationalValue = 0.0;
+    //_wm->_desiredRotationalVelocity = 0.0;
     
-    //_currentFitness += updateFitness (inputs, outputs);
 }
 
 /*
@@ -214,12 +213,14 @@ std::vector<double> neatestController::stepNeuralController(){
     }
     // some output 
     if(gVerbose){
-	std::cout << "[Robot #" + to_string(_wm->getId()) + "]\n"
-		  << "\t[Inputs : " ;
+	
+	std::cout << "[Controller] "
+		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
+		  << "\t\t[Inputs : " ;
 	for(unsigned int i = 0; i < _nbInputs; i++){
 	    std::cout << to_string(inputs[i]) + " ";
 	    if ((i % _wm->_cameraSensorsNb) == 0)
-		std::cout << "]" <<  std::endl << "\t\t[ ";
+		std::cout << "]" <<  std::endl << "\t\t\t[ ";
 	}
 	std::cout <<  std::endl;
     }
@@ -241,7 +242,7 @@ std::vector<double> neatestController::stepNeuralController(){
 
     // more output 
     if(gVerbose){
-	std::cout <<  "\t[Outputs : " ;
+	std::cout <<  "\t\t[Outputs : " ;
 	std::vector<double>::iterator itr;
 	for(itr = outputs.begin (); itr != outputs.end (); itr++)
 	    std::cout << to_string(*itr) + " ";
@@ -253,76 +254,12 @@ std::vector<double> neatestController::stepNeuralController(){
 }
 
 
-
-
-std::pair<std::vector<double>, std::vector<double>> neatestController::act(){
-    // ---- Build inputs ----
-    std::vector<double>* inputs = new std::vector<double>(_nbInputs);
-    int inputToUse = 0;
-    
-    (*inputs)[inputToUse++] = 1.0; // bias
-    
-    // distance sensors
-    for (int i = 0; i < _wm->_cameraSensorsNb; i++){
-	(*inputs)[inputToUse] =
-	    _wm->getDistanceValueFromCameraSensor (i) /
-	    _wm->getCameraSensorMaximumDistanceValue (i);
-	inputToUse++;
-	
-	if (gExtendedSensoryInputs)   {
-	    int objectId = _wm->getObjectIdFromCameraSensor (i);
-	    
-	    // input: physical object? which type?
-	    if (PhysicalObject::isInstanceOf (objectId)){
-		int nbOfTypes = 5;	//Only type 4 (Switch)
-		for (int i = 4; i != nbOfTypes; i++){
-		    if (i == (gPhysicalObjects
-			      [objectId -
-			       gPhysicalObjectIndexStartOffset]->getType ())){
-			(*inputs)[inputToUse] = 1.0;	// match
-		    }
-		    else
-			(*inputs)[inputToUse] = 0.0;
-		    inputToUse++;
-		}
-	    }
-	    // not an object.Should still fill in the inputs (with zeroes)
-	    else{
-		int nbOfTypes = 5;
-		for (int i = 4; i != nbOfTypes; i++){
-		    (*inputs)[inputToUse] = 0;
-		    inputToUse++;
-		}
-	    }
-	}
-    }
-
-    // step the neuro controller
-    _neurocontroller->load_sensors ((&(*inputs)[0]));
-    if (!_neurocontroller->activate()){
-	std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
-	exit (-1);
-    }
-    
-    // read output
-    std::vector<double> outputs;
-    std::vector<NNode*>::iterator out_iter;
-    for (out_iter = _neurocontroller->outputs.begin ();
-	 out_iter != _neurocontroller->outputs.end (); 
-	 out_iter++)
-	outputs.push_back ((*out_iter)->activation);
-    
-    return std::make_pair(*inputs,outputs);
+void neatestController::setFitness (double f){
+    _fitness = f;
 }
 
-
-float neatestController::updateFitness (std::vector < double >in,
-					 std::vector < double >out){
-    float deltaFit = 0.0;
-    int targetIndex = _wm->getGroundSensorValue ();
-    if (PhysicalObject::isInstanceOf (targetIndex))
-	deltaFit += 1.0;
-    return deltaFit;
+void neatestController::updateFitness (double df){
+    _fitness += df;
 }
 
 void neatestController::broadcastGenome () {

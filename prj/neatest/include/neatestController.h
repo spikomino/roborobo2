@@ -29,8 +29,10 @@ private:
     
     GenomeAdapted* _genome;
     Network*       _neurocontroller;
+    double         _fitness;
+    
 
-        
+
     float _currentFitness;
     float _currentSigma;
 
@@ -65,8 +67,12 @@ private:
     bool lifeTimeOver();
 
     std::vector<double>  stepNeuralController();
-    pair<vector<double>, vector<double>> act();
-    float updateFitness (vector<double> in, vector<double> out);
+
+
+    void updateFitness(double); // incremental fitness 
+    void setFitness(double);    // absolute fitness 
+  
+    
 
     void storeGenome (GenomeAdapted* genome, 
 		      int senderId, 
