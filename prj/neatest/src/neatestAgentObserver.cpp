@@ -70,6 +70,6 @@ void neatestAgentObserver::step(){
 		      << "\twalked upon " << targetIndex << "]" 
 		      <<  std::endl;
 	
-	_wm->updateFitness(1.0);
+	
     }
 }

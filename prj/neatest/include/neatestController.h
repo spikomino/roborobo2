@@ -21,78 +21,50 @@
 using namespace NEAT;
 using namespace std;
 
+typedef tuple<GenomeAdapted*, double, double, int> message;
+
 class neatestController:public Controller {
 
 private:
-    int _iteration;
-    int _birthdate;	 // iteration number at witch are created 
-    
-    GenomeAdapted* _genome;
-    Network*       _neurocontroller;
-    double         _fitness;
-    
-
-
-    float _currentFitness;
-    float _currentSigma;
+    int                     _iteration;
+    int                     _birthdate; // iteration at witch are created 
+    GenomeAdapted*          _genome;
+    double                  _fitness;
+    double                  _sigma;
+    Network*                _neurocontroller;
+    unsigned int            _nbInputs;
+    unsigned int            _nbOutputs;
+    std::map<int, message>  _glist;
+  
 
     //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
     double innovNumber;
     int nodeId;
 
-    // ANN
-    unsigned int _nbInputs;
-    unsigned int _nbOutputs;
-    
-  
 
-    // evolutionary engine
-
-    map <int, GenomeAdapted*> _genomesList;
-    map <int, float>          _sigmaList;
-    map <int, float>          _fitnessList;
-    map <int, int>            _birthdateList;	
-    // store the birthdate of the received controllers (useful for monitoring).
-    
-
-    // Methods 
-
-    void initRobot();
-    void createNeuroController();
-    
+   
+    /* behavior */ 
+    void initRobot     ();
     void stepBehaviour ();
-    void broadcastGenome ();
-    void emptyGenomeList();
 
-    bool lifeTimeOver();
+    /* genome list */
+    void broadcast       ();
+    void storeGenome     (int, message);  
+    void emptyGenomeList ();
 
-    std::vector<double>  stepNeuralController();
+    /* neuro controller */
+    void                 createNeuroController ();
 
-
-    void updateFitness(double); // incremental fitness 
-    void setFitness(double);    // absolute fitness 
-  
-    
-
-    void storeGenome (GenomeAdapted* genome, 
-		      int senderId, 
-		      int senderBirthdate,
-		      float sigma, 
-		      float fitness);  
-
-
-
-
+    /* vvolution */
+    void updateFitness(double); 
     void stepEvolution ();
-    void logGenome();
-    
-    int selectBest   (map<int, float> lFitness);
-    int selectRandom (map<int, float> lFitness);
+    int  selectRandom  ();
+    void mutate        (float sigma);
 
-    void mutate (float sigma);
-
-    void printRobot();
-
+    /* misc */
+    bool lifeTimeOver  ();
+    void printRobot    ();
+    void printMessage  (message);
 
 public:
 
