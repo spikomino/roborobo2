@@ -40,8 +40,6 @@ private:
     //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
     double innovNumber;
     int nodeId;
-
-
    
     /* behavior */ 
     void initRobot     ();
@@ -53,7 +51,7 @@ private:
     void emptyGenomeList ();
 
     /* neuro controller */
-    void                 createNeuroController ();
+    void createNeuroController ();
 
     /* vvolution */
     void updateFitness(double); 
@@ -68,17 +66,12 @@ private:
 
 public:
 
-    neatestController (RobotWorldModel * wm);
+    neatestController  (RobotWorldModel * wm);
     ~neatestController ();
-
-    void reset ();
-    void step ();
-
-    int getBirthdate ()
-    {
-	return _birthdate;
-    }
     
+    int getId(){ return _wm->getId(); }
+    void reset ();
+    void step  ();
 
 };
 
