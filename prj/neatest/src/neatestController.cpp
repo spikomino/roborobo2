@@ -56,6 +56,10 @@ void neatestController::initRobot (){
     // create a neuro controller from this genome
     createNeuroController();
 
+    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
+    innovNumber = (double) _neurocontroller->linkcount ();
+    nodeId = 1 + _nbInputs + _nbOutputs;    
+    
     // empty the genome list 
     emptyGenomeList();
 
@@ -67,11 +71,6 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
     }
-    
-    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    innovNumber = (double) _neurocontroller->linkcount ();
-    nodeId = 1 + _nbInputs + _nbOutputs;    
-    
 }
 
 void neatestController::printRobot(){
@@ -125,11 +124,17 @@ void neatestController::step(){
 
   stepBehaviour(); // execure the neuro controller
   broadcast();     // broadcast genome to neighbors
-  printRobot();
+  
   
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       reset();          // reset fitness and neurocontroller
+      
+      std::string fname = "logs/"+to_string(_genome->getIdTrace());
+      std::ofstream oFile(fname);
+      _genome->print_to_file(oFile);
+      oFile.close();
+      //printRobot();
   }
 }
 
