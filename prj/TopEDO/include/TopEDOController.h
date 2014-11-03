@@ -22,12 +22,14 @@
 using namespace Neural;
 using namespace NEAT;
 
+
 class TopEDOController:public Controller
 {
 private:
   int _iteration;
-  int _birthdate;		// evaluation when this controller was initialized.
   
+  int _birthdate;		// evaluation when this controller was initialized.
+
   Network *nn;
 
   void createNN ();
@@ -106,8 +108,7 @@ public:
   {
     return _birthdate;
   }
-
-
+  
 };
 
 
