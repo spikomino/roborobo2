@@ -28,14 +28,22 @@ def read_options(defaults):
 def draw(g) :
     pylab.clf()
 
-    in_nodes     = [v for v in g if g.node[v]['label']==1]
-    out_nodes    = [v for v in g if g.node[v]['label']==2]
-    bias_nodes   = [v for v in g if g.node[v]['label']==3]
-    hidden_nodes = [v for v in g if g.node[v]['label']==0]
+    in_nodes     = [v for v in g if g.node[v]['lbl']==1]
+    out_nodes    = [v for v in g if g.node[v]['lbl']==2]
+    bias_nodes   = [v for v in g if g.node[v]['lbl']==3]
+    hidden_nodes = [v for v in g if g.node[v]['lbl']==0]
 
-    #active_edges   = [e for e in g if g.edge[e]['enable']==1] 
-    #inactive_edges = [e for e in g if g.edge[e]['enable']==0] 
+    active_edges=[]
+    inactive_edges=[]
+    for n,nbrs in g.adjacency_iter():
+        for nbr,eattr in nbrs.items():
+            if eattr['enable'] == 1 :
+                active_edges.append((n,nbr))
+            else:
+                inactive_edges.append((n,nbr))
 
+
+                
     p=nx.spring_layout(g)
 
     nx.draw_networkx_nodes(g, p, nodelist=in_nodes,     node_shape='s')
@@ -43,11 +51,11 @@ def draw(g) :
     nx.draw_networkx_nodes(g, p, nodelist=bias_nodes,   node_shape='v')
     nx.draw_networkx_nodes(g, p, nodelist=hidden_nodes, node_shape='0')
 
-    #nx.draw_networkx_edges(g, p, edgelist=active_edges,   style='solid')
-    #nx.draw_networkx_edges(g, p, edgelist=inactive_edges, style='dashed')
-    
+    nx.draw_networkx_edges(g, p, edgelist=active_edges,   style='dashed')
+    nx.draw_networkx_edges(g, p, edgelist=inactive_edges, style='dashed')
 
-    nx.draw(g,p)
+
+   # nx.draw(g,p)
     pylab.draw()
 
 
@@ -57,23 +65,28 @@ def process_trait(g, d):
     return 
 
 def process_node(g, d):
+    shapes = ['circle', 'box', 'diamond', 'doublecircle']
+    
     n = d[1]
     g.add_node(n)
     g.node[n]['trait'] = d[2] # ? 
     g.node[n]['type']  = d[3] # 0=>output, 1=>input
-    g.node[n]['label'] = d[4] # 0=>hidden, 1=>input, 2=>output, 3=>bias
+    g.node[n]['lbl'] = d[4] # 0=>hidden, 1=>input, 2=>output, 3=>bias
+    g.node[n]['shape'] = shapes[ int(d[4]) ]
 
+    
 def process_gene(g, d):
     n0 = d[2]
     n1 = d[3]
     w  = d[4]
     g.add_edge(n0, n1, weight=w)
-    g.edge[n0][n1]['trait']    =d[5] # ?
+    g.edge[n0][n1]['trait']    =d[1] # ?
     g.edge[n0][n1]['recurent'] =d[5] # 0/1 yes/no
     g.edge[n0][n1]['inov_num'] =d[6] # int
     g.edge[n0][n1]['mut_num']  =d[7] # float
     g.edge[n0][n1]['enable']   =d[8] # 0/1 yes/no
-
+    if d[8]=='0':
+        g.edge[n0][n1]['style'] = 'dashed' 
     
 
 def process(parameters):
@@ -91,6 +104,7 @@ def process(parameters):
     for line in fh :
         data = line.split()
         if data[0] == 'genomestart' :
+            gid = data[1]
             G.graph['id'] = data[1]
         elif data[0] == 'trait' :
             process_trait(G,data)
@@ -99,13 +113,17 @@ def process(parameters):
         elif data[0] == 'gene' :  
             process_gene(G,data)
         elif data[0] == 'genomeend' :
+            if gid != data[1] : 
+                print 'Error: mismatch genome end tag'
+                exit(1)
             if parameters.win_out:
                 draw(G) 
         else :
             print data
             print 'Error: unexpected token'
 
-
+   
+    
     fh.close()   
     nx.write_dot(G, "gen.dot")
 

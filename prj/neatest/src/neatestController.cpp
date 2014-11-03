@@ -82,9 +82,12 @@ void neatestController::printRobot(){
 		  << "\t\t id  = " + to_string(_genome->getIdTrace()) + "\n"
 		  << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
 		  << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
-    
-	_genome->print_to_file(std::cout);
-    
+
+	std::string fname = "logs/"+to_string(_genome->getIdTrace());
+	std::ofstream oFile(fname);
+	_genome->print_to_file(oFile);
+	oFile.close();
+	
 	std::cout << "\t[Genome list]\n";
 	std::map<int, message>::iterator it;
 	for (it=_glist.begin() ; it != _glist.end(); it++){
@@ -120,7 +123,7 @@ void neatestController::step(){
   stepBehaviour(); // execure the neuro controller
   broadcast();     // broadcast genome to neighbors
   printRobot();
-
+  
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       reset();          // reset fitness and neurocontroller
