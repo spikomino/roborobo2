@@ -27,6 +27,9 @@ void neatestAgentObserver::reset(){
 }
 
 void neatestAgentObserver::step(){
+    if(gVerbose)
+	std::cout << "[Observer]\n";
+    
     // * update energy if needed
     if ( gEnergyLevel && _wm->isAlive() ){
 	_wm->substractEnergy(1);
@@ -44,20 +47,29 @@ void neatestAgentObserver::step(){
 	// sensor ray bumped into a physical object
         if ( PhysicalObject::isInstanceOf(targetIndex) ) {
             targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
-            //std::cout << "[DEBUG] Robot #" << _wm->getId() << " touched " << targetIndex << "\n";
-            gPhysicalObjects[targetIndex]->isTouched(_wm->getId());
-        }
+	    gPhysicalObjects[targetIndex]->isTouched(_wm->getId());
+
+            if(gVerbose)
+		std::cout << "\t[Robot #" + to_string(_wm->getId()) 
+			  << "\tTouched " << targetIndex << "]" 
+			  <<  std::endl;
+	}
     }
     
     // through floor sensor
     int targetIndex = _wm->getGroundSensorValue();
-    
+
     // ground sensor is upon a physical object 
     // (OR: on a place marked with this physical object footprint, 
     // cf. groundsensorvalues image)
     if ( PhysicalObject::isInstanceOf(targetIndex) ) {
         targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
-        //std::cout << "[DEBUG] #" << _wm->getId() << " walked upon " << targetIndex << "\n";
-        gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
+	gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
+	if(gVerbose)
+	    std::cout << "\t[Robot #" + to_string(_wm->getId()) 
+		      << "\twalked upon " << targetIndex << "]" 
+		      <<  std::endl;
+	
+	
     }
 }
