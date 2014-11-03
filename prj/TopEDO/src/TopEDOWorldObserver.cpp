@@ -62,7 +62,8 @@ void TopEDOWorldObserver::step()
     
     updateMonitoring();
 
-    if( _lifeIterationCount >= TopEDOSharedData::gEvaluationTime ) // switch to next generation.
+    if( _lifeIterationCount >= 
+	TopEDOSharedData::gEvaluationTime ) // switch to next generation.
 	{
         // update iterations and generations counters
         _lifeIterationCount = 0;

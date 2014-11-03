@@ -26,7 +26,7 @@ class DemoMedeaController : public Controller
 	private:
 		int _iteration;
         int _birthdate; // evaluation when this controller was initialized.
-    
+	double _currentFitness;
 
 		std::vector<double> _parameters;
 		std::string _nnType;

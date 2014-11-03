@@ -25,18 +25,22 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 {
 
   _wm = wm;
-  _isFixedTopo = false;
+  //true = perceptron, false=neat genome
+  _isFixedTopo = true;
 
   nn = NULL;
   
   NEAT::load_neat_params ("prj/TopEDO/src/explo.ne", false);
 
   _currentSigma = TopEDOSharedData::gSigmaRef;
-  
+ 
+
   initRobot ();
 
   _iteration = 0;
-  _birthdate = 0;
+   _birthdate = 0;
+  _currentFitness = 0.0;
+ 
 }
 
 TopEDOController::~TopEDOController ()
@@ -49,7 +53,8 @@ void
 TopEDOController::reset ()
 {
   _currentFitness = 0.0;
-  _birthdate = gWorld->getIterations ();
+   _birthdate = gWorld->getIterations ();
+ 
   if(!_isFixedTopo)
     _genomesList.clear ();
   else
@@ -100,13 +105,20 @@ TopEDOController::initRobot ()
     }
   else
     {
+      //Single layer perceptron
+      //nbWeights = _nbInputs * _nbOutputs;
        //Single layer perceptron with recurrent connections of the outputs
-      nbWeights = _nbInputs * _nbOutputs + _nbOutputs * _nbOutputs;
+       nbWeights = _nbInputs * _nbOutputs + _nbOutputs * _nbOutputs;
       for(unsigned int i = 0; i < nbWeights; i++ )
 	{
-	  _genomeF.push_back(gaussrand());
+	   _genomeF.push_back(gaussrand());
 	}
-      
+
+      _genomeF[_nbInputs] = 0.0;
+      _genomeF[_nbInputs + 1] = 0.0;
+      _genomeF[2 + 2 * _nbInputs] = 0.0;
+      _genomeF[2 + 2 * _nbInputs + 1] = 0.0;
+	 
       _previousOut.clear();
       //Fill activation for recurrent connections
       for(unsigned int i = 0; i < _nbOutputs; i++)
@@ -133,8 +145,6 @@ TopEDOController::initRobot ()
     }
 
   _fitnessList.clear ();
-  
- 
 }
 
 
@@ -159,16 +169,16 @@ void
 TopEDOController::step ()
 {
   _iteration++;
+
   stepBehaviour ();
-  
-  if (dynamic_cast <
-      TopEDOWorldObserver *
-      >(gWorld->getWorldObserver ())->getLifeIterationCount () >=
-      TopEDOSharedData::gEvaluationTime - 1){
- 
-      stepEvolution ();
-      reset();
-  }
+    
+ if (dynamic_cast <TopEDOWorldObserver *>
+     (gWorld->getWorldObserver ())->getLifeIterationCount () >=
+            TopEDOSharedData::gEvaluationTime - 1)
+     {
+       stepEvolution ();
+       reset();
+    }
 }
 
 
@@ -181,17 +191,39 @@ void
 TopEDOController::stepBehaviour ()
 {
   std::pair<std::vector<double>,std::vector<double>> io ;
+  std::vector<double> outputs;
+  std::vector < double >inputs;
   if(!_isFixedTopo)
-      io = act();
+    {
+      io = act();  
+      outputs= io.second;
+      inputs= io.first;
+      
+      _wm->_desiredTranslationalValue = outputs[0];
+      //Rotational velocity in [-1,+1]. Neat uses sigmoid [0,+1]
+      _wm->_desiredRotationalVelocity = 2 * (outputs[1] - 0.5);
+    }
   else
-    io = actFTopo();
-
-  std::vector<double> outputs = io.second;
-  std::vector < double >inputs = io.first;
-  
-  _wm->_desiredTranslationalValue = outputs[0];
-  //Rotational velocity in [-1,+1]
-  _wm->_desiredRotationalVelocity = 2 * (outputs[1] - 0.5);
+    {
+      io = actFTopo(); 
+      outputs= io.second;
+      inputs= io.first;
+      
+      _wm->_desiredTranslationalValue = outputs[0];
+      //Rotational velocity in [-1,+1]. Perceptron with tanh()
+      _wm->_desiredRotationalVelocity = outputs[1];
+    }
+  /*  std::cout << std::endl;  std::cout << std::endl;  std::cout << std::endl;
+  for(unsigned int i = 0; i < _nbInputs; i++)
+    {
+      std::cout << inputs[i] << " - ";
+    }
+  std::cout << std::endl;
+  for(unsigned int i = 0; i < _nbOutputs; i++)
+    {
+      std::cout << outputs[i] << " - ";
+    }
+    std::cout << std::endl;  std::cout << std::endl;  std::cout << std::endl;*/
 
   // normalize to motor interval values
   _wm->_desiredTranslationalValue =
@@ -218,7 +250,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
 
   // distance sensors
   for (int i = 0; i < _wm->_cameraSensorsNb; i++)
-    {
+    {	  
       inputs[inputToUse] =
 	_wm->getDistanceValueFromCameraSensor (i) /
 	_wm->getCameraSensorMaximumDistanceValue (i);
@@ -250,7 +282,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
 
 	}
     }
- 
+
   // ---- compute and read out ----
   nn->load_sensors (&(inputs[0]));
 
@@ -313,7 +345,7 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::actFTopo()
 	}
     }
   
-  
+ 
   std::vector < double> outputs;
   int idxGenome = 0;
   double aux;
@@ -327,17 +359,26 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::actFTopo()
 	{
 	  aux += inputs[i] * _genomeF[idxGenome++];	  
 	}
-      for(unsigned int i = 0; i < _nbOutputs; i++)
+     
+       for(unsigned int i = 0; i < _nbOutputs; i++)
 	{
 	  aux += _previousOut[i] * _genomeF[idxGenome++];
 	}
-	  //Using sigmoid function as in NEAT
-	  //Second constant is not used, 
-	  //first constant is the slope for sigmoid activation function
-	  outputs.push_back(NEAT::fsigmoid(aux,4.924273,2.4621365));
+      
+      //[Not anymore]
+      //Using sigmoid function as in NEAT
+      //Second constant is not used, 
+      //first constant is the slope for sigmoid activation function
+      //outputs.push_back(NEAT::fsigmoid(aux,4.924273,2.4621365));
+      
+      //Using tanh
+      outputs.push_back(tanh(aux));
     }
-  _previousOut = outputs;
- 
+
+  _previousOut.clear();
+  _previousOut.push_back(outputs[0]);
+  _previousOut.push_back(outputs[1]);
+
   return std::make_pair(inputs,outputs);
 }
 
@@ -365,9 +406,18 @@ TopEDOController::updateFitness (std::vector < double >in,
       break;
     case 1:
       //[Floreano2000] locomotion fitness function
-      //Translational speed * (1 - abs(Rotational Speed)) * minimal(distance to obstacle)
-      vT = out[0];
-      vR =  2 * (out[1] - 0.5);
+      //abs(Translational speed) * (1 - abs(Rotational Speed)) * minimal(distance to obstacle)
+
+      if(!_isFixedTopo)
+	{//Neat uses sigmoid[0,1] activation function
+	  vT = 2 * (out[0] - 0.5);
+	  vR =  2 * (out[1] - 0.5);
+	}
+      else
+	{//Perceptron uses tanh[-1,1] activation function
+	  vT = out[0];
+	  vR =  out[1];       
+	}
 
       minSensor = in[0];
       
@@ -376,8 +426,14 @@ TopEDOController::updateFitness (std::vector < double >in,
 	  if(in[i + 1] < minSensor)
 	    minSensor = in[i + 1];
 	}
-      deltaFit += vT * (1 - fabs(vR)) * minSensor;
-      
+      deltaFit += fabs(vT) * (1 - fabs(vR)) * minSensor;
+      if(deltaFit < 0.0)
+	{
+	  std::cerr << "[ERROR] Negative fitness in navigation" << std::endl;
+	  exit(-1);
+	}
+      // if(_wm->getId() == 1)
+      //std::cout << deltaFit << " - " << fabs(vT) << " - " << (1 - fabs(vR)) << " - " << minSensor << std::endl;
       break;
 
     default:
@@ -415,27 +471,22 @@ TopEDOController::broadcastGenome ()
 		" is not compatible" << std::endl;
 	      exit (-1);
 	    }
-	  
+
 	  // other agent stores my genome.
 	  if(!_isFixedTopo)
 	    {
 	      targetRobotController->
 		storeGenome (_genome, _wm->getId (), _birthdate,
-			     _currentFitness / (gWorld -> getIterations() + 1 - _birthdate),
-					      _currentFitness);
+			     _currentSigma, _currentFitness);
 	    }
 	  else
 	    {
-	        targetRobotController->
+	      targetRobotController->
 		storeGenomeF (_genomeF, _wm->getId (), _birthdate,
-			     _currentFitness / (gWorld -> getIterations() + 1 - _birthdate),
-					      _currentFitness);
+			      _currentSigma, _currentFitness);
 	    }
-	    
-	  
 	}
     }
-  
 }
 
 void
@@ -480,7 +531,8 @@ TopEDOController::stepEvolution ()
     else
       _genomesFList[_wm->getId()] = _genomeF;
       
-    _fitnessList[_wm->getId()] = _currentFitness / (gWorld -> getIterations() + 1 - _birthdate);
+    //_fitnessList[_wm->getId()] = _currentFitness / (gWorld -> getIterations() + 1 - _birthdate);
+    _fitnessList[_wm->getId()] = _currentFitness;
     _sigmaList[_wm->getId ()] = _currentSigma;
     _birthdateList[_wm->getId ()] = _birthdate;
     
@@ -534,7 +586,7 @@ TopEDOController::stepEvolution ()
 	createNN ();
       }
     else
-      _genomeF = mutateF(_genomeF,_currentSigma);
+        _genomeF = mutateF(_genomeF,_currentSigma);
     
 }
 
@@ -546,6 +598,11 @@ TopEDOController::stepEvolution ()
       {
 	result.push_back( g[i] + sigma * gaussrand());
       }
+    result[_nbInputs] = 0.0;
+    result[_nbInputs + 1] = 0.0;
+    result[2 + 2 * _nbInputs] = 0.0;
+    result[2 + 2 * _nbInputs + 1] = 0.0;
+	 
     return result;
   }
 
@@ -554,21 +611,22 @@ void TopEDOController::logGenome()
 {
    if(!_isFixedTopo)
       {
-	//GENERATION ID-ROBOT FITNESS IDGENOME IDMOM
-	TopEDOSharedData::gEvoLog << (gWorld->getIterations () /
-				      TopEDOSharedData::
-				      gEvaluationTime) << " " << _wm->getId () << " " <<
-	  _currentFitness / (gWorld -> getIterations() + 1 - _birthdate) << " " << _genome->getIdTrace () << " " << _genome->
-	  getMom () << std::endl;
+	//GENERATION ID-ROBOT FITNESS SIZE(localPop) IDGENOME IDMOM
+	TopEDOSharedData::gEvoLog << 
+	  //(gWorld->getIterations () /
+				      dynamic_cast <TopEDOWorldObserver *>
+     (gWorld->getWorldObserver ())->getGenerationCount() 
+	  //	     TopEDOSharedData::gEvaluationTime)
+     << " " << _wm->getId () << " " <<
+	  _currentFitness << " " << _fitnessList.size() << " " << _genome->getIdTrace () << " " << _genome-> getMom () << std::endl;
+
       }
    else
      {
-       //GENERATION ID-ROBOT FITNESS 
-	TopEDOSharedData::gEvoLog << (gWorld->getIterations () /
-				      TopEDOSharedData::
-				      gEvaluationTime) << " " << _wm->getId () << " " <<
-	  _currentFitness / (gWorld -> getIterations() + 1 - _birthdate) 
+       //GENERATION ID-ROBOT FITNESS SIZE(localPop)
+       TopEDOSharedData::gEvoLog << (gWorld->getIterations () /TopEDOSharedData::gEvaluationTime) << " " << _wm->getId () << " " <<  _currentFitness 	  << " " << _fitnessList.size()
 	  << std::endl;
+
      }
   
   
@@ -694,7 +752,15 @@ TopEDOController::selectBinaryTournament(std::map < int, float >lFitness)
 }
 int
 TopEDOController::selectRandom(std::map < int, float >lFitness)
-{      
+{       
+  int randomIndex = rand()%lFitness.size();
+  std::map<int, float >::iterator it = lFitness.begin();
+  while (randomIndex !=0 )
+    {
+      it ++;
+      randomIndex --;
+    }
+  /*
   std::vector<int> v;
   //Vector for storing the keys (robot ID)
   for(std::map<int,float>::iterator it = lFitness.begin(); it != lFitness.end(); ++it) {
@@ -702,7 +768,8 @@ TopEDOController::selectRandom(std::map < int, float >lFitness)
   } 
 
   return  v[rand () % v.size ()];
-  
+  */
+  return it->first;
 }
 
 bool TopEDOController::compareFitness(std::pair<int,float> i,std::pair<int,float> j) 

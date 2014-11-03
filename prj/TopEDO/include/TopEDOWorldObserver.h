@@ -38,7 +38,7 @@ class TopEDOWorldObserver : public WorldObserver
 		void step();
 
 		int getLifeIterationCount() { return _lifeIterationCount; }
-
+		int getGenerationCount() { return _generationCount; }
 };
 
 #endif

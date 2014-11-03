@@ -7,6 +7,7 @@
 #include "Config/TestConfigurationLoader.h"
 #include "Config/TopEDOConfigurationLoader.h"
 #include "Config/neatestConfigurationLoader.h"
+#include "Config/TestMedeaConfigurationLoader.h"
 //###DO-NOT-DELETE-THIS-LINE###TAG:INCLUDE###//
 
 
@@ -60,6 +61,12 @@ ConfigurationLoader* ConfigurationLoader::make_ConfigurationLoader (std::string 
 	else if (configurationLoaderObjectName == "neatestConfigurationLoader" )
 	{
 		return new neatestConfigurationLoader();
+	}
+#endif
+#if defined PRJ_TESTMEDEA || !defined MODULAR
+	else if (configurationLoaderObjectName == "TestMedeaConfigurationLoader" )
+	{
+		return new TestMedeaConfigurationLoader();
 	}
 #endif
     //###DO-NOT-DELETE-THIS-LINE###TAG:SWITCH###//
