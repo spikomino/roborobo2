@@ -28,34 +28,21 @@ def read_options(defaults):
 def draw(g) :
     pylab.clf()
 
-    in_nodes     = [v for v in g if g.node[v]['lbl']==1]
-    out_nodes    = [v for v in g if g.node[v]['lbl']==2]
-    bias_nodes   = [v for v in g if g.node[v]['lbl']==3]
-    hidden_nodes = [v for v in g if g.node[v]['lbl']==0]
-
-    active_edges=[]
-    inactive_edges=[]
-    for n,nbrs in g.adjacency_iter():
-        for nbr,eattr in nbrs.items():
-            if eattr['enable'] == 1 :
-                active_edges.append((n,nbr))
-            else:
-                inactive_edges.append((n,nbr))
-
-
+    #in_nodes     = [v for v in g if g.node[v]['lbl']==1]
+    #out_nodes    = [v for v in g if g.node[v]['lbl']==2]
+    #bias_nodes   = [v for v in g if g.node[v]['lbl']==3]
+    #hidden_nodes = [v for v in g if g.node[v]['lbl']==0]
                 
-    p=nx.spring_layout(g)
+    p=nx.circular_layout(g)
 
-    nx.draw_networkx_nodes(g, p, nodelist=in_nodes,     node_shape='s')
-    nx.draw_networkx_nodes(g, p, nodelist=out_nodes,    node_shape='^')
-    nx.draw_networkx_nodes(g, p, nodelist=bias_nodes,   node_shape='v')
-    nx.draw_networkx_nodes(g, p, nodelist=hidden_nodes, node_shape='0')
-
-    nx.draw_networkx_edges(g, p, edgelist=active_edges,   style='dashed')
-    nx.draw_networkx_edges(g, p, edgelist=inactive_edges, style='dashed')
-
-
-   # nx.draw(g,p)
+    #nx.draw_networkx_nodes(g, p, nodelist=in_nodes,     node_color='r')
+    #nx.draw_networkx_nodes(g, p, nodelist=out_nodes,    node_color='g')
+    #nx.draw_networkx_nodes(g, p, nodelist=bias_nodes,   node_color='b')
+    #nx.draw_networkx_nodes(g, p, nodelist=hidden_nodes, node_color='w')
+    #nx.draw_networkx_edges(g,p)
+   
+    nx.draw(g,p)
+    
     pylab.draw()
 
 

@@ -27,7 +27,7 @@ class neatestController:public Controller {
 
 private:
     int                     _iteration;
-    int                     _birthdate; // iteration at witch are created 
+    int                     _birthdate; // iteration at which we are created 
     GenomeAdapted*          _genome;
     double                  _fitness;
     double                  _sigma;
@@ -54,7 +54,7 @@ private:
     void createNeuroController ();
 
     /* vvolution */
-    void updateFitness(double); 
+    void updateFitness (double); 
     void stepEvolution ();
     int  selectRandom  ();
     void mutate        (float sigma);

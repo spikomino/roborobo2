@@ -45,11 +45,13 @@ void neatestController::initRobot (){
 
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
-    _genome->setIdTrace (_wm->getId());
-    _genome->genome_id = _wm->getId();
+    _genome->setIdTrace(getId());
+    _genome->genome_id = getId();
     _genome->setMom(-1);
     _genome->setDad(-1);  
     _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
+
+  
 
     // create a neuro controller from this genome
     createNeuroController();
@@ -65,10 +67,11 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
     }
-          
+    
     //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    //innovNumber = (double) _neurocontroller->linkcount ();
-    //nodeId = 1 + _nbInputs + _nbOutputs;
+    innovNumber = (double) _neurocontroller->linkcount ();
+    nodeId = 1 + _nbInputs + _nbOutputs;    
+    
 }
 
 void neatestController::printRobot(){
@@ -148,10 +151,7 @@ void neatestController::stepBehaviour(){
     int    inputToUse = 0;
     
     // Read inputs 
-    
-    /* bias */
-    inputs[inputToUse++] = 1.0; 
-
+ 
     /* read distance sensors  */
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
 	inputs[inputToUse++] = 
@@ -176,6 +176,10 @@ void neatestController::stepBehaviour(){
 		inputs[inputToUse++] = 0.0;
 	}
  
+    /* bias : neat put biases after sensors */
+    inputs[inputToUse++] = 1.0; 
+    
+
     // step the neuro controller
     _neurocontroller->load_sensors(inputs);
     if (!_neurocontroller->activate()){
