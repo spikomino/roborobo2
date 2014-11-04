@@ -73,7 +73,8 @@ def process_node(g, d):
     g.node[n]['lbl'] = d[4] # 0=>hidden, 1=>input, 2=>output, 3=>bias
     g.node[n]['shape'] = shapes[ int(d[4]) ]
     g.node[n]['color'] = colors[ int(d[4]) ]
-    
+  
+
 def process_gene(g, d):
     n0 = d[2]
     n1 = d[3]
@@ -114,11 +115,18 @@ def process_graph(fname):
     fh.close()   
     return G
 
-def process_path(path):
-    gl=[]
+def list_files_in_path(path):
+    l=[]
     for f in listdir(path) :
         if isfile(join(path,f)) and f.endswith('.gen'):
-            gl.append(process_graph(join(path,f)))
+            l.append(join(path,f) )
+    l.sort()
+    return l
+
+def process_path(l):
+    gl = []
+    for g in l:
+        gl.append(process_graph(g))
     return gl;
 
 def save_graph(g):
@@ -146,13 +154,16 @@ if __name__ == '__main__':
         pylab.show()
     
     if options.path != None : # are we processing a directory
-        gl = process_path(options.path)
+        l  = list_files_in_path(options.path)
+        print l
+        gl = process_path(l)
         save_graph_many(gl)
         if options.win_out :
             for g in gl:
                 draw(g)
                 print 'Press enter'
                 raw_input()
+
     else : # we're processing a single file 
         g = process_graph(options.file) 
         save_graph(g)
@@ -164,6 +175,7 @@ if __name__ == '__main__':
         raw_input()
 
 
+    exit
         
     if options.path != None and options.animation != None :
         for g in gl:
@@ -181,5 +193,15 @@ if __name__ == '__main__':
 
         # execute ffmpeg -framerate 1 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p out.mp4
         
-        fin = 
+        fin = [v.graph['id']+'.png' for v in gl ]
+        l=''
+        for f in fin :
+            l = l+' '+f
+        
+            #      subprocess.call(
+            #          ['ffmpeg',
+            #           '-framerate', '1', 
+            #           '-pattern_type','glob', '-i', "" 
+            # '-c:v', 'libx264', '-pix_fmt','yuv420p', ]
+            #)
             

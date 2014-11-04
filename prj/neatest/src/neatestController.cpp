@@ -71,6 +71,18 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
     }
+
+    save_genome();
+}
+
+void neatestController::save_genome(){
+    char fname[128];
+    snprintf(fname, 127, "logs/%04d-%010d.gen", 
+	     getId(), 
+	     _genome->getIdTrace());
+    std::ofstream oFile(fname);
+    _genome->print_to_file(oFile);
+    oFile.close();
 }
 
 void neatestController::printRobot(){
@@ -85,11 +97,6 @@ void neatestController::printRobot(){
 		  << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
 		  << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
 
-	std::string fname = "logs/"+to_string(_genome->getIdTrace());
-	std::ofstream oFile(fname);
-	_genome->print_to_file(oFile);
-	oFile.close();
-	
 	std::cout << "\t[Genome list]\n";
 	std::map<int, message>::iterator it;
 	for (it=_glist.begin() ; it != _glist.end(); it++){
@@ -130,14 +137,9 @@ void neatestController::step(){
       stepEvolution (); // select, mutate, replace
       reset();          // reset fitness and neurocontroller
       
-      std::string fname =
-	  "logs/"
-	  +to_string(getId())+"-"
-	  +to_string(_genome->getIdTrace())+".gen";
-      std::ofstream oFile(fname);
-      _genome->print_to_file(oFile);
-      oFile.close();
-      //printRobot();
+      save_genome();
+
+      printRobot();
   }
 }
 

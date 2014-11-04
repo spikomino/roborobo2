@@ -63,6 +63,7 @@ private:
     bool lifeTimeOver  ();
     void printRobot    ();
     void printMessage  (message);
+    void save_genome   ();
 
 public:
 
