@@ -1,5 +1,5 @@
 
-ROOT =/mnt/data/boumaza/git/roborobo2
+ROOT =../../../../
 
 
 INCLUDE = -I $(ROOT)/include/contrib/

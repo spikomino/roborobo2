@@ -130,7 +130,10 @@ void neatestController::step(){
       stepEvolution (); // select, mutate, replace
       reset();          // reset fitness and neurocontroller
       
-      std::string fname = "logs/"+to_string(_genome->getIdTrace());
+      std::string fname =
+	  "logs/"
+	  +to_string(getId())+"-"
+	  +to_string(_genome->getIdTrace())+".gen";
       std::ofstream oFile(fname);
       _genome->print_to_file(oFile);
       oFile.close();

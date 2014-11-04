@@ -16,12 +16,13 @@ int main (int argc, char** argv){
     double innovNumber;
     int nodeId= nb_inputs+nb_outputs+1;
    
-    load_neat_params ("../../../../prj/neatest/src/explo.ne", true);
+    load_neat_params ("explo.ne", true);
     
     GenomeAdapted* genome = new GenomeAdapted(nb_inputs, nb_outputs, 0, 0);
     genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
     genome->setIdTrace(-1);
-    std::string fname = to_string(genome->getIdTrace());
+    std::string fname =
+	  "0-"+to_string(genome->getIdTrace())+".gen";
     std::ofstream oFile(fname);
     genome->print_to_file(oFile);
     oFile.close();
@@ -34,7 +35,7 @@ int main (int argc, char** argv){
 				nodeId, 
 				innovNumber);
 	
-	std::string fname = to_string(genome->getIdTrace());
+	std::string fname = "0-"+to_string(genome->getIdTrace())+".gen";
 	std::ofstream oFile(fname);
 	genome->print_to_file(oFile);
 	oFile.close();
