@@ -65,13 +65,14 @@ private:
     void printGenomeList ();
     void printMessage    (message);
     void save_genome     ();
+    void printAll        ();
 
 public:
 
     neatestController  (RobotWorldModel * wm);
     ~neatestController ();
     
-    int getId(){ return _wm->getId(); }
+    int getId  (){ return _wm->getId(); }
     void reset ();
     void step  ();
 

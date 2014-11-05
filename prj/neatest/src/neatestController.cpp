@@ -52,8 +52,6 @@ void neatestController::initRobot (){
     _genome->setDad(-1);  
     _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
 
-  
-
     // create a neuro controller from this genome
     createNeuroController();
 
@@ -86,34 +84,47 @@ void neatestController::save_genome(){
     oFile.close();
 }
 
-void neatestController::printRobot(){
-    if (gVerbose){
-	std::cout << "[Robot #"        + to_string(_wm->getId())    + "]\n"
-		  << "\t iteration = " + to_string(_iteration)      + "\n"
-		  << "\t birthdate = " + to_string(_birthdate)      + "\n"
-		  << "\t fitness   = " + to_string(_fitness) + "\n"
-		  << "\t sigma     = " + to_string(_sigma)   + "\n"
-		  << "\t [Genome] \n" 
-		  << "\t\t id  = " + to_string(_genome->getIdTrace()) + "\n"
-		  << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
-		  << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
 
-	printGenomeList();
-	    
-    }
+
+void print_genome(GenomeAdapted* g){
+    std::cout << "[Genome: id=" << g->genome_id
+	      << " idtrace="     << g->getIdTrace()
+	      << " mom="         << g->getMom()
+	      << " dad="         << g->getDad() << " ]";
 }
 
 void neatestController::printGenomeList(){
-    std::cout << "\t[Genome list]\n";
+    std::cout << "[Genome list " + to_string(getId()) + "]\n";
     std::map<int, message>::iterator it;
     for (it=_glist.begin() ; it != _glist.end(); it++){
 	std::cout << "\t\t[R# " << it->first << "] " ;
-	printMessage(it->second);
+	GenomeAdapted* g;
+	double f,s;
+	int b;
+	std::tie (g,f,s,b) = it->second;
+
+	print_genome(g);
 	std::cout << std::endl;
     }
 
 }
 
+void neatestController::printRobot(){
+    std::cout << "[Robot: id=" + to_string(getId())
+	      << " iteration=" + to_string(_iteration)
+	      << " birthdate=" + to_string(_birthdate) 
+	      << " fitness="   + to_string(_fitness) 
+	      << " sigma="     + to_string(_sigma) + " ]";
+}
+
+void neatestController::printAll(){
+    printRobot();
+    //std::cout << "\n\t";
+    print_genome(_genome);
+    std::cout << "\n";
+    //std::cout << "\t";
+    //printGenomeList();
+}
 
 
 void neatestController::createNeuroController (){
@@ -140,14 +151,16 @@ void neatestController::step(){
 
   stepBehaviour(); // execure the neuro controller
   broadcast();     // broadcast genome to neighbors
-    
+
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
+      save_genome();
+      if (gVerbose)
+	  printAll();
       reset();          // reset fitness and neurocontroller
       
-      save_genome();
+      
 
-      printRobot();
   }
 }
 
@@ -214,7 +227,7 @@ void neatestController::stepBehaviour(){
 	outputs.push_back((*out_iter)->activation);
 
     // print things
-    if(gVerbose){
+    /*if(gVerbose){
 	std::cout << "[Controller] "
 		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
 		  << "\t\t[Inputs : " ;
@@ -231,7 +244,7 @@ void neatestController::stepBehaviour(){
 	    std::cout << to_string(*itr) + " ";
 	std::cout << "]"
 		  << std::endl;
-    }
+		  }*/
     
     // execute the motor commands 
     _wm->_desiredTranslationalValue = outputs[0]; 

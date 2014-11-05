@@ -27,8 +27,8 @@ void neatestAgentObserver::reset(){
 }
 
 void neatestAgentObserver::step(){
-    if(gVerbose)
-	std::cout << "[Observer]\n";
+    /* if(gVerbose) */
+    /*   std::cout << "[Observer]\n"; */
     
     // * update energy if needed
     if ( gEnergyLevel && _wm->isAlive() ){
@@ -49,10 +49,10 @@ void neatestAgentObserver::step(){
             targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
 	    gPhysicalObjects[targetIndex]->isTouched(_wm->getId());
 
-            if(gVerbose)
-		std::cout << "\t[Robot #" + to_string(_wm->getId()) 
-			  << "\tTouched " << targetIndex << "]" 
-			  <<  std::endl;
+            /* if(gVerbose) */
+	    /* 	std::cout << "\t[Robot #" + to_string(_wm->getId())  */
+	    /* 		  << "\tTouched " << targetIndex << "]"  */
+	    /* 		  <<  std::endl; */
 	}
     }
     
@@ -65,10 +65,10 @@ void neatestAgentObserver::step(){
     if ( PhysicalObject::isInstanceOf(targetIndex) ) {
         targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
 	gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
-	if(gVerbose)
-	    std::cout << "\t[Robot #" + to_string(_wm->getId()) 
-		      << "\twalked upon " << targetIndex << "]" 
-		      <<  std::endl;
+	/* if(gVerbose) */
+	    /* std::cout << "\t[Robot #" + to_string(_wm->getId())  */
+	    /* 	      << "\twalked upon " << targetIndex << "]"  */
+	    /* 	      <<  std::endl; */
 	
 	
     }
