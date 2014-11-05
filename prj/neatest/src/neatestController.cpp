@@ -98,7 +98,7 @@ void neatestController::printRobot(){
 		  << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
 		  << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
 
-	printGenomeList()
+	printGenomeList();
 	    
     }
 }
@@ -318,10 +318,10 @@ void neatestController::printMessage(message msg){
 	      << " sigma="     << s
 	      << " birthdate=" << b << ")";
     
-    std::cout << "[Genome : (id = " << g->getId()
+    std::cout << "[Genome : (id = " << g->genome_id
 	      << ", idtrace = "     << g->getIdTrace()
 	      << ", mom = "         << g->getMom()
-	      << ", dad = "         << g->getDad() ")]"
+	      << ", dad = "         << g->getDad() << ")]";
 }
 
 void neatestController::emptyGenomeList(){
