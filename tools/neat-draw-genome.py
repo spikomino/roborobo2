@@ -147,13 +147,15 @@ if __name__ == '__main__':
     defaults_opts['path']      = None
     defaults_opts['animation'] = None
     (options, args) = read_options(defaults_opts)
-    
-    if options.win_out: # If we draw things ... prepare    
+
+    # If we draw things ... prepare    
+    if options.win_out: 
         pylab.ion()
         fig = pylab.figure(num=None, figsize=(5, 5), dpi=100)
         pylab.show()
-    
-    if options.path != None : # are we processing a directory
+   
+    # are we processing a directory
+    if options.path != None :
         l  = list_files_in_path(options.path)
         print l
         gl = process_path(l)
@@ -175,7 +177,6 @@ if __name__ == '__main__':
         raw_input()
 
 
-    exit
         
     if options.path != None and options.animation != None :
         for g in gl:
@@ -190,6 +191,9 @@ if __name__ == '__main__':
             p3 = Popen(["dot", "-Tpng", "-o", fout],stdin=p2.stdout,stdout=PIPE)
             p2.stdout.close()  
             p3.communicate()[0]
+
+
+        exit 
 
         # execute ffmpeg -framerate 1 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p out.mp4
         

@@ -60,10 +60,11 @@ private:
     void mutate        (float sigma);
 
     /* misc */
-    bool lifeTimeOver  ();
-    void printRobot    ();
-    void printMessage  (message);
-    void save_genome   ();
+    bool lifeTimeOver    ();
+    void printRobot      ();
+    void printGenomeList ();
+    void printMessage    (message);
+    void save_genome     ();
 
 public:
 

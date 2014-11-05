@@ -45,8 +45,9 @@ void neatestController::initRobot (){
 
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
-    _genome->setIdTrace(getId());
     _genome->genome_id = getId();
+    
+    _genome->setIdTrace(getId());
     _genome->setMom(-1);
     _genome->setDad(-1);  
     _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
@@ -97,15 +98,23 @@ void neatestController::printRobot(){
 		  << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
 		  << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
 
-	std::cout << "\t[Genome list]\n";
-	std::map<int, message>::iterator it;
-	for (it=_glist.begin() ; it != _glist.end(); it++){
-	    std::cout << "\t\t[" << it->first << "] " ;
-	    printMessage(it->second);
-	    std::cout << std::endl;
-	}
+	printGenomeList()
+	    
     }
 }
+
+void neatestController::printGenomeList(){
+    std::cout << "\t[Genome list]\n";
+    std::map<int, message>::iterator it;
+    for (it=_glist.begin() ; it != _glist.end(); it++){
+	std::cout << "\t\t[R# " << it->first << "] " ;
+	printMessage(it->second);
+	std::cout << std::endl;
+    }
+
+}
+
+
 
 void neatestController::createNeuroController (){
   if (_neurocontroller != NULL)
@@ -121,7 +130,7 @@ bool neatestController::lifeTimeOver(){
 
 void neatestController::reset(){
     _fitness   = 0.0;
-    _birthdate = gWorld->getIterations ();
+    _birthdate = gWorld->getIterations();
     emptyGenomeList();
     createNeuroController();
 }
@@ -131,8 +140,7 @@ void neatestController::step(){
 
   stepBehaviour(); // execure the neuro controller
   broadcast();     // broadcast genome to neighbors
-  
-  
+    
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       reset();          // reset fitness and neurocontroller
@@ -272,7 +280,7 @@ void neatestController::broadcast() {
 	    }
 	}
 	
-	// if found any broadcast my genome
+	// if found neighbors, broadcast my genome
 	if(neighbors.size() > 0) {
 	    message msg (_genome, _fitness, _sigma, _birthdate);
 	    /* remove duplicates */
@@ -309,6 +317,11 @@ void neatestController::printMessage(message msg){
 	      << " fitness="   << f
 	      << " sigma="     << s
 	      << " birthdate=" << b << ")";
+    
+    std::cout << "[Genome : (id = " << g->getId()
+	      << ", idtrace = "     << g->getIdTrace()
+	      << ", mom = "         << g->getMom()
+	      << ", dad = "         << g->getDad() ")]"
 }
 
 void neatestController::emptyGenomeList(){
