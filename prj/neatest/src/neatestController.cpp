@@ -45,15 +45,21 @@ void neatestController::initRobot (){
 
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
-    _genome->setIdTrace (_wm->getId());
-    _genome->genome_id = _wm->getId();
+    _genome->setIdTrace(getId());
+    _genome->genome_id = getId();
     _genome->setMom(-1);
     _genome->setDad(-1);  
     _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
 
+  
+
     // create a neuro controller from this genome
     createNeuroController();
 
+    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
+    innovNumber = (double) _neurocontroller->linkcount ();
+    nodeId = 1 + _nbInputs + _nbOutputs;    
+    
     // empty the genome list 
     emptyGenomeList();
 
@@ -65,10 +71,18 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
     }
-          
-    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    //innovNumber = (double) _neurocontroller->linkcount ();
-    //nodeId = 1 + _nbInputs + _nbOutputs;
+
+    save_genome();
+}
+
+void neatestController::save_genome(){
+    char fname[128];
+    snprintf(fname, 127, "logs/%04d-%010d.gen", 
+	     getId(), 
+	     _genome->getIdTrace());
+    std::ofstream oFile(fname);
+    _genome->print_to_file(oFile);
+    oFile.close();
 }
 
 void neatestController::printRobot(){
@@ -83,11 +97,6 @@ void neatestController::printRobot(){
 		  << "\t\t mon = " + to_string(_genome->getMom()) + "\n"
 		  << "\t\t dad = " + to_string(_genome->getDad()) + "\n";
 
-	std::string fname = "logs/"+to_string(_genome->getIdTrace());
-	std::ofstream oFile(fname);
-	_genome->print_to_file(oFile);
-	oFile.close();
-	
 	std::cout << "\t[Genome list]\n";
 	std::map<int, message>::iterator it;
 	for (it=_glist.begin() ; it != _glist.end(); it++){
@@ -122,11 +131,15 @@ void neatestController::step(){
 
   stepBehaviour(); // execure the neuro controller
   broadcast();     // broadcast genome to neighbors
-  printRobot();
+  
   
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       reset();          // reset fitness and neurocontroller
+      
+      save_genome();
+
+      printRobot();
   }
 }
 
@@ -148,10 +161,7 @@ void neatestController::stepBehaviour(){
     int    inputToUse = 0;
     
     // Read inputs 
-    
-    /* bias */
-    inputs[inputToUse++] = 1.0; 
-
+ 
     /* read distance sensors  */
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
 	inputs[inputToUse++] = 
@@ -176,6 +186,10 @@ void neatestController::stepBehaviour(){
 		inputs[inputToUse++] = 0.0;
 	}
  
+    /* bias : neat put biases after sensors */
+    inputs[inputToUse++] = 1.0; 
+    
+
     // step the neuro controller
     _neurocontroller->load_sensors(inputs);
     if (!_neurocontroller->activate()){

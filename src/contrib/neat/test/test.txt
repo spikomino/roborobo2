@@ -1,0 +1,5 @@
+neat-test
+
+python tools/neat-draw-genome.py -w -f 9
+
+dot gen.dot | gvcolor | twopi -Tps -o gen.ps
