@@ -9,7 +9,6 @@
 #include "Config/neatestConfigurationLoader.h"
 #include "Config/TestMedeaConfigurationLoader.h"
 #include "Config/SimpleConfigurationLoader.h"
-#include "Config/SimpleShellsConfigurationLoader.h"
 //###DO-NOT-DELETE-THIS-LINE###TAG:INCLUDE###//
 
 

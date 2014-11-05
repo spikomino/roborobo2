@@ -114,10 +114,10 @@ TopEDOController::initRobot ()
 	   _genomeF.push_back(gaussrand());
 	}
 
-      _genomeF[_nbInputs] = 0.0;
+      /*_genomeF[_nbInputs] = 0.0;
       _genomeF[_nbInputs + 1] = 0.0;
       _genomeF[2 + 2 * _nbInputs] = 0.0;
-      _genomeF[2 + 2 * _nbInputs + 1] = 0.0;
+      _genomeF[2 + 2 * _nbInputs + 1] = 0.0;*/
 	 
       _previousOut.clear();
       //Fill activation for recurrent connections
@@ -246,7 +246,6 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
     std::vector < double >inputs(_nbInputs);
   int inputToUse = 0;
 
-  inputs[inputToUse++] = 1.0;
 
   // distance sensors
   for (int i = 0; i < _wm->_cameraSensorsNb; i++)
@@ -282,6 +281,8 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
 
 	}
     }
+  //Bias
+  inputs[inputToUse++] = 1.0;
 
   // ---- compute and read out ----
   nn->load_sensors (&(inputs[0]));
@@ -308,7 +309,6 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::actFTopo()
     std::vector < double >inputs(_nbInputs);
   int inputToUse = 0;
 
-  inputs[inputToUse++] = 1.0;
 
   // distance sensors
   for (int i = 0; i < _wm->_cameraSensorsNb; i++)
@@ -344,6 +344,9 @@ std::pair<std::vector<double>,std::vector<double>> TopEDOController::actFTopo()
 
 	}
     }
+
+  //Bias
+  inputs[inputToUse++] = 1.0;
   
  
   std::vector < double> outputs;
@@ -419,12 +422,12 @@ TopEDOController::updateFitness (std::vector < double >in,
 	  vR =  out[1];       
 	}
 
-      minSensor = in[0];
+      minSensor = in[_wm->_cameraSensorsNb - 1];
       
       for (int i = 0; i < _wm->_cameraSensorsNb; i++)
 	{
-	  if(in[i + 1] < minSensor)
-	    minSensor = in[i + 1];
+	  if(in[i] < minSensor)
+	    minSensor = in[i];
 	}
       deltaFit += fabs(vT) * (1 - fabs(vR)) * minSensor;
       if(deltaFit < 0.0)
@@ -598,10 +601,10 @@ TopEDOController::stepEvolution ()
       {
 	result.push_back( g[i] + sigma * gaussrand());
       }
-    result[_nbInputs] = 0.0;
+    /*result[_nbInputs] = 0.0;
     result[_nbInputs + 1] = 0.0;
     result[2 + 2 * _nbInputs] = 0.0;
-    result[2 + 2 * _nbInputs + 1] = 0.0;
+    result[2 + 2 * _nbInputs + 1] = 0.0;*/
 	 
     return result;
   }
