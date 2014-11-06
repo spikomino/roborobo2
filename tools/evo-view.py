@@ -2,19 +2,14 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 
-import pylab
+import os
 import networkx as nx
 from optparse import OptionParser
 from optparse import OptionGroup
 
-from os import listdir
-from os.path import isfile, join, splitext
-
-from subprocess import Popen, PIPE
-
-
+# python evo-view.py -f ../logs/out.log
 # process files of the form 
-#
+
 
 #[Robot: id=0 iteration=20 birthdate=0 fitness=0.000000 sigma=0.000000 ][Genome: id=0 idtrace=10000 mom=2 dad=-1 ]
 #[Robot: id=2 iteration=20 birthdate=0 fitness=0.000000 sigma=0.000000 ][Genome: id=2 idtrace=10002 mom=0 dad=-1 ]
@@ -101,20 +96,50 @@ def process_file(fname):
     return G
 
 # trac the offspring of a gene and add them to the graph 
-def trac_genome(gl, id, G):
+def trac_genome(gl, id, G, col):
+   
     for i in gl :
         for g in gl[i] :
             (tr, m, d) = g
             if m == id :               
                 G.add_node(tr)
-                G.add_edge(id,tr)
-                trac_genome(gl, tr, G)
+                G.node[tr]['agent'] = i
+                G.node[tr]['id']    = tr
+                G.node[tr]['mom']   = m
+                G.node[tr]['dad']   = d
+                G.node[tr]['color'] = col[i%len(col)]
+                G.add_edge(id, tr)
+                trac_genome(gl, tr, G, col)
 
-def create_phylo_graph(gl, G):
+
+# Crete a phylogenetic tree 
+# in  : log file in the correct format see above
+# out : the graphe og the phylo tree (root nodes are the initial genes)
+def create_phylo_graph(fname, save=False): 
+    colors = ['chartreuse', 'chocolate', 'cadetblue', 'cornflowerblue', 'cyan',
+              'darkorange', 'darkviolet', 'deeppink']
+  
+    # create a graph
+    G=nx.DiGraph()        
+
+    # fill the lists with all the genes 
+    gl = process_file(fname)
+    
+    # create the phylo-tree
     for n in gl.keys():
         G.add_node(n) # the root node (the initial gene)
-        trac_genome(gl,n, G)
-        
+        G.node[n]['agent'] = n
+        G.node[n]['id']    = n
+        G.node[n]['color'] = colors[n%len(colors)]
+        trac_genome(gl, n, G, colors)
+    
+    # write the file 
+    if save :
+        nx.write_dot(G, os.path.splitext(fname)[0]+'-phylo.dot')
+    
+    return G
+   
+
 
 # If run directly (toplevel)
 
@@ -127,16 +152,8 @@ if __name__ == '__main__':
     defaults_opts['path']      = None
     (options, args) = read_options(defaults_opts)
 
-    # create a graph
-    G=nx.DiGraph()        
-
+  
     # fill the lists with all the genes 
-    gl = process_file(options.file)
+    g = create_phylo_graph(options.file, True)
     
-    # create the phylo-tree
-    create_phylo_graph(gl, G)
-    
-    # write the file 
-    nx.write_dot(G, splitext(options.file)[0]+'-phylo.dot')
-
     
