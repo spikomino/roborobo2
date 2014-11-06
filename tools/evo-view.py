@@ -63,6 +63,8 @@ def read_options(defaults):
 
 
 # extract the genome form a line and put it in the right list
+# in  : a line from the evolution log
+# out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
     if d[6] != '][Genome:' :
         return (None, None, None, None)
@@ -72,18 +74,17 @@ def process_robot_entry(d):
     dad     = int(d[10].split('=')[1])
     return (rob,idtrace, mom, dad)
 
-
-# read the log file and fill the genome lists.
+# read the number of robots & creates a dictionary with num robots lists 
+# like this one with 3 robots {0: [(tuples), ()], 1: [], 2: []}
+# in  : a log file name
+# out : a dictionary with robots id as keys to lists to tuple 
 def process_file(fname):
-    
-    # read the number of robots & creates a dictionary with num robots lists 
-    # like this one with 3 robots {0: [], 1: [], 2: []}
     G = {}
     fh = open(fname, 'r')
     for line in fh :
         data = line.split()
         if data != [] and data[0] == '[initRobot]' :
-            # read the id of the robot (which = genome id)
+            # read the id of the robot (which is genome id)
             gid = int(data[1].split('=')[1]) 
             G[gid] = []
     fh.close()   
@@ -99,7 +100,7 @@ def process_file(fname):
     fh.close()   
     return G
 
-# trac the offspring of a gene 
+# trac the offspring of a gene and add them to the graph 
 def trac_genome(gl, id, G):
     for i in gl :
         for g in gl[i] :
@@ -108,7 +109,12 @@ def trac_genome(gl, id, G):
                 G.add_node(tr)
                 G.add_edge(id,tr)
                 trac_genome(gl, tr, G)
-  
+
+def create_phylo_graph(gl, G):
+    for n in gl.keys():
+        G.add_node(n) # the root node (the initial gene)
+        trac_genome(gl,n, G)
+        
 
 # If run directly (toplevel)
 
@@ -128,10 +134,8 @@ if __name__ == '__main__':
     gl = process_file(options.file)
     
     # create the phylo-tree
-    for n in gl.keys():
-        G.add_node(n) # the root node (the initial gene)
-        trac_genome(gl,n, G)
-
+    create_phylo_graph(gl, G)
+    
     # write the file 
     nx.write_dot(G, splitext(options.file)[0]+'-phylo.dot')
 
