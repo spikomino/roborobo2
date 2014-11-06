@@ -16,7 +16,7 @@
 #include "neatest/include/neatestWorldObserver.h"
 
 using namespace NEAT;
-
+void print_genome(GenomeAdapted*);
 
 neatestController::neatestController(RobotWorldModel * wm){
   _wm              = wm;
@@ -69,6 +69,7 @@ void neatestController::initRobot (){
 		  << "out=" << _nbOutputs 
 		  << std::endl;
 	printRobot();
+	print_genome(_genome);
     }
 
     save_genome();
@@ -88,9 +89,9 @@ void neatestController::save_genome(){
 
 void print_genome(GenomeAdapted* g){
     std::cout << "[Genome: id=" << g->genome_id
-	      << " idtrace="     << g->getIdTrace()
-	      << " mom="         << g->getMom()
-	      << " dad="         << g->getDad() << " ]";
+	      << " idtrace="    << g->getIdTrace()
+	      << " mom="        << g->getMom()
+	      << " dad="        << g->getDad() << " ]";
 }
 
 void neatestController::printGenomeList(){

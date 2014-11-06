@@ -35,6 +35,7 @@ from subprocess import Popen, PIPE
 
 
 
+
 def read_options(defaults):
     parser = OptionParser()
     parser.add_option("-w", "--win-output", 
@@ -55,49 +56,59 @@ def read_options(defaults):
                       default=defaults['path']   ,  
                       help="the path to genome files [default "
                       +str(defaults['path'])+"]")
-   
-    
     
     return parser.parse_args()
 
 
-# this function creates a dictionary with num robots lists 
-# like this one with 3 robots {0: [0], 1: [1], 2: [2]}
-def create_genome_lists(fname):
-    G = {}
-    fh = open(fname, 'r')
-    for line in fh :
-        data = line.split()
-       
-        if data != [] and data[0] == '[initRobot]' :
-            # read the id of the robot (which = genome id)
-            gid = int(data[1].split('=')[1]) 
-            G[gid] = [gid]
-    fh.close()   
-    return G
 
 
 # extract the genome form a line and put it in the right list
 def process_robot_entry(d):
     if d[6] != '][Genome:' :
-        return (None, None))
-    idtrace = int(d[8].split('=')[1]) 
-    mom     = int(d[9].split('=')[1]) 
-    return (idtrace, mom)
+        return (None, None, None, None)
+    rob     = int( d[7].split('=')[1]) 
+    idtrace = int( d[8].split('=')[1]) 
+    mom     = int( d[9].split('=')[1])
+    dad     = int(d[10].split('=')[1])
+    return (rob,idtrace, mom, dad)
 
 
 # read the log file and fill the genome lists.
-def process_file(fname, G):
+def process_file(fname):
+    
+    # read the number of robots & creates a dictionary with num robots lists 
+    # like this one with 3 robots {0: [], 1: [], 2: []}
+    G = {}
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and data[0] == '[initRobot]' :
+            # read the id of the robot (which = genome id)
+            gid = int(data[1].split('=')[1]) 
+            G[gid] = []
+    fh.close()   
+
+    # fill the lists 
     fh = open(fname, 'r')
     for line in fh :
         data = line.split()
         if data != [] and  data[0] == '[Robot:' :
-            (id, mom) = process_robot_entry(data)
-            if id != None :
-                
+            (r, id, mom, dad) = process_robot_entry(data)
+            if r != None :
+                G[r].append((id, mom, dad))
     fh.close()   
-    
+    return G
 
+# trac the offspring of a gene 
+def trac_genome(gl, id, G):
+    for i in gl :
+        for g in gl[i] :
+            (tr, m, d) = g
+            if m == id :               
+                G.add_node(tr)
+                G.add_edge(id,tr)
+                trac_genome(gl, tr, G)
+  
 
 # If run directly (toplevel)
 
@@ -110,7 +121,18 @@ if __name__ == '__main__':
     defaults_opts['path']      = None
     (options, args) = read_options(defaults_opts)
 
+    # create a graph
+    G=nx.DiGraph()        
+
+    # fill the lists with all the genes 
+    gl = process_file(options.file)
+    
+    # create the phylo-tree
+    for n in gl.keys():
+        G.add_node(n) # the root node (the initial gene)
+        trac_genome(gl,n, G)
+
+    # write the file 
+    nx.write_dot(G, splitext(options.file)[0]+'-phylo.dot')
 
     
-    G = create_genome_lists(options.file)
-    print G
