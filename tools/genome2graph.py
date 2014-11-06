@@ -35,9 +35,12 @@ def process_gene(g, d):
     g.edge[n0][n1]['inov_num'] =d[6] # int
     g.edge[n0][n1]['mut_num']  =d[7] # float
     g.edge[n0][n1]['enable']   =d[8] # 0/1 yes/no
+    g.edge[n0][n1]['style'] = 'solid'
+    g.edge[n0][n1]['color'] = 'black'
     if d[8]=='0':
         g.edge[n0][n1]['style'] = 'dashed' 
-        g.edge[n0][n1]['color'] = 'red' 
+        g.edge[n0][n1]['color'] = 'red'
+
 
 # Reads a neat genome filename and greate the coresponding graph
 # in  : a filename of the genome (neat format)
@@ -75,11 +78,25 @@ def graph_from_graph(G, fname):
     # read the new genome
     T = process_graph(fname)
 
+    # copy the larger graph 
     H = G.copy() 
+
+    # enable all that was disabled
+    for v in T.edges_iter():
+        (n1,n2) = v
+        H.edge[n1][n2]['style'] = T.edge[n1][n2]['style']
+        H.edge[n1][n2]['color'] = T.edge[n1][n2]['color']
     
+    # make nodes not in T invisible 
     for n in [v for v in G if v not in T ] :
         H.node[n]['style'] = 'invis'
-    
+
+    # make edges not in T invisible 
+    for v in [e for e in G.edges_iter() if e not in T.edges()]:
+        (n1,n2) = v
+        H.edge[n1][n2]['style'] = 'invis'
+
+
     return H
 
 

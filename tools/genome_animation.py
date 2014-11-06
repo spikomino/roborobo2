@@ -14,7 +14,7 @@ from subprocess import Popen, PIPE
 
 
 from genome2graph import *
-
+from phylo_graph import *
 
 
 def read_options(defaults):
@@ -61,7 +61,13 @@ def generate_fname_seq(n, ext):
     return l
 
 
+def generate_genfile_seq(l):
+    l = []
+    for f in l :
+        idr = 
+        fname = 
 
+    
 
 
 # If run directly (toplevel)
@@ -75,13 +81,25 @@ if __name__ == '__main__':
     defaults_opts['moviefile'] = 'out.mp4'
     (options, args) = read_options(defaults_opts)
 
-
+    # make a phylogenetic tree
+    pt = create_phylo_tree(options.file, True)
     
+    path = nx.shortest_path(pt, 0, 90000)
+    
+    
+
+
     
     # print generate_fname_seq(100, 'png')
-    G1 = process_graph('../logs/0000-0000120000.gen')
-    #G2 = graph_from_graph(G1, '../logs/0002-0000000002.gen')
+    G = process_graph('../logs/0000-0000120000.gen')
 
-    nx.write_dot(G1, 't1.dot')
-    #nx.write_dot(G2, 't2.dot')
+    
+    H = graph_from_graph(G, '../logs/0002-0000000002.gen')
 
+  
+    
+    nx.write_dot(G, 'g.dot')
+    nx.write_dot(H, 'h.dot')
+        
+    dot2png('g.dot', 'g.png')
+    dot2png('h.dot', 'h.png')

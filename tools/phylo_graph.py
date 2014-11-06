@@ -115,7 +115,7 @@ def trac_genome(gl, id, G, col):
 # Crete a phylogenetic tree 
 # in  : log file in the correct format see above
 # out : the graphe og the phylo tree (root nodes are the initial genes)
-def create_phylo_graph(fname, save=False): 
+def create_phylo_tree(fname, save=False): 
     colors = ['chartreuse', 'chocolate', 'cadetblue', 'cornflowerblue', 'cyan',
               'darkorange', 'darkviolet', 'deeppink']
   
@@ -124,7 +124,7 @@ def create_phylo_graph(fname, save=False):
 
     # fill the lists with all the genes 
     gl = process_file(fname)
-    
+
     # create the phylo-tree
     for n in gl.keys():
         G.add_node(n) # the root node (the initial gene)
@@ -138,7 +138,10 @@ def create_phylo_graph(fname, save=False):
         nx.write_dot(G, os.path.splitext(fname)[0]+'-phylo.dot')
     
     return G
-   
+
+
+
+
 
 
 # If run directly (toplevel)
@@ -154,6 +157,6 @@ if __name__ == '__main__':
 
   
     # fill the lists with all the genes 
-    g = create_phylo_graph(options.file, True)
+    g = create_phylo_tree(options.file, True)
     
     
