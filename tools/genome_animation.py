@@ -60,14 +60,7 @@ def generate_fname_seq(n, ext):
         l.append(fname)
     return l
 
-
-def generate_genfile_seq(l):
-    l = []
-    for f in l :
-        idr = 
-        fname = 
-
-    
+  
 
 
 # If run directly (toplevel)
@@ -84,8 +77,8 @@ if __name__ == '__main__':
     # make a phylogenetic tree
     pt = create_phylo_tree(options.file, True)
     
-    path = nx.shortest_path(pt, 0, 90000)
-    
+    path = nx.shortest_path(pt, 2, 120000)
+    print path
     
 
 

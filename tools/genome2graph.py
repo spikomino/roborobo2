@@ -96,7 +96,6 @@ def graph_from_graph(G, fname):
         (n1,n2) = v
         H.edge[n1][n2]['style'] = 'invis'
 
-
     return H
 
 
