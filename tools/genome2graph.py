@@ -210,3 +210,52 @@ def generate_fname_seq(n, ext):
         fname = fname.zfill(chars+len(ext)+1)
         l.append(fname)
     return l
+
+# create multiple png files suited for an animation
+# in  : a phylogenetic line, the genomes dir &  the output dir
+# out : png files 
+def lineage_animation(phylo_line, indir, outdir=None):
+
+    # by default the same 
+    if outdir == None :
+        outdir = indir
+    
+    # read the genome filenames and put then in a list
+    genomes_files =[]
+    for g in phylo_line :
+        name=str(g)+'.gen'
+        name=name.zfill(10+4)
+        for f in os.listdir(indir) :
+            if f.endswith(name):
+                genomes_files.append(f)
+    
+    # create dot files 
+    last_genome_file = genomes_files[-1]
+    last_genome = process_graph(indir+'/'+last_genome_file)
+    for gf in genomes_files :
+        graph_of_g = graph_from_graph(last_genome, indir+'/'+gf)
+        nx.write_dot(graph_of_g, outdir+'/'+gf[:-4]+'.dot')
+        
+    # create png files 
+    png_filenames = generate_fname_seq(len(genomes_files), 'png')
+    i=0
+    for gf in genomes_files :
+        dot2png(outdir+'/'+gf[:-4]+'.dot', outdir+'/'+png_filenames[i])
+        i=i+1
+
+    # print the command line to create the movie 
+    zpad = len(str(i)) 
+    cmd_line = 'ffmpeg -framerate 1 -i '+outdir+'/'+'%0'+str(zpad)+'d.png  -c:v libx264 -pix_fmt yuv420p '+outdir+'/out.mp4';
+    print 'To create the movies run the following command:'
+    print cmd_line
+
+    # scratchapd no meant to be used
+    # to clean up from the script (removing dot & png files)
+    #i=0
+    #for gf in genomes_files :
+    #os.remove(options.path+'/'+gf[:-4]+'.dot')
+    #os.remove(tmpdir+'/'+png_filenames[i])
+    #i=i+1
+
+        
+    
