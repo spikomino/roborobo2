@@ -10,7 +10,7 @@ from optparse import OptionGroup
 from os import listdir
 from os.path import isfile, join, splitext
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, call
 
 
 from genome2graph import *
@@ -57,24 +57,26 @@ if __name__ == '__main__':
     defaults_opts['moviefile'] = 'out.mp4'
     (options, args) = read_options(defaults_opts)
 
-    # make a phylogenetic tree
-    phylo_tree = create_phylo_tree(options.file, True)
+    start_genome = 1
+    end_genome = 110002
+    tmpdir = '/tmp'
+    movie_filename = 'out.mp4'
+    frame_rate = 1
     
-    lineage = nx.shortest_path(phylo_tree, 1, 110002)
+    # make a phylogenetic tree end extract the lineage of interest 
+    phylo_tree = create_phylo_tree(options.file, True)
+    lineage = nx.shortest_path(phylo_tree, start_genome, end_genome)
     print lineage
     
     # read the genome filenames and put then in a list
     genomes_files =[]
-
     for g in lineage :
         name=str(g)+'.gen'
         name=name.zfill(10+4)
         for f in listdir(options.path) :
             if f.endswith(name):
                 genomes_files.append(f)
-            
-    print genomes_files
-
+   
     # create dot files 
     last_genome_file = genomes_files[-1]
     last_genome = process_graph(options.path+'/'+last_genome_file)
@@ -86,32 +88,25 @@ if __name__ == '__main__':
     png_filenames = generate_fname_seq(len(genomes_files), 'png')
     i=0
     for gf in genomes_files :
-        dot2png(options.path+'/'+gf[:-4]+'.dot', /tmp/png_filenames[i])
+        dot2png(options.path+'/'+gf[:-4]+'.dot', tmpdir+'/'+png_filenames[i])
+        i=i+1
+    zpad = len(str(i)) # the size needed below int ffmpeg -i format  
+    
+    # make movie
+    # ffmpeg -framerate 1 -i /tmp/%02d.png -c:v libx264 -pix_fmt yuv420p out.mp4
+    cmd_line = [
+        'ffmpeg',
+        '-framerate '+str(frame_rate)+' -i '+tmpdir+'/'+'%0'+str(zpad)+'d.png -y  -loglevel debug -c:v libx264 -pix_fmt yuv420p '+movie_filename]
+    
+    print cmd_line
+    
+    #call(cmd_line)
+        
+    # clean up by removing dot & png files
+    i=0
+    for gf in genomes_files :
+        #os.remove(options.path+'/'+gf[:-4]+'.dot')
+        #os.remove(tmpdir+'/'+png_filenames[i])
         i=i+1
 
-    # make movie
-    #  ffmpeg -framerate 1 -i /tmp/%02d.png -c:v libx264 -pix_fmt yuv420p out.mp4
-
-
-
-    #remove png files
-   # os.remove() will remove a file.
-
-#os.rmdir() will remove an empty directory.
-
-#shutil.rmtree() will delete a directory and all its contents.
-
-        
-    # print generate_fname_seq(100, 'png')
-    G = process_graph('../logs/0000-0000120000.gen')
-
     
-    H = graph_from_graph(G, '../logs/0002-0000000002.gen')
-
-  
-    
-    nx.write_dot(G, 'g.dot')
-    nx.write_dot(H, 'h.dot')
-        
-    dot2png('g.dot', 'g.png')
-    dot2png('h.dot', 'h.png')
