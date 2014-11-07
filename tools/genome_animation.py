@@ -14,7 +14,6 @@ from subprocess import Popen, PIPE, call
 
 
 from genome2graph import *
-from phylo_graph import *
 
 
 def read_options(defaults):
@@ -57,9 +56,11 @@ if __name__ == '__main__':
     defaults_opts['moviefile'] = 'out.mp4'
     (options, args) = read_options(defaults_opts)
 
+    log_file = 'out.log'
+    genome_path= 'test' 
     start_genome = 1
     end_genome = 110002
-    tmpdir = '/tmp'
+    tmpdir = 'test'
     movie_filename = 'out.mp4'
     frame_rate = 1
     

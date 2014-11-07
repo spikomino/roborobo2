@@ -100,6 +100,91 @@ def graph_from_graph(G, fname):
     return new
 
 ################################################################################
+# phylogenetic related functions
+################################################################################
+
+# extract the genome form a line and put it in the right list
+# in  : a line from the evolution log
+# out : a tuple (rob_id, id_trace, mom, dad)
+def process_robot_entry(d):
+    if d[6] != '][Genome:' :
+        return (None, None, None, None)
+    rob     = int( d[7].split('=')[1]) 
+    idtrace = int( d[8].split('=')[1]) 
+    mom     = int( d[9].split('=')[1])
+    dad     = int(d[10].split('=')[1])
+    return (rob,idtrace, mom, dad)
+
+# read the number of robots & creates a dictionary with num robots lists 
+# like this one with 3 robots {0: [(tuples), ()], 1: [], 2: []}
+# in  : a log file name
+# out : a dictionary with robots id as keys to lists to tuple 
+def process_file(fname):
+    G = {}
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and data[0] == '[initRobot]' :
+            # read the id of the robot (which is genome id)
+            gid = int(data[1].split('=')[1]) 
+            G[gid] = []
+    fh.close()   
+
+    # fill the lists 
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and  data[0] == '[Robot:' :
+            (r, id, mom, dad) = process_robot_entry(data)
+            if r != None :
+                G[r].append((id, mom, dad))
+    fh.close()   
+    return G
+
+# trac the offspring of a gene and add them to the graph 
+def trac_genome(gl, id, G, col):
+    for i in gl :
+        for g in gl[i] :
+            (tr, m, d) = g
+            if m == id :               
+                G.add_node(tr)
+                G.node[tr]['agent'] = i
+                G.node[tr]['id']    = tr
+                G.node[tr]['mom']   = m
+                G.node[tr]['dad']   = d
+                G.node[tr]['color'] = col[i%len(col)]
+                G.add_edge(id, tr)
+                trac_genome(gl, tr, G, col)
+
+
+# Crete a phylogenetic tree 
+# in  : log file in the correct format see above
+# out : the graphe og the phylo tree (root nodes are the initial genes)
+def create_phylo_tree(fname, save=False, dotfile='philo.dot'): 
+    colors = ['chartreuse', 'chocolate', 'cadetblue', 'cornflowerblue', 'cyan',
+              'darkorange', 'darkviolet', 'deeppink']
+  
+    # create a graph
+    G=nx.DiGraph()        
+
+    # fill the lists with all the genes 
+    gl = process_file(fname)
+
+    # create the phylo-tree
+    for n in gl.keys():
+        G.add_node(n) # the root node (the initial gene)
+        G.node[n]['agent'] = n
+        G.node[n]['id']    = n
+        G.node[n]['color'] = colors[n%len(colors)]
+        trac_genome(gl, n, G, colors)
+    
+    # write the file 
+    if save :
+        nx.write_dot(G, dotfile)
+    
+    return G
+
+################################################################################
 # Animation related functions
 ################################################################################
 
