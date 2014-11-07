@@ -42,23 +42,6 @@ def read_options(defaults):
     return parser.parse_args()
 
 
-# rename files for ffmpeg needs
-# in  : a list of sorted names (in video sequence) of dot files
-# out : a video file.
-##def dot2mp4(inlist):
- 
-
-# generate a sequence of filenames suited for ffmpeg
-# in  : the length of the sequence, the filename extention 
-# out : a liste of numbered filename padded with zeros
-def generate_fname_seq(n, ext):
-    l = []
-    chars = len(str(n))
-    for i in  xrange(n):
-        fname = str(i)+'.'+ext
-        fname = fname.zfill(chars+len(ext)+1)
-        l.append(fname)
-    return l
 
   
 
@@ -75,14 +58,50 @@ if __name__ == '__main__':
     (options, args) = read_options(defaults_opts)
 
     # make a phylogenetic tree
-    pt = create_phylo_tree(options.file, True)
+    phylo_tree = create_phylo_tree(options.file, True)
     
-    path = nx.shortest_path(pt, 2, 120000)
-    print path
+    lineage = nx.shortest_path(phylo_tree, 1, 110002)
+    print lineage
     
+    # read the genome filenames and put then in a list
+    genomes_files =[]
+
+    for g in lineage :
+        name=str(g)+'.gen'
+        name=name.zfill(10+4)
+        for f in listdir(options.path) :
+            if f.endswith(name):
+                genomes_files.append(f)
+            
+    print genomes_files
+
+    # create dot files 
+    last_genome_file = genomes_files[-1]
+    last_genome = process_graph(options.path+'/'+last_genome_file)
+    for gf in genomes_files :
+        graph_of_g = graph_from_graph(last_genome, options.path+'/'+gf)
+        nx.write_dot(graph_of_g, options.path+'/'+gf[:-4]+'.dot')
+
+    # create png files 
+    png_filenames = generate_fname_seq(len(genomes_files), 'png')
+    i=0
+    for gf in genomes_files :
+        dot2png(options.path+'/'+gf[:-4]+'.dot', /tmp/png_filenames[i])
+        i=i+1
+
+    # make movie
+    #  ffmpeg -framerate 1 -i /tmp/%02d.png -c:v libx264 -pix_fmt yuv420p out.mp4
 
 
-    
+
+    #remove png files
+   # os.remove() will remove a file.
+
+#os.rmdir() will remove an empty directory.
+
+#shutil.rmtree() will delete a directory and all its contents.
+
+        
     # print generate_fname_seq(100, 'png')
     G = process_graph('../logs/0000-0000120000.gen')
 
