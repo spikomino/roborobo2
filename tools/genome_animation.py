@@ -35,8 +35,8 @@ if __name__ == '__main__':
     defaults_opts['path']      = 'test'
     (options, args) = read_options(defaults_opts)
 
-    start_genome = 1
-    end_genome = 110002
+    start_genome = 7
+    end_genome = 440007
     
     # make a phylogenetic tree end extract the lineage of interest 
     phylo_tree = create_phylo_tree(options.file, False)
