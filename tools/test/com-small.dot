@@ -1,0 +1,201 @@
+strict digraph  {
+	node [label="\N"];
+	"R1@19"	 [color=green,
+		label=R1,
+		style=filled];
+	"R3@19"	 [color=green,
+		label=R3,
+		style=filled];
+	"R1@19" -> "R3@19";
+	"R1@7"	 [color=green,
+		label=R1,
+		style=filled];
+	"R3@7"	 [color=green,
+		label=R3,
+		style=filled];
+	"R1@7" -> "R3@7";
+	"R1@4"	 [color=yellow,
+		label=R1,
+		style=filled];
+	"R3@4"	 [color=yellow,
+		label=R3,
+		style=filled];
+	"R1@4" -> "R3@4";
+	"R2@3"	 [color=green,
+		label=R2,
+		style=filled];
+	"R8@3"	 [color=green,
+		label=R8,
+		style=filled];
+	"R2@3" -> "R8@3";
+	"R2@4"	 [color=yellow,
+		label=R2,
+		style=filled];
+	"R8@4"	 [color=yellow,
+		label=R8,
+		style=filled];
+	"R2@4" -> "R8@4";
+	"R2@5"	 [color=green,
+		label=R2,
+		style=filled];
+	"R8@5"	 [color=green,
+		label=R8,
+		style=filled];
+	"R2@5" -> "R8@5";
+	"R2@6"	 [color=yellow,
+		label=R2,
+		style=filled];
+	"R8@6"	 [color=yellow,
+		label=R8,
+		style=filled];
+	"R2@6" -> "R8@6";
+	"R1@16"	 [color=green,
+		label=R1,
+		style=filled];
+	"R3@16"	 [color=green,
+		label=R3,
+		style=filled];
+	"R1@16" -> "R3@16";
+	"R7@15"	 [color=yellow,
+		label=R7,
+		style=filled];
+	"R4@15"	 [color=yellow,
+		label=R4,
+		style=filled];
+	"R7@15" -> "R4@15";
+	"R4@10"	 [color=yellow,
+		label=R4,
+		style=filled];
+	"R7@10"	 [color=yellow,
+		label=R7,
+		style=filled];
+	"R4@10" -> "R7@10";
+	"R3@7" -> "R1@7";
+	"R1@10"	 [color=yellow,
+		label=R1,
+		style=filled];
+	"R3@10"	 [color=yellow,
+		label=R3,
+		style=filled];
+	"R1@10" -> "R3@10";
+	"@10"	 [color=gray,
+		label="iteration 10",
+		style=filled];
+	"@10" -> "R4@10"	 [style=dashed];
+	"@10" -> "R1@10"	 [style=dashed];
+	"@13"	 [color=gray,
+		label="iteration 13",
+		style=filled];
+	"@10" -> "@13";
+	"R4@5"	 [color=green,
+		label=R4,
+		style=filled];
+	"R7@5"	 [color=green,
+		label=R7,
+		style=filled];
+	"R4@5" -> "R7@5";
+	"R4@2"	 [color=yellow,
+		label=R4,
+		style=filled];
+	"R7@2"	 [color=yellow,
+		label=R7,
+		style=filled];
+	"R4@2" -> "R7@2";
+	"@15"	 [color=gray,
+		label="iteration 15",
+		style=filled];
+	"@15" -> "R7@15"	 [style=dashed];
+	"@16"	 [color=gray,
+		label="iteration 16",
+		style=filled];
+	"@15" -> "@16";
+	"@16" -> "R1@16"	 [style=dashed];
+	"@18"	 [color=gray,
+		label="iteration 18",
+		style=filled];
+	"@16" -> "@18";
+	"@16" -> "R3@16"	 [style=dashed];
+	"@19"	 [color=gray,
+		label="iteration 19",
+		style=filled];
+	"@18" -> "@19";
+	"R4@18"	 [color=yellow,
+		label=R4,
+		style=filled];
+	"@18" -> "R4@18"	 [style=dashed];
+	"R1@13"	 [color=green,
+		label=R1,
+		style=filled];
+	"R3@13"	 [color=green,
+		label=R3,
+		style=filled];
+	"R1@13" -> "R3@13";
+	"R4@8"	 [color=yellow,
+		label=R4,
+		style=filled];
+	"R7@8"	 [color=yellow,
+		label=R7,
+		style=filled];
+	"R4@8" -> "R7@8";
+	"R4@9"	 [color=green,
+		label=R4,
+		style=filled];
+	"R7@9"	 [color=green,
+		label=R7,
+		style=filled];
+	"R7@9" -> "R4@9";
+	"R8@4" -> "R2@4";
+	"@13" -> "@15";
+	"@13" -> "R1@13"	 [style=dashed];
+	"@19" -> "R1@19"	 [style=dashed];
+	"R3@16" -> "R1@16";
+	"@2"	 [color=gray,
+		label="iteration 2",
+		style=filled];
+	"@2" -> "R4@2"	 [style=dashed];
+	"@3"	 [color=gray,
+		label="iteration 3",
+		style=filled];
+	"@2" -> "@3";
+	"@3" -> "R2@3"	 [style=dashed];
+	"@4"	 [color=gray,
+		label="iteration 4",
+		style=filled];
+	"@3" -> "@4";
+	"@6"	 [color=gray,
+		label="iteration 6",
+		style=filled];
+	"@6" -> "R2@6"	 [style=dashed];
+	"@7"	 [color=gray,
+		label="iteration 7",
+		style=filled];
+	"@6" -> "@7";
+	"@7" -> "R1@7"	 [style=dashed];
+	"@7" -> "R3@7"	 [style=dashed];
+	"@8"	 [color=gray,
+		label="iteration 8",
+		style=filled];
+	"@7" -> "@8";
+	"@4" -> "R1@4"	 [style=dashed];
+	"@4" -> "R2@4"	 [style=dashed];
+	"@4" -> "R8@4"	 [style=dashed];
+	"@5"	 [color=gray,
+		label="iteration 5",
+		style=filled];
+	"@4" -> "@5";
+	"@5" -> "R2@5"	 [style=dashed];
+	"@5" -> "R4@5"	 [style=dashed];
+	"@5" -> "@6";
+	None -> "@2";
+	"R7@18"	 [color=yellow,
+		label=R7,
+		style=filled];
+	"R4@18" -> "R7@18";
+	"@8" -> "R4@8"	 [style=dashed];
+	"@9"	 [color=gray,
+		label="iteration 9",
+		style=filled];
+	"@8" -> "@9";
+	"@9" -> "@10";
+	"@9" -> "R7@9"	 [style=dashed];
+}
