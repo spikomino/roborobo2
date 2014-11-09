@@ -25,15 +25,16 @@ def process_node(g, d):
     g.node[n]['lbl']   = d[4] # 0=>hidden, 1=>input, 2=>output, 3=>bias
     g.node[n]['shape'] = shapes[ int(d[4]) ]
     g.node[n]['color'] = colors[ int(d[4]) ]
+    g.node[n]['style'] = 'filled'
 
 # add a link in the network
 # in  : a graph object and the splited line from the genome file
 #       called exclusively by process_graph 
 def process_gene(g, d):
-    n0 = d[2]
-    n1 = d[3]
-    w  = d[4]
-    g.add_edge(n0, n1, weight=float(w))
+    n0 = int(d[2])
+    n1 = int(d[3])
+    w  = float(d[4])
+    g.add_edge(n0, n1, weight=w)
     g.edge[n0][n1]['trait']    =d[1] # ?
     g.edge[n0][n1]['recurent'] =d[5] # 0/1 yes/no
     g.edge[n0][n1]['inov_num'] =d[6] # int
@@ -70,33 +71,39 @@ def process_graph(fname):
             print data
             print 'Error: unexpected token'
             return None
-    fh.close()   
+    fh.close()
+
+    
     return G
 
 # Create a graph from a larger by hiding nodes and edges not fname
 # in  : a graph object (the larger one) and a genome filename (the smaller) 
 # out : the graph object
 def graph_from_graph(G, fname):
-    
+
     # read the new genome
     small = process_graph(fname)
-
+    
     # copy the larger graph 
     new = G.copy() 
 
-    # enable all that was disabled
-    for v in small.edges_iter():
-        (n1,n2) = v
-        new.edge[n1][n2]['style'] = small.edge[n1][n2]['style']
-        new.edge[n1][n2]['color'] = small.edge[n1][n2]['color']
-    
-    # make nodes not in small invisible 
-    for n in [v for v in G if v not in small ] :
-        new.node[n]['style'] = 'invis'
-    # make edges not in small invisible 
-    for v in [e for e in G.edges_iter() if e not in small.edges()]:
-        (n1,n2) = v
-        new.edge[n1][n2]['style'] = 'invis'
+    # make nodes & edges not in small invisible 
+    sn = small.nodes()
+    se = small.edges()
+    for n in G.nodes_iter():
+        if n not in sn:
+            new.node[n]['style'] = 'invis'
+        else :
+            new.node[n]['style'] = small.node[n]['style']
+            
+    for e in G.edges_iter():
+        (n1,n2) = e
+        if e not in se :
+            new.edge[n1][n2]['style'] = 'invis'
+        else :
+            new.edge[n1][n2]['style'] = small.edge[n1][n2]['style']
+            new.edge[n1][n2]['color'] = small.edge[n1][n2]['color']
+       
     return new
 
 ################################################################################
@@ -258,4 +265,69 @@ def lineage_animation(phylo_line, indir, outdir=None):
     #i=i+1
 
         
+################################################################################
+# Communication graph related functions
+################################################################################
+
+# adds a node to indicate the iteration number
+# in : the graph, the node 
+def add_com_root(g, n):
+    g.add_node(n)
+    g.node[n]['label'] = 'iteration '+n[1:]
+    g.node[n]['color'] = 'gray'
+    g.node[n]['style'] = 'filled'
+
+# add a 2 nodes to the grah (2 agent that comunicate)    
+# in  : a graph object the data line from the log and a color string
+def add_com_entry(g, d, c):
+    root = d[0]
+    n1 = d[1]+d[0]
+    g.add_node(n1)
+    g.add_edge(root, n1)
+    g.edge[root][n1]['style'] = 'dashed'
+    
+    g.node[n1]['label'] = d[1]
+    g.node[n1]['color'] = c
+    g.node[n1]['style'] = 'filled'
+   
+    n2 = 'R'+d[3]+d[0]            
+    g.add_node(n2)
+    g.node[n2]['label'] = 'R'+d[3]
+    g.node[n2]['color'] = c
+    g.node[n2]['style'] = 'filled'
+    g.add_edge(n1, n2)
+    
+    
+# Create the communication graph (genome exchange between agents)
+# in  : and evolution log 
+# out : a graph object
+#       Will parse lines : @ R# -> #
+def make_com_graph(fname):
+    colors=['green','yellow']
+    cur_color=0;
+
+    # create the graph
+    G=nx.DiGraph()
+    fh = open(fname, 'r')
+
+    # make the root node (the first iteration)
+    last_iteration = None
+    for line in fh :
+        data = line.split()
+        
+        if len(data)>0 and data[0][:1] == '@': # if comm line 
+            if data[0] not in G.nodes():
+                add_com_root(G, data[0])
+                G.add_edge(last_iteration, data[0])
+                last_iteration = data[0]
+                cur_color = (cur_color+1) % len(colors)
+            add_com_entry(G, data, colors[cur_color])
+    fh.close()   
+    return G
+       
+
+            
+          
+           
+
     
