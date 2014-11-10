@@ -70,9 +70,8 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
 	print_genome(_genome);
+	save_genome();
     }
-
-    save_genome();
 }
 
 void neatestController::save_genome(){
@@ -84,8 +83,6 @@ void neatestController::save_genome(){
     _genome->print_to_file(oFile);
     oFile.close();
 }
-
-
 
 void print_genome(GenomeAdapted* g){
     std::cout << "[Genome: id=" << g->genome_id
@@ -107,7 +104,6 @@ void neatestController::printGenomeList(){
 	print_genome(g);
 	std::cout << std::endl;
     }
-
 }
 
 void neatestController::printRobot(){
@@ -120,13 +116,11 @@ void neatestController::printRobot(){
 
 void neatestController::printAll(){
     printRobot();
-    //std::cout << "\n\t";
     print_genome(_genome);
     std::cout << "\n";
     //std::cout << "\t";
     //printGenomeList();
 }
-
 
 void neatestController::createNeuroController (){
   if (_neurocontroller != NULL)
@@ -155,13 +149,12 @@ void neatestController::step(){
 
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
-      save_genome();
-      if (gVerbose)
+      
+      if (gVerbose){
+	  save_genome();
 	  printAll();
+      }
       reset();          // reset fitness and neurocontroller
-      
-      
-
   }
 }
 
@@ -307,11 +300,12 @@ void neatestController::broadcast() {
 		c->storeGenome (getId(), msg);
 
 	    /* some screen output */
-	    std::cout << "@"  << _iteration << " R" << getId() << " -> " ;
-	    for (const auto& c : neighbors)
-		std::cout << c->getId() << " ";
-	    std::cout << std::endl;
-
+	    if (gVerbose){
+		std::cout << "@"  << _iteration << " R" << getId() << " -> " ;
+		for (const auto& c : neighbors)
+		    std::cout << c->getId() << " ";
+		std::cout << std::endl;
+	    }
 	    neighbors.clear();
 	}
     }
@@ -369,7 +363,7 @@ void neatestController::stepEvolution() {
 }
 
 void neatestController::updateFitness (double df){
-    _fitness += df;
+    _wm->_fitnessValue += df;
 }
 
 int  neatestController::selectRandom(){
