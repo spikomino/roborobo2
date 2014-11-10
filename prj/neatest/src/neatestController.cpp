@@ -135,7 +135,7 @@ bool neatestController::lifeTimeOver(){
 }
 
 void neatestController::reset(){
-    _fitness   = 0.0;
+    _wm->_fitnessValue   = 0.0;
     _birthdate = gWorld->getIterations();
     emptyGenomeList();
     createNeuroController();
@@ -143,10 +143,10 @@ void neatestController::reset(){
 
 void neatestController::step(){
   _iteration++;
-
-  stepBehaviour(); // execure the neuro controller
-  broadcast();     // broadcast genome to neighbors
-
+  if (_wm->isAlive()){
+      stepBehaviour(); // execure the neuro controller
+      broadcast();     // broadcast genome to neighbors
+  }
   if (lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       
@@ -257,58 +257,56 @@ void neatestController::stepBehaviour(){
 } /* end stepNeuralController */
 
 void neatestController::broadcast() {
-    if (_wm->isAlive()){
+    // Make a list of all neighbors within reach 
+    std::vector<neatestController *> neighbors;
+    for (int i = 0; i < _wm->_cameraSensorsNb; i++)	{
+	int targetIndex = _wm->getObjectIdFromCameraSensor (i);
 	
-	// Make a list of all neighbors within reach 
-	std::vector<neatestController *> neighbors;
-	for (int i = 0; i < _wm->_cameraSensorsNb; i++)	{
-	    int targetIndex = _wm->getObjectIdFromCameraSensor (i);
+	/*sensor ray bumped into a robot : communication is possible */
+	if (targetIndex >= gRobotIndexStartOffset){
 	    
-	    /*sensor ray bumped into a robot : communication is possible */
-	    if (targetIndex >= gRobotIndexStartOffset){
-	
-		/* convert image registering index into robot id. */
-		targetIndex = targetIndex - gRobotIndexStartOffset;
-		neatestController *targetRobotController =
-		    dynamic_cast <
-		    neatestController *
-		    >(gWorld->getRobot (targetIndex)->getController ());
-		
-		/* an error */ 
-		if(!targetRobotController){
-		    std:: cerr << "Error from robot "         << _wm->getId () 
-			       << " : the observer of robot " << targetIndex 
-			       << " is not compatible"        << std::endl;
-		    exit (-1);
-		}
-		
-		/* add to the list  */
-		neighbors.push_back(targetRobotController);
+	    /* convert image registering index into robot id. */
+	    targetIndex = targetIndex - gRobotIndexStartOffset;
+	    neatestController *targetRobotController =
+		dynamic_cast <
+		neatestController *
+		>(gWorld->getRobot (targetIndex)->getController ());
+	    
+	    /* an error */ 
+	    if(!targetRobotController){
+		std:: cerr << "Error from robot "         << _wm->getId () 
+			   << " : the observer of robot " << targetIndex 
+			   << " is not compatible"        << std::endl;
+		exit (-1);
 	    }
-	}
-	
-	// if found neighbors, broadcast my genome
-	if(neighbors.size() > 0) {
-	    message msg (_genome, _fitness, _sigma, _birthdate);
-	    /* remove duplicates */
-	    std::sort(neighbors.begin(), neighbors.end()); 
-	    auto last = std::unique(neighbors.begin(), neighbors.end());
-	    neighbors.erase(last, neighbors.end());
-
-	    /* broadcast */
-	    for (const auto& c : neighbors)
-		c->storeGenome (getId(), msg);
-
-	    /* some screen output */
-	    if (gVerbose){
-		std::cout << "@"  << _iteration << " R" << getId() << " -> " ;
-		for (const auto& c : neighbors)
-		    std::cout << c->getId() << " ";
-		std::cout << std::endl;
-	    }
-	    neighbors.clear();
+	    
+	    /* add to the list  */
+	    neighbors.push_back(targetRobotController);
 	}
     }
+    
+    // if found neighbors, broadcast my genome
+    if(neighbors.size() > 0) {
+	message msg (_genome, _fitness, _sigma, _birthdate);
+	/* remove duplicates */
+	std::sort(neighbors.begin(), neighbors.end()); 
+	auto last = std::unique(neighbors.begin(), neighbors.end());
+	neighbors.erase(last, neighbors.end());
+	
+	/* broadcast */
+	for (const auto& c : neighbors)
+	    c->storeGenome (getId(), msg);
+	
+	/* some screen output */
+	if (gVerbose){
+	    std::cout << "@"  << _iteration << " R" << getId() << " -> " ;
+	    for (const auto& c : neighbors)
+		std::cout << c->getId() << " ";
+	    std::cout << std::endl;
+	}
+	neighbors.clear();
+    }
+
 }
 
 void neatestController::storeGenome(int id, message msg){
