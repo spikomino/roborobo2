@@ -29,7 +29,7 @@ private:
     int                     _iteration;
     int                     _birthdate; // iteration at which we are created 
     GenomeAdapted*          _genome;
-    double                  _fitness;
+    //double                  _fitness;
     double                  _sigma;
     Network*                _neurocontroller;
     unsigned int            _nbInputs;
@@ -57,6 +57,7 @@ private:
     void updateFitness (double); 
     void stepEvolution ();
     int  selectRandom  ();
+    int  selectBest    ();
     void mutate        (float sigma);
 
     /* misc */

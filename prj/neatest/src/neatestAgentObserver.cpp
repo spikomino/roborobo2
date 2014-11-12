@@ -65,6 +65,9 @@ void neatestAgentObserver::step(){
     if ( PhysicalObject::isInstanceOf(targetIndex) ) {
         targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
 	gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
+	
+	/* increment fitness */
+	_wm->_fitnessValue += 1.0;
 
 	/* if(gVerbose) */
 	    /* std::cout << "\t[Robot #" + to_string(_wm->getId())  */

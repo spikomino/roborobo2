@@ -69,19 +69,24 @@ void neatestWorldObserver::updateMonitoring(){
     // switch to next generation.
     if( _lifeIterationCount >= neatestSharedData::gEvaluationTime ) {
 	// * monitoring: count number of active agents.
-        
+        double fitness =0;
 	int activeCount = 0;
-	for ( int i = 0 ; i != gNumberOfRobots ; i++ )
+	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
+	    fitness += (dynamic_cast<neatestController*>
+		  (gWorld->getRobot(i)->getController()))
+		->getWorldModel()->_fitnessValue;
+
 	    if ( (dynamic_cast<neatestController*>
 		  (gWorld->getRobot(i)->getController()))->getWorldModel()->
 		 isAlive() == true )
 		activeCount++;
-	        
+	}
 	if ( gVerbose )
 	    std::cout << "[gen:" 
 		      << (gWorld->getIterations()/
 			  neatestSharedData::gEvaluationTime) 
-		      << ";pop:" << activeCount << "]\n";		
+		      << ";pop:" << activeCount 
+		      << ";fit:" << fitness << "]\n";		
         
         // Logging
         std::string s = std::string("") + 

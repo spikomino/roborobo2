@@ -100,8 +100,9 @@ void neatestController::printGenomeList(){
 	double f,s;
 	int b;
 	std::tie (g,f,s,b) = it->second;
-
+	
 	print_genome(g);
+	printMessage(it->second);
 	std::cout << std::endl;
     }
 }
@@ -110,7 +111,7 @@ void neatestController::printRobot(){
     std::cout << "[Robot: id=" + to_string(getId())
 	      << " iteration=" + to_string(_iteration)
 	      << " birthdate=" + to_string(_birthdate) 
-	      << " fitness="   + to_string(_fitness) 
+	      << " fitness="   + to_string(_wm->_fitnessValue) 
 	      << " sigma="     + to_string(_sigma) + " ]";
 }
 
@@ -287,7 +288,7 @@ void neatestController::broadcast() {
     
     // if found neighbors, broadcast my genome
     if(neighbors.size() > 0) {
-	message msg (_genome, _fitness, _sigma, _birthdate);
+	message msg (_genome, _wm->_fitnessValue, _sigma, _birthdate);
 	/* remove duplicates */
 	std::sort(neighbors.begin(), neighbors.end()); 
 	auto last = std::unique(neighbors.begin(), neighbors.end());
@@ -340,11 +341,11 @@ void neatestController::emptyGenomeList(){
 
 void neatestController::stepEvolution() {
     /* store our genome in the list */
-    message msg (_genome, _fitness, _sigma, _birthdate);
+    message msg (_genome, _wm->_fitnessValue, _sigma, _birthdate);
     storeGenome (_wm->getId(), msg);
        
     /* select an offspring */
-    int selected = selectRandom();
+    int selected = selectBest();
     _genome = std::get<0>(_glist[selected]);
     _sigma  = std::get<2>(_glist[selected]);
     
@@ -370,3 +371,24 @@ int  neatestController::selectRandom(){
     return it->first;
 }
 
+int neatestController::selectBest(){
+    //printGenomeList() ;
+    
+    std::map<int, message>::iterator it = _glist.begin();
+    double max_fit =  std::get<1>(it->second);
+    int    best_g  =  it->first;
+    for ( ; it != _glist.end(); it++){
+	GenomeAdapted* g;
+	double f,s;
+	int b;
+	std::tie (g,f,s,b) = it->second;
+	if(f > max_fit){
+	    max_fit = f;
+	    best_g = it->first ;
+	}
+    }
+       
+    //std::cout << "best = " << best_g << std::endl; 
+
+    return best_g;
+}
