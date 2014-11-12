@@ -72,8 +72,6 @@ def process_graph(fname):
             print 'Error: unexpected token'
             return None
     fh.close()
-
-    
     return G
 
 # Create a graph from a larger by hiding nodes and edges not fname
@@ -323,6 +321,84 @@ def make_com_graph(fname):
                 cur_color = (cur_color+1) % len(colors)
             add_com_entry(G, data, colors[cur_color])
     fh.close()   
+    return G
+       
+# Generate a timeline of exchanges from a list of robot exchanges 
+# in  : a dictionary of exchange lists (see add_event bellow)
+# out : a graph object
+def generate_event_graph(gl):
+    # get the latest event (to set the size of the graph) 
+    last = -1
+    for r in gl :
+        if last < gl[r][-1][0] :
+            last =  gl[r][-1][0]
+            i = r
+    # the number of lines in graph
+    num_robots = len(gl)
+
+    g = nx.DiGraph()
+
+    # construct the time lines 
+    for r in gl :
+        n1='R'+str(r)
+        g.add_node(n1)
+        g.node[n1]['label'] = n1
+        
+        g.node[n1]['color']='white'
+        g.node[n1]['style']='filled'
+        for e in xrange(1, last+1):
+            n2 = str(e)+'@'+str(r)
+            g.add_node(n2)
+            g.node[n2]['label']=e
+            g.node[n2]['color']='white'
+            g.node[n2]['style']='filled'
+            g.add_edge(n1,n2)
+            n1 = n2
+
+    # add the exchange events 
+    for r in gl :
+        for e in gl[r]:
+            n = str(e[0])+'@'+str(r)
+            t = str(e[0])+'@'+str(e[1])
+            g.node[n]['color'] = 'green'
+            g.node[t]['color'] = 'green'
+            g.add_edge(n,t)
+    return g
+
+# adds an event to the dictionary 
+def add_event(gl, d):
+    r = int(d[1][1:]) # robot
+    t = int(d[3])     # target
+    i = int(d[0][1:]) # iteration
+
+    # if robot not in list 
+    if r not in gl :
+        gl[r] = []
+    
+    gl[r].append((i,t))
+    if t not in gl :
+        gl[t] = []
+
+# Create the communication graph (as process time lines)
+# in  : and evolution log 
+# out : a graph object
+#       Will parse lines : @ R# -> #
+def make_event_graph(fname):
+    colors=['green','yellow']
+    cur_color=0;
+
+    # create the graph
+    GL = {}
+    fh = open(fname, 'r')
+    # make the root node (the first iteration)
+    last_iteration = None
+    for line in fh :
+        data = line.split()
+        if len(data)>0 and data[0][:1] == '@': # if comm line 
+            add_event(GL, data)
+    fh.close()   
+
+    G = generate_event_graph(GL)
     return G
        
 
