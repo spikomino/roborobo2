@@ -204,7 +204,8 @@ GenomeAdapted *GenomeAdapted::duplicate(int new_id, int idTr )
 	newgenome -> setIdTrace(idTr);
 	newgenome -> setMom(this -> getIdTrace());
 	newgenome -> setDad(-1);  
-		
+	newgenome -> nodeId = nodeId;
+	newgenome -> innovNumber = innovNumber;	
 	return newgenome;
 }
 

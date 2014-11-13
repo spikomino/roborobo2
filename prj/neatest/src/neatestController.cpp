@@ -46,18 +46,16 @@ void neatestController::initRobot (){
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
     _genome->genome_id = getId();
-    
     _genome->setIdTrace(getId());
     _genome->setMom(-1);
     _genome->setDad(-1);  
-    _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
-
     // create a neuro controller from this genome
     createNeuroController();
-
-    //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
     _genome->setInnovNumber( (double) _neurocontroller->linkcount ());
     _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
+    _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
+    
+
     
     // empty the genome list 
     emptyGenomeList();
