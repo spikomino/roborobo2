@@ -56,8 +56,8 @@ void neatestController::initRobot (){
     createNeuroController();
 
     //TOFIX NEAT-like innovation number and node id FOR THIS ROBOT
-    innovNumber = (double) _neurocontroller->linkcount ();
-    nodeId = 1 + _nbInputs + _nbOutputs;    
+    _genome->setInnovNumber( (double) _neurocontroller->linkcount ());
+    _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
     
     // empty the genome list 
     emptyGenomeList();
@@ -356,9 +356,7 @@ void neatestController::stepEvolution() {
 
     _genome = _genome->mutate(_sigma,
 			      _wm->getId(), 
-			      newId, 
-			      nodeId, 
-			      innovNumber);
+			      newId);
 }
 
 void neatestController::updateFitness (double df){

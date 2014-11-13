@@ -42,6 +42,13 @@ int GenomeAdapted::getDad() const
   return _dad;
 }
 
+GenomeAdapted* GenomeAdapted::mutate(float sigma, int idRobot ,int newId){
+
+    return mutate(sigma,idRobot, newId, nodeId, innovNumber);
+
+}
+
+
 GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int newId, int &nodeId, double &innovNum) 
 {
   std::map<int, GenomeAdapted*>::iterator curorg;

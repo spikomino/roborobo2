@@ -34,6 +34,9 @@ namespace NEAT
     int _mom;
     int _dad;
 
+    int nodeId;
+    double innovNumber;
+    
   public:
     
     GenomeAdapted(int num_in,int num_out,int num_hidden,int type);
@@ -47,9 +50,14 @@ namespace NEAT
     // Duplicate this Genome to create a new one with the specified id 
     GenomeAdapted* duplicate(int new_id, int idTr);
     GenomeAdapted* mutate(float sigma, int idRobot ,int newId, int &nodeId, double &innovNumber);
+    GenomeAdapted* mutate(float sigma, int idRobot ,int newId);
+
     void setIdTrace(int id);
     void setMom(int idMom);
     void setDad(int idDad);
+
+    void setNodeId(int id){nodeId=id;};
+    void setInnovNumber(double n){innovNumber=n;};
 
   };
 } // namespace NEAT
