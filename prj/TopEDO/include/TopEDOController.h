@@ -60,7 +60,12 @@ private:
   static bool compareFitness(std::pair<int,float> i,std::pair<int,float> j);
 
   std::vector<double> mutateF(std::vector<double> g, float sigma);
-
+  
+  void printIO(std::pair<std::vector<double>,std::vector<double>> io);
+  void printVector(std::vector<double> v);
+  void printGenome();
+  void printFitnessList();
+    
   bool getNewGenomeStatus ()
   {
     return _isNewGenome;

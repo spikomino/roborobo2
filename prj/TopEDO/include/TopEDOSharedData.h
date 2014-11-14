@@ -36,6 +36,8 @@ class TopEDOSharedData {
   static int gEvaluationTime; //! theoretical duration of a generation (ie. maximum time a controller will be evaluated on a robot)
 
   static int gIteration; //! used by every class to know what is the current iteration step of roborobo
+  
+  static bool gIsFixedTopo;//Neat: false; Perceptron+recurr: true
 
 
   static bool gSynchronization; //!If set to false, a robot will restart its controller as soon as it has no more energy. If set to true, the robot without energy will wait and reload its controller at the same time as every other robots.

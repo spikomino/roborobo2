@@ -25,6 +25,8 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
     gProperties.checkAndGetPropertyValue("gFitness",&TopEDOSharedData::gFitness,true);
     gProperties.checkAndGetPropertyValue("gSigmaRef",&TopEDOSharedData::gSigmaRef,true);
 
+    gProperties.checkAndGetPropertyValue("gIsFixedTopo",&TopEDOSharedData::gIsFixedTopo,true);
+
     TopEDOSharedData::gEvoLog.open(TopEDOSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
     if(!TopEDOSharedData::gEvoLog)
       {

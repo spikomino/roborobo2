@@ -42,13 +42,11 @@ int GenomeAdapted::getDad() const
   return _dad;
 }
 
-GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int newId, int &nodeId, double &innovNum) 
+GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNum) 
 {
   std::map<int, GenomeAdapted*>::iterator curorg;
 
   GenomeAdapted *new_genome;	//For holding baby's genes
-
-  Network *net_analogue;	//For adding link to test for recurrency
 
   double mut_power = NEAT::weight_mut_power;
 
@@ -56,8 +54,11 @@ GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int newId, int &n
 
   //NOTE: default NEAT method (randomly) replaced  by previous selection (best)
   // which has been stored in _genome
-  new_genome = this -> duplicate (idRobot, newId);
-
+  new_genome = this -> duplicate (idRobot);
+  new_genome -> setIdTrace(idNewGenome);
+  new_genome -> setMom(this -> getIdTrace());
+  new_genome -> setDad(-1);  
+  
   //Decide whether to mate or mutate
   //If there is only one genome in the list, then always mutate
   if ((randfloat () < NEAT::mutate_only_prob))
@@ -67,60 +68,48 @@ GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int newId, int &n
 	{
 	  //08/10/14  Bogus variables for innovations deactivated 
 	  //perRobot innovNum and nodeId used instead
-	  std::vector < Innovation * >innovations;
-
+	  std::vector < Innovation * > innovations;
+	  
 	  if (new_genome->mutate_add_node (innovations, nodeId, innovNum))
 	    {
-	      //std::cout << "Mutate add node " << nodeId - 1 << std::endl;
-	    }
-
-	}
-      else if (randfloat () < NEAT::mutate_add_link_prob)
-	{
-	  //Inaki Hack: generation is only used as a network_id
-	  int generation = 0;
-	  //No further repercusion of this parameter
-	  net_analogue = new_genome->genesis (generation);
-
-	  std::vector < Innovation * >innovations;
-	  if (new_genome->mutate_add_link (innovations, innovNum,
-					   NEAT::newlink_tries))
-	    {
-	      //std::cout << "Mutate add link" << std::endl;
-	    }
-	  delete net_analogue;
-
-	}
-      //NOTE:links CANNOT be added directly after a node  because the phenotype
-      // will not be appropriately altered to reflect the change
-      else
-	{
-	  //If we didn't do a structural mutation, we do the other kinds
-	  if (randfloat () < NEAT::mutate_link_weights_prob)
-	    {
-	      //std::cout << "Mutate_link_weights" << std::endl;
-	      new_genome->mutate_link_weights (mut_power, 1.0, GAUSSIAN);
-	    }
-	  if (randfloat () < NEAT::mutate_toggle_enable_prob)
-	    {
-	      //std::cout << "Mutate toggle enable" << std::endl;
-	      new_genome->mutate_toggle_enable (1);
-	    }
-	  if (randfloat () < NEAT::mutate_gene_reenable_prob)
-	    {
-	      //std::cout << "Mutate gene reenable" << std::endl;
-	      new_genome->mutate_gene_reenable ();
 	    }
 	}
 
     }
-
+  else if (randfloat () < NEAT::mutate_add_link_prob)
+    {
+      std::vector < Innovation * >innovations;
+      if (new_genome->mutate_add_link (innovations, innovNum,
+				       NEAT::newlink_tries))
+	    {
+	    }
+      
+    }
+  //NOTE:links CANNOT be added directly after a node  because the phenotype
+  // will not be appropriately altered to reflect the change
+  else
+    {
+      //If we didn't do a structural mutation, we do the other kinds
+      if (randfloat () < NEAT::mutate_link_weights_prob)
+	{
+	  new_genome->mutate_link_weights (mut_power, 1.0, GAUSSIAN);
+	}
+      if (randfloat () < NEAT::mutate_toggle_enable_prob)
+	{
+	  new_genome->mutate_toggle_enable (1);
+	}
+      if (randfloat () < NEAT::mutate_gene_reenable_prob)
+	{
+	  new_genome->mutate_gene_reenable ();
+	}
+    }
+  
   return new_genome;
 }
 
 // Duplicate this Genome to create a new one with the specified id 
 // and give mom id value
-GenomeAdapted *GenomeAdapted::duplicate(int new_id, int idTr )
+GenomeAdapted *GenomeAdapted::duplicate(int idRobot )
 {
 	//Collections for the new Genome
 	std::vector<Trait*> traits_dup;
@@ -193,10 +182,7 @@ GenomeAdapted *GenomeAdapted::duplicate(int new_id, int idTr )
 	}
 
 	//Finally, return the genome
-	newgenome=new GenomeAdapted(new_id,traits_dup,nodes_dup,genes_dup);
-	newgenome -> setIdTrace(idTr);
-	newgenome -> setMom(this -> getIdTrace());
-	newgenome -> setDad(-1);  
+	newgenome=new GenomeAdapted(idRobot,traits_dup,nodes_dup,genes_dup);
 		
 	return newgenome;
 }
