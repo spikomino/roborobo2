@@ -162,7 +162,7 @@ GenomeAdapted *GenomeAdapted::duplicate(int idRobot )
 		newnode=new NNode(*curnode,assoc_trait);
 
 		(*curnode)->dup=newnode;  //Remember this node's old copy
-		//    (*curnode)->activation_count=55;
+	
 		nodes_dup.push_back(newnode);    
 	}
 
