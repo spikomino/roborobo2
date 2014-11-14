@@ -48,15 +48,11 @@ namespace NEAT
     int getDad() const;
     
     // Duplicate this Genome to create a new one with the specified id 
-<<<<<<< HEAD
     GenomeAdapted* duplicate(int idRobot);
     GenomeAdapted* mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNumber);
-=======
-    GenomeAdapted* duplicate(int new_id, int idTr);
-    GenomeAdapted* mutate(float sigma, int idRobot ,int newId, int &nodeId, double &innovNumber);
+
     GenomeAdapted* mutate(float sigma, int idRobot ,int newId);
 
->>>>>>> 7a0087de0d96507bc7694c9b9beaa30035204fac
     void setIdTrace(int id);
     void setMom(int idMom);
     void setDad(int idDad);
