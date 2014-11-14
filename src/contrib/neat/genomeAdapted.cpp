@@ -42,7 +42,18 @@ int GenomeAdapted::getDad() const
   return _dad;
 }
 
+<<<<<<< HEAD
 GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNum) 
+=======
+GenomeAdapted* GenomeAdapted::mutate(float sigma, int idRobot ,int newId){
+
+    return mutate(sigma,idRobot, newId, nodeId, innovNumber);
+
+}
+
+
+GenomeAdapted *GenomeAdapted::mutate(float sigma, int idRobot ,int newId, int &nodeId, double &innovNum) 
+>>>>>>> 7a0087de0d96507bc7694c9b9beaa30035204fac
 {
   std::map<int, GenomeAdapted*>::iterator curorg;
 
@@ -182,8 +193,17 @@ GenomeAdapted *GenomeAdapted::duplicate(int idRobot )
 	}
 
 	//Finally, return the genome
+<<<<<<< HEAD
 	newgenome=new GenomeAdapted(idRobot,traits_dup,nodes_dup,genes_dup);
 		
+=======
+	newgenome=new GenomeAdapted(new_id,traits_dup,nodes_dup,genes_dup);
+	newgenome -> setIdTrace(idTr);
+	newgenome -> setMom(this -> getIdTrace());
+	newgenome -> setDad(-1);  
+	newgenome -> nodeId = nodeId;
+	newgenome -> innovNumber = innovNumber;	
+>>>>>>> 7a0087de0d96507bc7694c9b9beaa30035204fac
 	return newgenome;
 }
 

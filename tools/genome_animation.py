@@ -31,12 +31,12 @@ if __name__ == '__main__':
 
     # Read options & provide with defaults
     defaults_opts={}
-    defaults_opts['file']      = 'evolution.log'
+    defaults_opts['file']      = 'out.log'
     defaults_opts['path']      = 'test'
     (options, args) = read_options(defaults_opts)
 
-    start_genome = 7
-    end_genome = 440007
+    start_genome = 1
+    end_genome = 490000
     
     # make a phylogenetic tree end extract the lineage of interest 
     phylo_tree = create_phylo_tree(options.file, False)

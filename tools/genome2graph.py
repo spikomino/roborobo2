@@ -234,6 +234,20 @@ def lineage_animation(phylo_line, indir, outdir=None):
             if f.endswith(name):
                 genomes_files.append(f)
     
+    # create the animation
+    genome_animation(genomes_files, indir, outdir)
+
+
+    
+# create multiple png files suited for an animation
+# in  : an orderd sequence of genome files, the genomes dir &  the output dir
+# out : png files 
+def genome_animation(genomes_files, indir, outdir=None):
+
+    # by default the same 
+    if outdir == None :
+        outdir = indir
+    
     # create dot files 
     last_genome_file = genomes_files[-1]
     last_genome = process_graph(indir+'/'+last_genome_file)
@@ -262,7 +276,11 @@ def lineage_animation(phylo_line, indir, outdir=None):
     #os.remove(tmpdir+'/'+png_filenames[i])
     #i=i+1
 
-        
+
+
+
+
+    
 ################################################################################
 # Communication graph related functions
 ################################################################################
