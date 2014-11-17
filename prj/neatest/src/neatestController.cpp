@@ -48,15 +48,14 @@ void neatestController::initRobot (){
     _genome->genome_id = getId();
     _genome->setIdTrace(getId());
     _genome->setMom(-1);
-    _genome->setDad(-1);  
+    _genome->setDad(-1);
+    
     // create a neuro controller from this genome
     createNeuroController();
     _genome->setInnovNumber( (double) _neurocontroller->linkcount ());
     _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
     _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
-    
-
-    
+        
     // empty the genome list 
     emptyGenomeList();
 

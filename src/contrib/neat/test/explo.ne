@@ -14,7 +14,7 @@ mutate_only_prob 1.0
 mutate_random_trait_prob 0.0
 mutate_link_trait_prob 0.0
 mutate_node_trait_prob 0.0
-mutate_link_weights_prob 0.7
+mutate_link_weights_prob 0.90
 mutate_toggle_enable_prob 0.1
 mutate_gene_reenable_prob 0.1
 mutate_add_node_prob 0.5
@@ -24,7 +24,7 @@ mate_multipoint_prob 0.6
 mate_multipoint_avg_prob 0.4
 mate_singlepoint_prob 0.0
 mate_only_prob 0.2
-recur_only_prob 0.2
+recur_only_prob 0.8
 pop_size 1
 dropoff_age 15
 newlink_tries 20
