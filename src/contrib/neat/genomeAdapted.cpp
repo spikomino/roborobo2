@@ -149,6 +149,7 @@ GenomeAdapted *GenomeAdapted::duplicate(){
 	traits_dup.push_back(newtrait);
     }
 
+<<<<<<< HEAD
     //Duplicate NNodes
     for(curnode=nodes.begin();curnode!=nodes.end();++curnode) {
 	//First, find the trait that this node points to
@@ -159,6 +160,24 @@ GenomeAdapted *GenomeAdapted::duplicate(){
 	    while(((*curtrait)->trait_id)!=(((*curnode)->nodetrait)->trait_id))
 		++curtrait;
 	    assoc_trait=(*curtrait);
+=======
+	//Duplicate NNodes
+	for(curnode=nodes.begin();curnode!=nodes.end();++curnode) {
+		//First, find the trait that this node points to
+		if (((*curnode)->nodetrait)==0) assoc_trait=0;
+		else {
+			curtrait=traits_dup.begin();
+			while(((*curtrait)->trait_id)!=(((*curnode)->nodetrait)->trait_id))
+				++curtrait;
+			assoc_trait=(*curtrait);
+		}
+
+		newnode=new NNode(*curnode,assoc_trait);
+
+		(*curnode)->dup=newnode;  //Remember this node's old copy
+	
+		nodes_dup.push_back(newnode);    
+>>>>>>> 268cc1284e85d0f8ab97d9948403c60564f5c841
 	}
 	
 	newnode=new NNode(*curnode,assoc_trait);
