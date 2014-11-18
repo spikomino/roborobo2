@@ -71,7 +71,10 @@ namespace NEAT
     bool mut_gene_reenable();
     bool mut_toggle_enable();
     void mut_link_weights(double sigma); 
+    bool mut_add_node();
+    bool mut_add_link(int tries);
 
+    
   };
 } // namespace NEAT
 
