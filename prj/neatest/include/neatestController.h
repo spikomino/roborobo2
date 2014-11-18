@@ -29,7 +29,7 @@ private:
     int                     _iteration;
     int                     _birthdate; // iteration at which we are created 
     GenomeAdapted*          _genome;
-    //double                  _fitness;
+    double                  _fitness;
     double                  _sigma;
     Network*                _neurocontroller;
     unsigned int            _nbInputs;
@@ -76,7 +76,7 @@ public:
     int getId  (){ return _wm->getId(); }
     void reset ();
     void step  ();
-
+    double getFitness  (){ return _fitness; }
 };
 
 

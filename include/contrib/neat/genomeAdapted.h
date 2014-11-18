@@ -62,11 +62,7 @@ namespace NEAT
 
     // Duplicate this Genome to create a new one with the specified id 
     GenomeAdapted* duplicate();
-    
-    GenomeAdapted* mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNumber);
-
     GenomeAdapted* mutate(float sigma, int idRobot ,int newId);
-
  
     bool mut_gene_reenable();
     bool mut_toggle_enable();

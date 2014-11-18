@@ -124,32 +124,19 @@ GenomeAdapted *GenomeAdapted::duplicate(){
     return newgenome;
 }
 
-GenomeAdapted* GenomeAdapted::mutate(float sigma, int idRobot, int newId){
-
-    return mutate(sigma,idRobot, newId, _nodeId, _innovNumber);
-
-}
 
 GenomeAdapted *GenomeAdapted::mutate(float sigma, 
 				     int idRobot, 
-				     int idNewGenome, 
-				     int &nodeId, 
-				     double &innovNum) {
-
+				     int idNewGenome) {
   
-
-
   // duplication this into a genome to mutate
   GenomeAdapted *new_genome = this -> duplicate ();
-
   new_genome->_idTrace = idNewGenome;
   new_genome->_mom     = this->_idTrace ;
   new_genome->_dad     = -1;  
   
-  //Decide whether to mate or mutate
-  //If there is only one genome in the list, then always mutate
-  
-  //if(randfloat() < NEAT::mutate_only_prob){
+ 
+
   //Choose the mutation depending on probabilities  
  
   /* add a node */
@@ -157,6 +144,7 @@ GenomeAdapted *GenomeAdapted::mutate(float sigma,
       if (new_genome->mut_add_node())
 	  std::cout << "Mutation: Node added" <<std::endl; 
   }
+  /* add a link */
   else if (randfloat () < NEAT::mutate_add_link_prob){
       if (new_genome->mut_add_link(NEAT::newlink_tries))
 	  std::cout << "Mutation: Link added" <<std::endl; 
@@ -289,19 +277,13 @@ void GenomeAdapted::mut_link_weights(double sigma) {
 		else // overflow btw range and range*2
 		    value = _maxValue - range + (overflow-range);
 	    }
-     
-	    (g->lnk)->weight = value;
+     	    (g->lnk)->weight = value;
 	}
     }
-
-
-
 }
 
 
 bool GenomeAdapted::mut_add_node() {
-    
-
     NNode *in_node; //Here are the nodes connected by the gene
     NNode *out_node; 
     Link  *thelink;  //The link inside the random gene

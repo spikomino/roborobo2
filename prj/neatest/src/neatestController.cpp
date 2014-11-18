@@ -23,7 +23,7 @@ neatestController::neatestController(RobotWorldModel * wm){
   _iteration       = 0;
   _birthdate       = 0;
   _neurocontroller = NULL;
-  _sigma           = neatestSharedData::gSigmaRef;
+  _sigma           = 0.3;//neatestSharedData::gSigmaRef;
   _wm->setAlive(true);
 
   load_neat_params ("prj/neatest/src/explo.ne", false);
@@ -54,7 +54,7 @@ void neatestController::initRobot (){
     createNeuroController();
     _genome->setInnovNumber( (double) _neurocontroller->linkcount ());
     _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
-    _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
+    _genome->mut_link_weights(_sigma);
         
     // empty the genome list 
     emptyGenomeList();
@@ -133,6 +133,7 @@ bool neatestController::lifeTimeOver(){
 }
 
 void neatestController::reset(){
+    _fitness = _wm->_fitnessValue ;
     _wm->_fitnessValue   = 0.0;
     _birthdate = gWorld->getIterations();
     emptyGenomeList();
@@ -351,9 +352,7 @@ void neatestController::stepEvolution() {
 	(1 + (gWorld->getIterations () /
 	      neatestSharedData::gEvaluationTime));
 
-    _genome = _genome->mutate(_sigma,
-			      _wm->getId(), 
-			      newId);
+    _genome = _genome->mutate(_sigma, getId(), newId);
 }
 
 void neatestController::updateFitness (double df){
