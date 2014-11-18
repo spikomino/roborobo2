@@ -15,11 +15,11 @@
 #include <neuralnetworks/Perceptron.h>
 #include <neuralnetworks/Elman.h>
 
-#include <neat/genome.h>
-#include "neat/genomeAdapted.h"
+#include <pure_neat/genome.h>
+#include <pure_neat/network.h>
 
 using namespace Neural;
-using namespace NEAT;
+using namespace PURENEAT;
 
 TopEDOController::TopEDOController (RobotWorldModel * wm)
 {
@@ -29,7 +29,7 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 
   nn = NULL;
   
-  NEAT::load_neat_params ("prj/TopEDO/src/forag.ne", false);
+  load_neat_params ("prj/TopEDO/src/forag.ne", false);
 
   _currentSigma = TopEDOSharedData::gSigmaRef;
  
@@ -44,7 +44,8 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 
 TopEDOController::~TopEDOController ()
 {
-  delete nn;
+  if(nn != NULL)
+    delete nn;
   nn = NULL;
 }
 
@@ -91,16 +92,15 @@ TopEDOController::initRobot ()
   if(!TopEDOSharedData::gIsFixedTopo)
     {
       // Inputs, outputs, 0 hidden neurons, fully connected. Start with Simple Perceptron 
-      _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
+      _genome = new Genome (_nbInputs, _nbOutputs);
       
-      _genome->setIdTrace (_wm->getId ());
-      _genome->setMom (-1);
-      _genome->setDad (-1);
+      _genome->mom_id = -1;
+      _genome->dad_id = -1;
       _genome->genome_id = _wm->getId ();
       
-      _genome->mutate_link_weights (1.0, 1.0, COLDGAUSSIAN);
+      _genome->mutate_link_weights (1.0, 1.0, PURENEAT::COLDGAUSSIAN);
       createNN ();
-
+      
     }
   else
     {
@@ -463,7 +463,7 @@ TopEDOController::broadcastGenome ()
 }
 
 void
-TopEDOController::storeGenome (GenomeAdapted * genome, int senderId,
+TopEDOController::storeGenome (Genome *genome, int senderId,
 			       int senderBirthdate, float sigma,
 			       float fitness)
 {
@@ -586,7 +586,7 @@ void TopEDOController::logGenome()
 	  dynamic_cast <TopEDOWorldObserver *>
      (gWorld->getWorldObserver ())->getGenerationCount() +1
      << " " << _wm->getId () << " " <<
-	  _currentFitness << " " << _fitnessList.size() << " " << _genome->getIdTrace () << " " << _genome-> getMom () << std::endl;
+	  _currentFitness << " " << _fitnessList.size() << " " << _genome->genome_id << " " << _genome->mom_id << std::endl;
 
       }
    else
@@ -605,7 +605,7 @@ void TopEDOController::logGenome()
   if(!TopEDOSharedData::gIsFixedTopo)
     {
       filename = TopEDOSharedData::gGenomeLogFolder;
-      filename += std::to_string(_genome -> getIdTrace());
+      filename += std::to_string(_genome -> genome_id);
       
       _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
     }

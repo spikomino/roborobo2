@@ -13,14 +13,14 @@
 #include "WorldModels/RobotWorldModel.h"
 #include "TopEDO/include/TopEDOAgentObserver.h"
 #include <neuralnetworks/NeuralNetwork.h>
-#include <neat/gene.h>
-#include <neat/genome.h>
-#include <neat/genomeAdapted.h>
+#include <pure_neat/gene.h>
+#include <pure_neat/genome.h>
+
 
 #include <iomanip>
 
 using namespace Neural;
-using namespace NEAT;
+using namespace PURENEAT;
 
 
 class TopEDOController:public Controller
@@ -44,7 +44,7 @@ private:
   std::pair<std::vector<double>,std::vector<double>> actFTopo();
   float updateFitness (std::vector < double >in, std::vector < double >out);
   void broadcastGenome ();
-  void storeGenome (GenomeAdapted * genome, int senderId, int senderBirthdate,
+  void storeGenome (Genome * genome, int senderId, int senderBirthdate,
 		    float sigma, float fitness);  
   void storeGenomeF (std::vector<double> genome, int senderId, int senderBirthdate,
 		    float sigma, float fitness);  
@@ -77,11 +77,11 @@ private:
 
   // evolutionary engine
 
-  GenomeAdapted *_genome;
+  Genome *_genome;
   std::vector<double> _genomeF;
   std::vector<double> _previousOut;
   
-  std::map < int, GenomeAdapted * >_genomesList;
+  std::map < int, Genome * >_genomesList;
   std::map <int, std::vector<double>> _genomesFList;
   std::map < int, float >_sigmaList;
   std::map < int, float >_fitnessList;
