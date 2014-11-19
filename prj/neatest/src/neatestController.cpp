@@ -23,10 +23,9 @@ neatestController::neatestController(RobotWorldModel * wm){
   _iteration       = 0;
   _birthdate       = 0;
   _neurocontroller = NULL;
-  _sigma           = 0.3;//neatestSharedData::gSigmaRef;
-  _wm->setAlive(true);
+  _sigma           = neatestSharedData::gSigmaRef;
 
-  load_neat_params ("prj/neatest/src/explo.ne", false);
+  _wm->setAlive(true);
   initRobot ();
 }
 
@@ -56,7 +55,7 @@ void neatestController::initRobot (){
     _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
     _genome->mut_link_weights(_sigma);
         
-    // empty the genome list 
+    // clear the genome list 
     emptyGenomeList();
 
     if (gVerbose){
@@ -69,55 +68,6 @@ void neatestController::initRobot (){
 	print_genome(_genome);
 	save_genome();
     }
-}
-
-void neatestController::save_genome(){
-    char fname[128];
-    snprintf(fname, 127, "logs/%04d-%010d.gen", 
-	     getId(), 
-	     _genome->getIdTrace());
-    std::ofstream oFile(fname);
-    _genome->print_to_file(oFile);
-    oFile.close();
-}
-
-void print_genome(GenomeAdapted* g){
-    std::cout << "[Genome: id=" << g->genome_id
-	      << " idtrace="    << g->getIdTrace()
-	      << " mom="        << g->getMom()
-	      << " dad="        << g->getDad() << " ]";
-}
-
-void neatestController::printGenomeList(){
-    std::cout << "[Genome list " + to_string(getId()) + "]\n";
-    std::map<int, message>::iterator it;
-    for (it=_glist.begin() ; it != _glist.end(); it++){
-	std::cout << "\t\t[R# " << it->first << "] " ;
-	GenomeAdapted* g;
-	double f,s;
-	int b;
-	std::tie (g,f,s,b) = it->second;
-	
-	print_genome(g);
-	printMessage(it->second);
-	std::cout << std::endl;
-    }
-}
-
-void neatestController::printRobot(){
-    std::cout << "[Robot: id=" + to_string(getId())
-	      << " iteration=" + to_string(_iteration)
-	      << " birthdate=" + to_string(_birthdate) 
-	      << " fitness="   + to_string(_wm->_fitnessValue) 
-	      << " sigma="     + to_string(_sigma) + " ]";
-}
-
-void neatestController::printAll(){
-    printRobot();
-    print_genome(_genome);
-    std::cout << "\n";
-    //std::cout << "\t";
-    //printGenomeList();
 }
 
 void neatestController::createNeuroController (){
@@ -142,11 +92,11 @@ void neatestController::reset(){
 
 void neatestController::step(){
   _iteration++;
-  if (_wm->isAlive()){
+  if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
       broadcast();     // broadcast genome to neighbors
   }
-  if (lifeTimeOver()){
+  if(lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       
       if (gVerbose){
@@ -156,8 +106,6 @@ void neatestController::step(){
       reset();          // reset fitness and neurocontroller
   }
 }
-
-
 
 // ################ ######################## ################
 // ################ BEHAVIOUR METHOD(S)      ################
@@ -174,7 +122,7 @@ void neatestController::stepBehaviour(){
     double inputs[_nbInputs]; 
     int    inputToUse = 0;
     
-    // Read inputs 
+    // (1)  Read inputs 
  
     /* read distance sensors  */
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
@@ -199,26 +147,35 @@ void neatestController::stepBehaviour(){
 	    else
 		inputs[inputToUse++] = 0.0;
 	}
- 
-    /* bias : neat put biases after sensors */
+    
+    /* bias node : neat put biases after sensors */
     inputs[inputToUse++] = 1.0; 
     
-
-    // step the neuro controller
+    // (2) step the neuro controller
     _neurocontroller->load_sensors(inputs);
     if (!_neurocontroller->activate()){
 	std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
 	exit (-1);
     }
     
-    // read output
+    // (3) read the output
     std::vector<double> outputs;
     std::vector<NNode*>::iterator out_iter;
     for (out_iter  = _neurocontroller->outputs.begin();
 	 out_iter != _neurocontroller->outputs.end(); 
 	 out_iter++)
 	outputs.push_back((*out_iter)->activation);
+     
+    // (4) execute the motor commands 
+    _wm->_desiredTranslationalValue = outputs[0]; 
+    _wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); /* [-1, 1] */
 
+    /* normalize to motor interval values */
+    _wm->_desiredTranslationalValue =
+	_wm->_desiredTranslationalValue * gMaxTranslationalSpeed;
+    _wm->_desiredRotationalVelocity =
+	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
+    
     // print things
     /*if(gVerbose){
 	std::cout << "[Controller] "
@@ -238,30 +195,23 @@ void neatestController::stepBehaviour(){
 	std::cout << "]"
 		  << std::endl;
 		  }*/
-    
-    // execute the motor commands 
-    _wm->_desiredTranslationalValue = outputs[0]; 
-    _wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); /* [-1, 1] */
 
-    /* normalize to motor interval values */
-    _wm->_desiredTranslationalValue =
-	_wm->_desiredTranslationalValue * gMaxTranslationalSpeed;
-    _wm->_desiredRotationalVelocity =
-	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
-    
     //_wm->_desiredTranslationalValue = 0.0;
     //_wm->_desiredRotationalVelocity = 0.0;
-    
-    
-} /* end stepNeuralController */
+} 
+
+
+// ################ ######################## ################
+// ################ COMMUNICATION  METHODS   ################
+// ################ ######################## ################
 
 void neatestController::broadcast() {
-    // Make a list of all neighbors within reach 
+    /* Make a list of all neighbors within reach  */
     std::vector<neatestController *> neighbors;
     for (int i = 0; i < _wm->_cameraSensorsNb; i++)	{
 	int targetIndex = _wm->getObjectIdFromCameraSensor (i);
 	
-	/*sensor ray bumped into a robot : communication is possible */
+	/* sensor ray bumped into a robot : communication is possible */
 	if (targetIndex >= gRobotIndexStartOffset){
 	    
 	    /* convert image registering index into robot id. */
@@ -271,7 +221,7 @@ void neatestController::broadcast() {
 		neatestController *
 		>(gWorld->getRobot (targetIndex)->getController ());
 	    
-	    /* an error */ 
+	    /* an error occured */ 
 	    if(!targetRobotController){
 		std:: cerr << "Error from robot "         << _wm->getId () 
 			   << " : the observer of robot " << targetIndex 
@@ -284,17 +234,18 @@ void neatestController::broadcast() {
 	}
     }
     
-    // if found neighbors, broadcast my genome
+    /* if found neighbors, broadcast my genome */
     if(neighbors.size() > 0) {
 	message msg (_genome, _wm->_fitnessValue, _sigma, _birthdate);
+
 	/* remove duplicates */
 	std::sort(neighbors.begin(), neighbors.end()); 
 	auto last = std::unique(neighbors.begin(), neighbors.end());
 	neighbors.erase(last, neighbors.end());
 	
-	/* broadcast */
+	/* send */
 	for (const auto& c : neighbors)
-	    c->storeGenome (getId(), msg);
+	    c->storeMessage (getId(), msg);
 	
 	/* some screen output */
 	if (gVerbose){
@@ -303,30 +254,13 @@ void neatestController::broadcast() {
 		std::cout << c->getId() << " ";
 	    std::cout << std::endl;
 	}
+	/* delete neighbors list */
 	neighbors.clear();
     }
-
 }
 
-void neatestController::storeGenome(int id, message msg){
+void neatestController::storeMessage(int id, message msg){
     _glist[id] = msg;
-}
-
-void neatestController::printMessage(message msg){
-    GenomeAdapted* g;
-    double f,s;
-    int b;
-
-    std::tie (g,f,s,b) = msg;
-    std::cout << "(Id="        << g->getIdTrace()
-	      << " fitness="   << f
-	      << " sigma="     << s
-	      << " birthdate=" << b << ")";
-    
-    std::cout << "[Genome : (id = " << g->genome_id
-	      << ", idtrace = "     << g->getIdTrace()
-	      << ", mom = "         << g->getMom()
-	      << ", dad = "         << g->getDad() << ")]";
 }
 
 void neatestController::emptyGenomeList(){
@@ -340,7 +274,7 @@ void neatestController::emptyGenomeList(){
 void neatestController::stepEvolution() {
     /* store our genome in the list */
     message msg (_genome, _wm->_fitnessValue, _sigma, _birthdate);
-    storeGenome (_wm->getId(), msg);
+    storeMessage(_wm->getId(), msg);
        
     /* select an offspring */
     int selected = selectBest();
@@ -349,10 +283,25 @@ void neatestController::stepEvolution() {
     
     /* mutate the offspring */
     int newId = _wm->getId() + 10000 * 
-	(1 + (gWorld->getIterations () /
+	(1 + (gWorld->getIterations() /
 	      neatestSharedData::gEvaluationTime));
-
-    _genome = _genome->mutate(_sigma, getId(), newId);
+    
+    switch(neatestSharedData::gControllerType) {
+    case 0:
+	_genome = _genome->mutate(_sigma, getId(), newId);
+	break;
+    case 1:
+	_genome = _genome->mutate_weights(_sigma, getId(), newId);
+	break;
+    default:
+	std::cerr << "Error unknown mutation for this controller" << std::endl;
+	exit (-1);
+    }
+    
+    /** there is a memory leak here. Genome is never deleted.
+	Selection selects some other genome and  mutate create a new one, 
+	the previous genome is not deleted. It cannot be deleted since it 
+	could be selected at some other agent ???? **/
 }
 
 void neatestController::updateFitness (double df){
@@ -385,4 +334,74 @@ int neatestController::selectBest(){
     //std::cout << "best = " << best_g << std::endl; 
 
     return best_g;
+}
+
+// ################ ######################## ################
+// ################ OUTPUT (FILES / SCREEN) METHODS #########
+// ################ ######################## ################
+
+void neatestController::printMessage(message msg){
+    GenomeAdapted* g;
+    double f,s;
+    int b;
+
+    std::tie (g,f,s,b) = msg;
+    std::cout << "(Id="        << g->getIdTrace()
+	      << " fitness="   << f
+	      << " sigma="     << s
+	      << " birthdate=" << b << ")";
+    
+    std::cout << "[Genome : (id = " << g->genome_id
+	      << ", idtrace = "     << g->getIdTrace()
+	      << ", mom = "         << g->getMom()
+	      << ", dad = "         << g->getDad() << ")]";
+}
+
+// Save a genome (file name = robot_id-genome_id.gen)
+void neatestController::save_genome(){
+    char fname[128];
+    snprintf(fname, 127, "logs/%04d-%010d.gen", 
+	     getId(), _genome->getIdTrace());
+    std::ofstream oFile(fname);
+    _genome->print_to_file(oFile);
+    oFile.close();
+}
+
+void print_genome(GenomeAdapted* g){
+    std::cout << "[Genome: id=" << g->genome_id
+	      << " idtrace="    << g->getIdTrace()
+	      << " mom="        << g->getMom()
+	      << " dad="        << g->getDad() << " ]";
+}
+
+void neatestController::printGenomeList(){
+    std::cout << "[Genome list at agent " + to_string(getId()) + "]\n";
+    std::map<int, message>::iterator it;
+    for (it=_glist.begin() ; it != _glist.end(); it++){
+	std::cout << "\t\t[R# " << it->first << "] " ;
+	GenomeAdapted* g;
+	double f,s;
+	int b;
+	std::tie (g,f,s,b) = it->second;
+	
+	print_genome(g);
+	printMessage(it->second);
+	std::cout << std::endl;
+    }
+}
+
+void neatestController::printRobot(){
+    std::cout << "[Robot: id=" + to_string(getId())
+	      << " iteration=" + to_string(_iteration)
+	      << " birthdate=" + to_string(_birthdate) 
+	      << " fitness="   + to_string(_wm->_fitnessValue) 
+	      << " sigma="     + to_string(_sigma) + " ]";
+}
+
+void neatestController::printAll(){
+    printRobot();
+    print_genome(_genome);
+    std::cout << "\n";
+    //std::cout << "\t";
+    //printGenomeList();
 }

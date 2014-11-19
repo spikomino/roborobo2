@@ -17,13 +17,19 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
     gProperties.checkAndGetPropertyValue("gEvaluationTime",
 					 &neatestSharedData::gEvaluationTime,
 					 true);
-    gProperties.checkAndGetPropertyValue("gGenomeLogFolder",
-					 &neatestSharedData::gGenomeLogFolder,
-					 true);
-
     gProperties.checkAndGetPropertyValue("gControllerType",
 					 &neatestSharedData::gControllerType,
+					 true);
+
+    gProperties.checkAndGetPropertyValue("gSigmaRef",
+					 &neatestSharedData::gSigmaRef,
 					 false);
+
+    gProperties.checkAndGetPropertyValue("gNeatParameters",
+					 &neatestSharedData::gNeatParameters,
+					 true);
+
+    NEAT::load_neat_params (neatestSharedData::gNeatParameters.c_str(), true);
     
     // ====
     //if ( !gRadioNetwork){

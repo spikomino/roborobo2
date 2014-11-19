@@ -40,7 +40,7 @@ class neatestSharedData {
   
   static bool gPropertiesLoaded;
   
-
+  static std::string gNeatParameters; //! neat parameter file 
 
   static int gNbHiddenLayers; // default: 1
   static int gNbNeuronsPerHiddenLayer; // default: 5

@@ -28,18 +28,14 @@ class neatestController:public Controller {
 private:
     int                     _iteration;
     int                     _birthdate; // iteration at which we are created 
-    GenomeAdapted*          _genome;
     double                  _fitness;
     double                  _sigma;
+    GenomeAdapted*          _genome;
     Network*                _neurocontroller;
     unsigned int            _nbInputs;
     unsigned int            _nbOutputs;
     std::map<int, message>  _glist;
-  
 
-    //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
-    double innovNumber;
-    int nodeId;
    
     /* behavior */ 
     void initRobot     ();
@@ -47,7 +43,7 @@ private:
 
     /* genome list */
     void broadcast       ();
-    void storeGenome     (int, message);  
+    void storeMessage    (int, message);  
     void emptyGenomeList ();
 
     /* neuro controller */
@@ -58,7 +54,6 @@ private:
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
-    void mutate        (float sigma);
 
     /* misc */
     bool lifeTimeOver    ();

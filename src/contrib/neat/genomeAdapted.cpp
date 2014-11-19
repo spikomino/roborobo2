@@ -9,6 +9,7 @@ This can allow to rebuild and trace back the lineage of a given genome
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <cfloat>
 
 using namespace NEAT;
 
@@ -249,37 +250,24 @@ double gaussian(double m, double s) {
     return( m + y1 * s );
 }
 
+// a wrapper to mutate only FFNN
+GenomeAdapted *GenomeAdapted::mutate_weights(float sigma, 
+				     int idRobot, 
+				     int idNewGenome) {
+    
+    GenomeAdapted *new_genome = this -> duplicate ();
+    new_genome->_idTrace = idNewGenome;
+    new_genome->_mom     = this->_idTrace ;
+    new_genome->_dad     = -1;  
+    
+    new_genome->mut_link_weights(sigma);
+    return new_genome;
+}
 
 void GenomeAdapted::mut_link_weights(double sigma) {
-    double _maxValue =  1.0;
-    double _minValue = -1.0; 
-
-    for(const auto& g : genes){		
-	if (!g->frozen){
-	    double value = (g->lnk)->weight + gaussian(0,sigma);
-	    
-	    // bouncing upper/lower bounds
-	    if(value < _minValue){
-		double range = _maxValue - _minValue;
-		double overflow = - ( (double)value - _minValue );
-		overflow = overflow - 2*range * (int)( overflow / (2*range) );
-		if ( overflow < range )
-		    value = _minValue + overflow;
-		else // overflow btw range and range*2
-		    value = _minValue + range - (overflow-range);
-	    }
-	    else if ( value > _maxValue ){
-		double range = _maxValue - _minValue;
-		double overflow = (double)value - _maxValue;
-		overflow = overflow - 2*range * (int)( overflow / (2*range) );
-		if ( overflow < range )
-		    value = _maxValue - overflow;
-		else // overflow btw range and range*2
-		    value = _maxValue - range + (overflow-range);
-	    }
-     	    (g->lnk)->weight = value;
-	}
-    }
+    for(const auto& g : genes)	
+	if (!g->frozen)
+	    (g->lnk)->weight = (g->lnk)->weight + gaussian(0,sigma);
 }
 
 
@@ -457,8 +445,7 @@ bool GenomeAdapted::mut_add_link(int tries) {
 					      count, thresh);
 
 		//ADDED: CONSIDER connections out of outputs recurrent
-		if ((nodep1->gen_node_label == OUTPUT)||
-		    (nodep2->gen_node_label == OUTPUT))
+		if (nodep1->gen_node_label == OUTPUT)
 		    recurflag=true;
 
 		//Exit if the network is faulty (contains an infinite loop)
@@ -523,8 +510,7 @@ bool GenomeAdapted::mut_add_link(int tries) {
 					       count, thresh);
 
 		//ADDED: CONSIDER connections out of outputs recurrent
-		if ((nodep1->gen_node_label == OUTPUT)||
-		    (nodep2->gen_node_label == OUTPUT))
+		if(nodep1->gen_node_label == OUTPUT)
 		    recurflag=true;
 
 		//Exit if the network is faulty (contains an infinite loop)
