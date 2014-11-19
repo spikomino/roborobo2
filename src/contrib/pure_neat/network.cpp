@@ -155,9 +155,8 @@ bool Network::activate()
 	      //Only activate if some active input came in
 	      if ((*curnode)->active_flag) 
 		{
-		  //Keep a memory of activations for potential time delayed connections
-		  (*curnode)->last_activation2=(*curnode)->last_activation;
-		  (*curnode)->last_activation=(*curnode)->activation;
+		  //Keep a memory of activations for potential time delayed connections		  
+          (*curnode)->last_activation=(*curnode)->activation;
 		  
 		  //Now run the net activation through an activation function
 		  //Sigmoidal activation- see comments under fsigmoid

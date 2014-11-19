@@ -145,7 +145,7 @@ TopEDOController::createNN ()
   if (nn != NULL)
     delete nn;
 
-  nn = _genome->genesis (_wm->_id);
+  nn = _genome->genesis (_wm->_id);//TOCHECK _genome -> genome_id
 
 }
 

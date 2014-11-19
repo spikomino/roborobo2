@@ -459,11 +459,9 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, d
 
   double mut_power = weight_mut_power;
 
-
-  //NOTE: default NEAT method (randomly) replaced  by previous selection (best)
-  // which has been stored in _genome
   new_genome = this -> duplicate ();
 
+  new_genome->genome_id = idNewGenome;
   new_genome->mom_id = this->genome_id;
   new_genome->dad_id = -1;  
   
@@ -474,7 +472,7 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, d
       if(!(new_genome->mutate_add_node(new_genome->node_id,new_genome->innovNumber)))
 	{
 	  std::cerr << "[FAILURE] No neural node added. This is not always a problem" << std::endl;
-	  exit(-1);		  
+	  // exit(-1);		  
 	}
     }   
   else 
@@ -485,7 +483,7 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, d
 					    newlink_tries)))
 	    {
 	      std::cerr << "[FAILURE] No link added. This is not always a problem" << std::endl;
-	      exit(-1);		  
+	      //exit(-1);		  
 	    }
 	}
       
@@ -837,8 +835,7 @@ bool Genome::mutate_add_link(double &curinnov,int tries)
 	      recurflag=phenotype->is_recur(nodep1->analogue,nodep2->analogue,count,thresh);
 	
 	      //ADDED: CONSIDER connections out of outputs recurrent
-	      if (((nodep1->gen_node_label)==OUTPUT)||
-		  ((nodep2->gen_node_label)==OUTPUT))
+          if ((nodep1->gen_node_label)==OUTPUT)
 		recurflag=true;
 	
 	      //Make sure it finds the right kind of link (recur)
@@ -894,8 +891,7 @@ bool Genome::mutate_add_link(double &curinnov,int tries)
 	      recurflag=phenotype->is_recur(nodep1->analogue,nodep2->analogue,count,thresh);
 	      
 	      //ADDED: CONSIDER connections out of outputs recurrent
-	      if (((nodep1->gen_node_label)==OUTPUT)||
-		  ((nodep2->gen_node_label)==OUTPUT))
+          if ((nodep1->gen_node_label)==OUTPUT)
 		recurflag=true;
 	      
 	      //Make sure it finds the right kind of link (recur or not)
@@ -915,7 +911,8 @@ bool Genome::mutate_add_link(double &curinnov,int tries)
   //Continue only if an open link was found
   if (found) 
     {
-      
+      //TODELETE
+      std::cout << "ADDED GENE" << std::endl;
       //If it was supposed to be recurrent, make sure it gets labeled that way
       if (do_recur) recurflag=1;
       

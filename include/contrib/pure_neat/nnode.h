@@ -45,11 +45,7 @@ namespace PURENEAT
     
     int activation_count;  // keeps track of which activation the node is currently in
     double last_activation; // Holds the previous step's activation for recurrency
-    double last_activation2; // Holds the activation BEFORE the prevous step's
-    // This is necessary for a special recurrent case when the innode
-    // of a recurrent link is one time step ahead of the outnode.
-    // The innode then needs to send from TWO time steps ago
-    
+
     NNode *dup;       // Used for Genome duplication
     
     NNode *analogue;  // Used for Gene decoding
@@ -88,9 +84,6 @@ namespace PURENEAT
     
     // Just return activation for step
     double get_active_out();
-    
-    // Return activation from PREVIOUS time step
-    double get_active_out_td();
     
     // Returns the type of the node, NEURON or SENSOR
     const nodetype get_type();

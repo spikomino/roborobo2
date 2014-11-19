@@ -1,5 +1,6 @@
 #include "pure_neat/nnode.h"
 #include "pure_neat/link.h"
+#include "pure_neat/network.h"
 #include <iostream>
 #include <sstream>
 using namespace PURENEAT;
@@ -10,7 +11,6 @@ NNode::NNode(nodetype ntype,int nodeid) {
 	activation=0;
 	output=0;
 	last_activation=0;
-	last_activation2=0;
 	type=ntype; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=nodeid;
@@ -26,7 +26,6 @@ NNode::NNode(nodetype ntype,int nodeid, nodeplace placement) {
 	activation=0;
 	output=0;
 	last_activation=0;
-	last_activation2=0;
 	type=ntype; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=nodeid;
@@ -41,7 +40,6 @@ NNode::NNode(NNode *n) {
 	activation=0;
 	output=0;
 	last_activation=0;
-	last_activation2=0;
 	type=n->type; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=n->node_id;
@@ -72,7 +70,6 @@ NNode::NNode (const NNode& nnode)
 	activation = nnode.activation;
 	output = nnode.output;
 	last_activation = nnode.last_activation;
-	last_activation2 = nnode.last_activation2;
 	type = nnode.type; //NEURON or SENSOR type
 	activation_count = nnode.activation_count; //Inactive upon creation
 	node_id = nnode.node_id;
@@ -106,8 +103,7 @@ nodetype NNode::set_type(nodetype newtype) {
 bool NNode::sensor_load(double value) {
 	if (type==SENSOR) {
 
-		//Time delay memory
-		last_activation2=last_activation;
+		//Time delay memory		
 		last_activation=activation;
 
 		activation_count++;  //Puts sensor into next time-step
@@ -145,14 +141,6 @@ double NNode::get_active_out() {
 	else return 0.0;
 }
 
-// Return activation currently in node from PREVIOUS (time-delayed) time step,
-// if there is one
-double NNode::get_active_out_td() {
-	if (activation_count>1)
-		return last_activation;
-	else return 0.0;
-}
-
 // This recursively flushes everything leading into and including this NNode, 
 //including recurrencies
 void NNode::flushback() 
@@ -167,8 +155,7 @@ void NNode::flushback()
 	{
 	  activation_count=0;
 	  activation=0;
-	  last_activation=0;
-	  last_activation2=0;
+	  last_activation=0;	  
 	}
       
       //Flush back recursively
@@ -184,7 +171,6 @@ void NNode::flushback()
     activation_count=0;
     activation=0;
     last_activation=0;
-    last_activation2=0;
     
   }
   
@@ -213,10 +199,7 @@ void NNode::flushback_check(std::vector<NNode*> &seenlist) {
       std::cout<<"ALERT: "<<this<<" has last_activation  "<<last_activation<<std::endl;
     }
     
-    if (last_activation2>0) {
-      std::cout<<"ALERT: "<<this<<" has last_activation2  "<<last_activation2<<std::endl;
-    }
-    
+
     for(curlink=innodes.begin();curlink!=innodes.end();++curlink) {
       location = std::find(seenlist.begin(),seenlist.end(),((*curlink)->in_node));
       if (location==seenlist.end()) {
@@ -231,8 +214,7 @@ void NNode::flushback_check(std::vector<NNode*> &seenlist) {
         std::cout<<"sALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
     std::cout<<"sALERT: "<<this<<" has activation  "<<activation<<std::endl;
     std::cout<<"sALERT: "<<this<<" has last_activation  "<<last_activation<<std::endl;
-    std::cout<<"sALERT: "<<this<<" has last_activation2  "<<last_activation2<<std::endl;
-    
+
     
     if (activation_count>0) {
       std::cout<<"ALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
@@ -245,11 +227,7 @@ void NNode::flushback_check(std::vector<NNode*> &seenlist) {
     if (last_activation>0) {
       std::cout<<"ALERT: "<<this<<" has last_activation  "<<last_activation<<std::endl;
     }
-    
-    if (last_activation2>0) {
-      std::cout<<"ALERT: "<<this<<" has last_activation2  "<<last_activation2<<std::endl;
-    }
-    
+        
   }
   
 }
