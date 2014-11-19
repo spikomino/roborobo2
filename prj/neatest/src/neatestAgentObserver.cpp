@@ -66,8 +66,13 @@ void neatestAgentObserver::step(){
         targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
 	gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
 	
-	/* increment fitness */
-	_wm->_fitnessValue += 1.0;
+	/* notify the robot that it picked an item  */
+	neatestController *cont = 
+	    dynamic_cast <
+	    neatestController *
+	    >(gWorld->getRobot (_wm->getId())->getController ());
+	cont->pickItem();
+
 
 	/* if(gVerbose) */
 	    /* std::cout << "\t[Robot #" + to_string(_wm->getId())  */

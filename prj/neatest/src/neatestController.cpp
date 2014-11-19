@@ -17,16 +17,34 @@
 
 using namespace NEAT;
 void print_genome(GenomeAdapted*);
+void emptyBasket();
+
+int get_lifetime(){
+    return dynamic_cast <neatestWorldObserver*> 
+	(gWorld->getWorldObserver())->getLifeIterationCount();  
+}
+
+bool lifeTimeOver(){
+    return dynamic_cast <neatestWorldObserver*> 
+	(gWorld->getWorldObserver())->getLifeIterationCount() 
+	>= neatestSharedData::gEvaluationTime - 1;
+}
+
+
 
 neatestController::neatestController(RobotWorldModel * wm){
   _wm              = wm;
   _iteration       = 0;
   _birthdate       = 0;
+  _prev_fitness    = 0.0;
+  _fitness         = 0.0;
+  _items           = 0;
   _neurocontroller = NULL;
   _sigma           = neatestSharedData::gSigmaRef;
 
   _wm->setAlive(true);
-  initRobot ();
+  initRobot();
+  
 }
 
 neatestController::~neatestController (){
@@ -76,24 +94,21 @@ void neatestController::createNeuroController (){
   _neurocontroller = _genome->genesis(_wm->_id);
 }
 
-bool neatestController::lifeTimeOver(){
-    return dynamic_cast <neatestWorldObserver*> 
-	(gWorld->getWorldObserver())->getLifeIterationCount() 
-	>= neatestSharedData::gEvaluationTime - 1;
-}
-
 void neatestController::reset(){
-    _fitness = _wm->_fitnessValue ;
-    _wm->_fitnessValue   = 0.0;
+    
+    /* fitness related resets */ 
+    _prev_fitness = _fitness;
+    _fitness = 0.0;
+    emptyBasket();
     _birthdate = gWorld->getIterations();
     emptyGenomeList();
-    createNeuroController();
 }
 
 void neatestController::step(){
   _iteration++;
   if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
+      updateFitness();
       broadcast();     // broadcast genome to neighbors
   }
   if(lifeTimeOver()){
@@ -298,15 +313,29 @@ void neatestController::stepEvolution() {
 	exit (-1);
     }
     
+    /* create a new network */
+    createNeuroController();
+
     /** there is a memory leak here. Genome is never deleted.
 	Selection selects some other genome and  mutate create a new one, 
 	the previous genome is not deleted. It cannot be deleted since it 
 	could be selected at some other agent ???? **/
 }
 
-void neatestController::updateFitness (double df){
-    _wm->_fitnessValue += df;
+
+// update fitness for foraging 
+void neatestController::updateFitness(){
+    _fitness = (double) _items / (double) get_lifetime();
 }
+
+void neatestController::pickItem(){
+    _items++;
+}
+
+void neatestController::emptyBasket(){
+    _items = 0;
+}
+
 
 int  neatestController::selectRandom(){
     auto it = _glist.begin();
@@ -394,7 +423,8 @@ void neatestController::printRobot(){
     std::cout << "[Robot: id=" + to_string(getId())
 	      << " iteration=" + to_string(_iteration)
 	      << " birthdate=" + to_string(_birthdate) 
-	      << " fitness="   + to_string(_wm->_fitnessValue) 
+	      << " fitness="   + to_string(_fitness) 
+	      << " items="     + to_string(_items) 
 	      << " sigma="     + to_string(_sigma) + " ]";
 }
 

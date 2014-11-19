@@ -29,11 +29,14 @@ private:
     int                     _iteration;
     int                     _birthdate; // iteration at which we are created 
     double                  _fitness;
+    double                  _prev_fitness; // to report to World observer
+    unsigned int            _items; // items collected 
     double                  _sigma;
     GenomeAdapted*          _genome;
     Network*                _neurocontroller;
     unsigned int            _nbInputs;
     unsigned int            _nbOutputs;
+    
     std::map<int, message>  _glist;
 
    
@@ -50,18 +53,19 @@ private:
     void createNeuroController ();
 
     /* vvolution */
-    void updateFitness (double); 
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
-
+    void updateFitness ();
+    void emptyBasket   ();
     /* misc */
-    bool lifeTimeOver    ();
+  
     void printRobot      ();
     void printGenomeList ();
     void printMessage    (message);
     void save_genome     ();
     void printAll        ();
+    
 
 public:
 
@@ -69,9 +73,11 @@ public:
     ~neatestController ();
     
     int getId  (){ return _wm->getId(); }
+    double getFitness  (){ return _prev_fitness; }
+
     void reset ();
     void step  ();
-    double getFitness  (){ return _fitness; }
+    void pickItem      ();
 };
 
 

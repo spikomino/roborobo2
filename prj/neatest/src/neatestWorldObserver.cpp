@@ -74,18 +74,22 @@ void neatestWorldObserver::updateMonitoring(){
     
     // switch to next generation.
     if( _lifeIterationCount >= neatestSharedData::gEvaluationTime ) {
-	// * monitoring: count number of active agents.
-        double fitness =0.0;
+	/* * monitoring: count number of active agents. */        
 	int activeCount = 0;
 	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
-	    fitness += (dynamic_cast<neatestController*>
-			(gWorld->getRobot(i)->getController()))->getFitness();
-
 	    if ( (dynamic_cast<neatestController*>
 		  (gWorld->getRobot(i)->getController()))->getWorldModel()->
 		 isAlive() == true )
 		activeCount++;
 	}
+
+	/* get all agents fitness */
+	double fitness =0.0;
+	for ( int i = 0 ; i != gNumberOfRobots ; i++ )
+	    fitness += (dynamic_cast<neatestController*>
+			(gWorld->getRobot(i)->getController()))->getFitness();
+	
+	    
 	if ( gVerbose )
 	    std::cout << "[gen:" 
 		      << (gWorld->getIterations()/
@@ -96,7 +100,8 @@ void neatestWorldObserver::updateMonitoring(){
         // Logging
         std::string s = std::string("") + 
 	    "{" + std::to_string(gWorld->getIterations()) + 
-	    "}[all] [pop_alive:" + std::to_string(activeCount) + "]\n";
+	    "}[all] [pop_alive:" + std::to_string(activeCount) + 
+	    " [fit:" + std::to_string(fitness) + "]\n";
         gLogManager->write(s);
 	gLogManager->flush();
     }
