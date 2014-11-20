@@ -39,6 +39,8 @@ private:
     
     std::map<int, message>  _glist;
 
+    /* floreano fitness related atribute */
+    double _lv, _rv, _md; /* tran rot velocities and min dist */
    
     /* behavior */ 
     void initRobot     ();
@@ -56,8 +58,12 @@ private:
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
-    void updateFitness ();
+    void updateFitnessForaging  ();
+    void updateFitnessNavigation ();
     void emptyBasket   ();
+
+
+
     /* misc */
   
     void printRobot      ();

@@ -66,12 +66,13 @@ void neatestController::initRobot (){
     _genome->setIdTrace(getId());
     _genome->setMom(-1);
     _genome->setDad(-1);
+    _genome->mut_link_weights(_sigma);
     
     // create a neuro controller from this genome
     createNeuroController();
     _genome->setInnovNumber( (double) _neurocontroller->linkcount ());
     _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
-    _genome->mut_link_weights(_sigma);
+ 
         
     // clear the genome list 
     emptyGenomeList();
@@ -108,7 +109,7 @@ void neatestController::step(){
   _iteration++;
   if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
-      updateFitness();
+      updateFitnessNavigation();
       broadcast();     // broadcast genome to neighbors
   }
   if(lifeTimeOver()){
@@ -136,15 +137,17 @@ bool is_energy_item(int id){
 void neatestController::stepBehaviour(){
     double inputs[_nbInputs]; 
     int    inputToUse = 0;
-    
+    const  int L = 0;
+    const  int R = 1;
+
     // (1)  Read inputs 
  
     /* read distance sensors  */
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
-	inputs[inputToUse++] = 
+	inputs[inputToUse++] = 1 - (
 	    _wm->getDistanceValueFromCameraSensor (i) /
-	    _wm->getCameraSensorMaximumDistanceValue (i);
-    
+	    _wm->getCameraSensorMaximumDistanceValue (i));
+
     /* read object sensors */
     if(gExtendedSensoryInputs)
 	for(int i = 0; i < _wm->_cameraSensorsNb; i++){
@@ -162,6 +165,13 @@ void neatestController::stepBehaviour(){
 	    else
 		inputs[inputToUse++] = 0.0;
 	}
+    
+    /* get the most activated obstacle sensor for floreano fitness*/
+    _md =-10.0;
+    for(int i = 0; i < _wm->_cameraSensorsNb; i++)
+	if(_md < inputs[i] && 
+	   gExtendedSensoryInputs && inputs[i+_wm->_cameraSensorsNb] < 1.0)
+	    _md = inputs[i];
     
     /* bias node : neat put biases after sensors */
     inputs[inputToUse++] = 1.0; 
@@ -182,26 +192,52 @@ void neatestController::stepBehaviour(){
 	outputs.push_back((*out_iter)->activation);
      
     // (4) execute the motor commands 
-    _wm->_desiredTranslationalValue = outputs[0]; 
-    _wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); /* [-1, 1] */
+    
+    /* outputs => rot & trans */ 
+    //_wm->_desiredTranslationalValue = outputs[0]; 
+    //_wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); /* [-1, 1] */
+
+    /* output = L & R velocity (differential drive) */ 
+    
+    /* store velocities for floreano fitness */
+    _lv = outputs[L];
+    _rv = outputs[R];
+
+    outputs[L] = 2.0 * (outputs[L]-0.5); /* [-1, 1] */
+    outputs[R] = 2.0 * (outputs[R]-0.5);
+  
+    /* outputs[L] = 0.0; */
+    /* outputs[R] = 0.0; */
+
+  
+
+    _wm->_desiredTranslationalValue =  (outputs[R] + outputs[L]) / 2.0 ;
+    _wm->_desiredRotationalVelocity =  outputs[R] - outputs[L] ;
 
     /* normalize to motor interval values */
     _wm->_desiredTranslationalValue =
-	_wm->_desiredTranslationalValue * gMaxTranslationalSpeed;
+    	_wm->_desiredTranslationalValue * gMaxTranslationalSpeed;
     _wm->_desiredRotationalVelocity =
-	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
+    	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
     
+    
+
+
     // print things
-    /*if(gVerbose){
+    if(gVerbose){
 	std::cout << "[Controller] "
 		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
-		  << "\t\t[Inputs : " ;
-	for(unsigned int i = 0; i < _nbInputs; i++){
-	    std::cout << to_string(inputs[i]) + " ";
+		  << "\t\t[lv=" << _lv 
+		  << " rv="     << _rv 
+		  << " max_sens=" << _md 
+		  << "]" << std::endl 
+		  << "\t\tInputs :[ " ;
+	for(unsigned int i = 1; i <= _nbInputs; i++){
+	    std::cout << to_string(inputs[i-1]) + " ";
 	    if ((i % _wm->_cameraSensorsNb) == 0)
 		std::cout << "]" <<  std::endl << "\t\t\t[ ";
 	}
-	std::cout <<  std::endl;
+	std::cout <<  " ]" << std::endl;
 
 	std::cout << "\t\t[Outputs : " ;
 	std::vector<double>::iterator itr;
@@ -209,10 +245,8 @@ void neatestController::stepBehaviour(){
 	    std::cout << to_string(*itr) + " ";
 	std::cout << "]"
 		  << std::endl;
-		  }*/
+		  }
 
-    //_wm->_desiredTranslationalValue = 0.0;
-    //_wm->_desiredRotationalVelocity = 0.0;
 } 
 
 
@@ -251,7 +285,7 @@ void neatestController::broadcast() {
     
     /* if found neighbors, broadcast my genome */
     if(neighbors.size() > 0) {
-	message msg (_genome, _wm->_fitnessValue, _sigma, _birthdate);
+	message msg (_genome, _fitness, _sigma, _birthdate);
 
 	/* remove duplicates */
 	std::sort(neighbors.begin(), neighbors.end()); 
@@ -288,11 +322,11 @@ void neatestController::emptyGenomeList(){
 
 void neatestController::stepEvolution() {
     /* store our genome in the list */
-    message msg (_genome, _wm->_fitnessValue, _sigma, _birthdate);
+    message msg (_genome, _fitness, _sigma, _birthdate);
     storeMessage(_wm->getId(), msg);
        
     /* select an offspring */
-    int selected = selectRandom();
+    int selected = selectBest();
     _genome = std::get<0>(_glist[selected]);
     _sigma  = std::get<2>(_glist[selected]);
     
@@ -324,7 +358,12 @@ void neatestController::stepEvolution() {
 
 
 // update fitness for foraging 
-void neatestController::updateFitness(){
+void neatestController::updateFitnessNavigation(){
+    _fitness += (fabs(_lv) + fabs(_rv)) * 
+	(1.0 -sqrt(fabs(_lv - _rv))) * 
+	(1.0 - _md) ;
+}
+void neatestController::updateFitnessForaging(){
     _fitness = (double) _items / (double) get_lifetime();
 }
 

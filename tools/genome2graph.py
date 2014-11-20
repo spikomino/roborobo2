@@ -119,13 +119,14 @@ def graph_from_graph(G, fname):
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
-    if d[6] != '][Genome:' :
+    if d[7] != '][Genome:' :
         return (None, None, None, None)
-    rob     = int( d[7].split('=')[1]) 
-    idtrace = int( d[8].split('=')[1]) 
-    mom     = int( d[9].split('=')[1])
-    dad     = int(d[10].split('=')[1])
-    return (rob,idtrace, mom, dad)
+    rob     = int( d[8].split('=')[1]) 
+    idtrace = int( d[9].split('=')[1]) 
+    mom     = int( d[10].split('=')[1])
+    dad     = int(d[11].split('=')[1])
+    
+    return (rob, idtrace, mom, dad)
 
 # read the number of robots & creates a dictionary with num robots lists 
 # like this one with 3 robots {0: [(tuples), ()], 1: [], 2: []}
