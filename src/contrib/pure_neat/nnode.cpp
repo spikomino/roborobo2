@@ -10,7 +10,6 @@ NNode::NNode(nodetype ntype,int nodeid) {
 	activesum=0;
 	activation=0;
 	output=0;
-	last_activation=0;
 	type=ntype; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=nodeid;
@@ -25,7 +24,6 @@ NNode::NNode(nodetype ntype,int nodeid, nodeplace placement) {
 	activesum=0;
 	activation=0;
 	output=0;
-	last_activation=0;
 	type=ntype; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=nodeid;
@@ -39,7 +37,6 @@ NNode::NNode(NNode *n) {
 	active_flag=false;
 	activation=0;
 	output=0;
-	last_activation=0;
 	type=n->type; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=n->node_id;
@@ -68,8 +65,7 @@ NNode::NNode (const NNode& nnode)
 	active_flag = nnode.active_flag;
 	activesum = nnode.activesum;
 	activation = nnode.activation;
-	output = nnode.output;
-	last_activation = nnode.last_activation;
+	output = nnode.output;	
 	type = nnode.type; //NEURON or SENSOR type
 	activation_count = nnode.activation_count; //Inactive upon creation
 	node_id = nnode.node_id;
@@ -102,10 +98,6 @@ nodetype NNode::set_type(nodetype newtype) {
 //If the node is a SENSOR, returns true and loads the value
 bool NNode::sensor_load(double value) {
 	if (type==SENSOR) {
-
-		//Time delay memory		
-		last_activation=activation;
-
 		activation_count++;  //Puts sensor into next time-step
 		activation=value;
 		return true;
@@ -152,27 +144,25 @@ void NNode::flushback()
     {
       
       if (activation_count>0) 
-	{
-	  activation_count=0;
-	  activation=0;
-	  last_activation=0;	  
-	}
+        {
+            activation_count=0;
+            activation=0;
+        }
       
       //Flush back recursively
       for(curlink=incoming.begin();curlink!=incoming.end();++curlink) 
-	{
-	  //Flush the link itself (For future learning parameters possibility) 
-	  if ((((*curlink)->in_node)->activation_count>0))
-	    ((*curlink)->in_node)->flushback();
-	}
+        {
+            //Flush the link itself (For future learning parameters possibility)
+            if ((((*curlink)->in_node)->activation_count>0))
+                ((*curlink)->in_node)->flushback();
+        }
     }
-  else {
-    //Flush the SENSOR
-    activation_count=0;
-    activation=0;
-    last_activation=0;
-    
-  }
+  else
+    {
+        //Flush the SENSOR
+        activation_count=0;
+        activation=0;
+    }
   
 }
 
@@ -185,50 +175,47 @@ void NNode::flushback_check(std::vector<NNode*> &seenlist) {
   std::vector<Link*> innodes=incoming;
   std::vector<NNode*>::iterator location;
   
-  if (!(type==SENSOR)) {
+  if (!(type==SENSOR))
+    {
     
-    if (activation_count>0) {
-      std::cout<<"ALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
-    }
+        if (activation_count>0)
+         {
+              std::cout<<"ALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
+         }
     
-    if (activation>0) {
-      std::cout<<"ALERT: "<<this<<" has activation  "<<activation<<std::endl;
-    }
-    
-    if (last_activation>0) {
-      std::cout<<"ALERT: "<<this<<" has last_activation  "<<last_activation<<std::endl;
-    }
-    
+        if (activation>0)
+          {
+             std::cout<<"ALERT: "<<this<<" has activation  "<<activation<<std::endl;
+          }
 
-    for(curlink=innodes.begin();curlink!=innodes.end();++curlink) {
-      location = std::find(seenlist.begin(),seenlist.end(),((*curlink)->in_node));
-      if (location==seenlist.end()) {
-	seenlist.push_back((*curlink)->in_node);
-	((*curlink)->in_node)->flushback_check(seenlist);
-      }
-    }
+        for(curlink=innodes.begin();curlink!=innodes.end();++curlink)
+            {
+                location = std::find(seenlist.begin(),seenlist.end(),((*curlink)->in_node));
+                if (location==seenlist.end())
+                {
+                    seenlist.push_back((*curlink)->in_node);
+                    ((*curlink)->in_node)->flushback_check(seenlist);
+                }
+            }
     
-  }
-  else {
-    //Flush_check the SENSOR
+    }
+  else
+    {
+        //Flush_check the SENSOR
         std::cout<<"sALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
-    std::cout<<"sALERT: "<<this<<" has activation  "<<activation<<std::endl;
-    std::cout<<"sALERT: "<<this<<" has last_activation  "<<last_activation<<std::endl;
+        std::cout<<"sALERT: "<<this<<" has activation  "<<activation<<std::endl;
+    
+    if (activation_count>0)
+        {
+            std::cout<<"ALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
+        }
+    
+    if (activation>0)
+        {
+            std::cout<<"ALERT: "<<this<<" has activation  "<<activation<<std::endl;
+        }
 
-    
-    if (activation_count>0) {
-      std::cout<<"ALERT: "<<this<<" has activation count "<<activation_count<<std::endl;
     }
-    
-    if (activation>0) {
-      std::cout<<"ALERT: "<<this<<" has activation  "<<activation<<std::endl;
-    }
-    
-    if (last_activation>0) {
-      std::cout<<"ALERT: "<<this<<" has last_activation  "<<last_activation<<std::endl;
-    }
-        
-  }
   
 }
 

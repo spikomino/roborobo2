@@ -17,7 +17,7 @@ namespace PURENEAT
     bool enable;  //When this is off the Gene is disabled
     
     //Construct a gene with no trait
-    Gene(double w,NNode *inode,NNode *onode,bool recur,double innov,double mnum);
+    Gene(double w,NNode *inode,NNode *onode,bool recur,double innov);
     
     //Construct a gene off of another gene as a duplicate
     Gene(Gene *g,NNode *inode,NNode *onode);

@@ -98,7 +98,7 @@ TopEDOController::initRobot ()
       _genome->dad_id = -1;
       _genome->genome_id = _wm->getId ();
       
-      _genome->mutate_link_weights (1.0, 1.0, PURENEAT::COLDGAUSSIAN);
+      _genome->mutate_link_weights (1.0);
       createNN ();
       
     }
@@ -145,7 +145,7 @@ TopEDOController::createNN ()
   if (nn != NULL)
     delete nn;
 
-  nn = _genome->genesis (_wm->_id);//TOCHECK _genome -> genome_id
+  nn = _genome->genesis ();
 
 }
 

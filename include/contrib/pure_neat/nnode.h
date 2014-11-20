@@ -44,7 +44,6 @@ namespace PURENEAT
   protected:
     
     int activation_count;  // keeps track of which activation the node is currently in
-    double last_activation; // Holds the previous step's activation for recurrency
 
     NNode *dup;       // Used for Genome duplication
     

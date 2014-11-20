@@ -72,65 +72,65 @@ Genome::Genome(int id, std::ifstream &iFile)
   //Loop until file is finished, parsing each line
   while (!done) 
     {
-      if (curwordnum > wordcount || wordcount == 0) 
-	{
-	  iFile.getline(curline, sizeof(curline));
-	  wordcount = getUnitCount(curline, delimiters);
-	  curwordnum = 0;
-	}
+      if (curwordnum > wordcount || wordcount == 0)
+        {
+          iFile.getline(curline, sizeof(curline));
+          wordcount = getUnitCount(curline, delimiters);
+          curwordnum = 0;
+        }
       
       std::stringstream ss(curline);
       
-      ss >> curword;
-      
+      ss >> curword; 
       
       //Check for end of Genome
       if (strcmp(curword,"genomeend")==0) 
-	{
+        {
 	  
-	  ss >> curword;
-	  int idcheck = atoi(curword);
-	  if (idcheck!=genome_id) printf("ERROR: id mismatch in genome");
-	  done=1;
-	}
+            ss >> curword;
+            int idcheck = atoi(curword);
+            if (idcheck!=genome_id) printf("ERROR: id mismatch in genome");
+            done=1;
+        }
 
       //Ignore genomestart if it hasn't been gobbled yet
       else if (strcmp(curword,"genomestart")==0) 
-	++curwordnum;
+        ++curwordnum;
       //Ignore comments surrounded by - they get printed to screen
       else if (strcmp(curword,"/*")==0) 
-	{
-	  ss >> curword;
-	  while (strcmp(curword,"*/")!=0) 
-	    ss >> curword;
-	}
+        {
+            ss >> curword;
+            while (strcmp(curword,"*/")!=0)
+                ss >> curword;
+        }
       //Read in a node
       else if (strcmp(curword,"node")==0) 
-	{
-	  NNode *newnode;
-	  char argline[1024];
-	  curwordnum = wordcount + 1;
+        {
+            NNode *newnode;
+            char argline[1024];
+            curwordnum = wordcount + 1;
     
-	  ss.getline(argline, 1024);
-	  //Allocate the new node
-	  newnode=new NNode(argline);
-	  //Add the node to the list of nodes
-	  nodes.push_back(newnode);
-	}  
+            ss.getline(argline, 1024);
+            //Allocate the new node
+            newnode=new NNode(argline);
+            //Add the node to the list of nodes
+            nodes.push_back(newnode);
+        }
       //Read in a Gene
-      else if (strcmp(curword,"gene")==0) {
-	Gene *newgene;
+      else if (strcmp(curword,"gene")==0)
+        {
+            Gene *newgene;
 	
-	char argline[1024];
-	curwordnum = wordcount + 1;
+            char argline[1024];
+            curwordnum = wordcount + 1;
 	
-	ss.getline(argline, 1024);
-	//Allocate the new Gene
-	newgene=new Gene(argline,nodes);
+            ss.getline(argline, 1024);
+            //Allocate the new Gene
+            newgene=new Gene(argline,nodes);
 	
-	//Add the gene to the genome
-	genes.push_back(newgene);
-      }
+            //Add the gene to the genome
+            genes.push_back(newgene);
+        }
       
     }
   
@@ -164,10 +164,9 @@ Genome::Genome(int num_in,int num_out) {
   for(ncount=1;ncount<=num_in;ncount++) 
     {
       if (ncount<num_in)
-	newnode=new NNode(SENSOR,ncount,INPUT);
-      else { 
-	newnode=new NNode(SENSOR,ncount,BIAS);
-      }
+        newnode=new NNode(SENSOR,ncount,INPUT);
+      else
+        newnode=new NNode(SENSOR,ncount,BIAS);
 
       //Add the node to the list of nodes
       nodes.push_back(newnode);
@@ -192,20 +191,21 @@ Genome::Genome(int num_in,int num_out) {
     {
       //Loop over the inputs
       for(curnode2=inputs.begin();curnode2!=inputs.end();++curnode2) 
-	{
-	  //Connect each input to each output
-	  newgene=new Gene(0, (*curnode2), (*curnode1),false,count,0);
+        {
+            //Connect each input to each output with a weight 0.0
+            // gene_id = count
+            newgene=new Gene(0, (*curnode2), (*curnode1),false,count);
 	  
-	  //Add the gene to the genome
-	  genes.push_back(newgene);	 
+            //Add the gene to the genome
+            genes.push_back(newgene);
 	  
-	  count++;
+            count++;
 	  
-	}
+        }
       
     }
-  mom_id = -1;
-  dad_id = -1;
+    mom_id = -1;
+    dad_id = -1;
 }
 
 Genome::~Genome() 
@@ -222,7 +222,7 @@ Genome::~Genome()
   
 }
 
-Network *Genome::genesis(int id) 
+Network *Genome::genesis()
 {
   std::vector<NNode*>::iterator curnode; 
   std::vector<Gene*>::iterator curgene;
@@ -285,7 +285,7 @@ Network *Genome::genesis(int id)
     }
   
   //Create the new network
-  newnet=new Network(inlist,outlist,all_list,id);
+  newnet=new Network(inlist,outlist,all_list,genome_id);
   
   //Attach genotype and phenotype together
   newnet->genotype=this;
@@ -494,7 +494,7 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, d
 	  //If we didn't do a structural mutation, we do the other kinds
 	  if (randfloat () < mutate_link_weights_prob)
 	    {
-	      new_genome->mutate_link_weights (mut_power, 1.0, GAUSSIAN);
+          new_genome->mutate_link_weights (mut_power);
 	    }
 	  if (randfloat () < mutate_toggle_enable_prob)
 	    {
@@ -510,83 +510,16 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, d
   return new_genome;
 }
 
-void Genome::mutate_link_weights(double power,double rate,mutator mut_type) 
+void Genome::mutate_link_weights(double power)
 {
   std::vector<Gene*>::iterator curgene;
-  double num;  //counts gene placement
-  double gene_total;
-  double powermod; //Modified power by gene number
-  //The power of mutation will rise farther into the genome
-  //on the theory that the older genes are more fit since
-  //they have stood the test of time
-  double randnum;
-  double randchoice; //Decide what kind of mutation to do on a gene
-  double endpart; //Signifies the last part of the genome
-  double gausspoint;
-  double coldgausspoint;
-  
-  bool severe;  //Once in a while really shake things up
-  
-  
-  if (randfloat()>0.5) severe=true;
-  else severe=false;
-  
-  //Go through all the Genes and perturb their link's weights
-  num=0.0;
-  gene_total=(double) genes.size();
-  endpart=gene_total*0.8;
-  
-  powermod=1.0;
-  
-  
+
   //Loop on all genes
+  //TODO - cap the weights to a value, even normalize weights [-1,+1]
   for(curgene=genes.begin();curgene!=genes.end();curgene++) 
     {
-      if (severe) 
-	{
-	  gausspoint=0.3;
-	  coldgausspoint=0.1;
-	}
-      else if ((gene_total>=10.0)&&(num>endpart)) 
-	{
-	  gausspoint=0.5;  //Mutate by modification % of connections
-	  coldgausspoint=0.3; //Mutate the rest by replacement % of the time
-	}
-      else 
-	{
-	  //Half the time don't do any cold mutations
-	  if (randfloat()>0.5) 
-	    {
-	      gausspoint=1.0-rate;
-	      coldgausspoint=1.0-rate-0.1;
-	    }
-	  else 
-	    {
-	      gausspoint=1.0-rate;
-	      coldgausspoint=1.0-rate;
-	    }
-	}
-
-      randnum=randposneg()*randfloat()*power*powermod;
-      
-      if (mut_type==GAUSSIAN) 
-	{
-	  randchoice=randfloat();
-	  if (randchoice>gausspoint)
-	    ((*curgene)->lnk)->weight+=randnum;
-	  else if (randchoice>coldgausspoint)
-	    ((*curgene)->lnk)->weight=randnum;
-	}
-      else if (mut_type==COLDGAUSSIAN)
-	((*curgene)->lnk)->weight=randnum;
-      
-      //Cap the weights at 8.0 (experimental)
-      if (((*curgene)->lnk)->weight > 8.0) ((*curgene)->lnk)->weight = 8.0;
-      else if (((*curgene)->lnk)->weight < -8.0) ((*curgene)->lnk)->weight = -8.0;
-      
-      //Counter on the genes, to mutate more the genes 
-      num+=1.0;
-      
+       if((*curgene) -> enable)
+        ((*curgene)-> lnk) -> weight += power * gaussrand();
     } //end for loop
 }
 
@@ -631,7 +564,8 @@ void Genome::mutate_gene_reenable() {
 	std::vector<Gene*>::iterator thegene;  //Gene to enable
 
 	thegene=genes.begin();
-
+    //TODO - reenable a random disabled gene,
+    //not just the first disabled one
 	//Search for a disabled gene
 	while((thegene!=genes.end())&&((*thegene)->enable==true))
 		++thegene;
@@ -708,13 +642,13 @@ bool Genome::mutate_add_node(int &curnode_id,double &curinnov)
   //Create the new Genes
   if (thelink->is_recurrent) 
     {
-      newgene1=new Gene(1.0,in_node,newnode,true,curinnov,0);
-      newgene2=new Gene(oldweight,newnode,out_node,false,curinnov+1,0);
+      newgene1=new Gene(1.0,in_node,newnode,true,curinnov);
+      newgene2=new Gene(oldweight,newnode,out_node,false,curinnov+1);
       curinnov+=2.0;
     }
   else {
-    newgene1=new Gene(1.0,in_node,newnode,false,curinnov,0);
-    newgene2=new Gene(oldweight,newnode,out_node,false,curinnov+1,0);
+    newgene1=new Gene(1.0,in_node,newnode,false,curinnov);
+    newgene2=new Gene(oldweight,newnode,out_node,false,curinnov+1);
     curinnov+=2.0;
   }
 
@@ -929,7 +863,7 @@ bool Genome::mutate_add_link(double &curinnov,int tries)
 	  newweight=randposneg()*randfloat()*1.0; 
 	  
 	  //Create the new gene
-	newgene=new Gene(newweight,nodep1,nodep2,recurflag,curinnov,newweight);
+    newgene=new Gene(newweight,nodep1,nodep2,recurflag,curinnov);
 	curinnov=curinnov+1.0;
 	
 	done=true;

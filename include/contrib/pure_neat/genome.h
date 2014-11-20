@@ -10,7 +10,6 @@ namespace PURENEAT
   enum mutator 
   {
     GAUSSIAN = 0,
-    COLDGAUSSIAN = 1 
   };
  
   //----------------------------------------------------------------------- 
@@ -62,7 +61,7 @@ namespace PURENEAT
     ~Genome();
     
     //Generate a network phenotype from this Genome with specified id
-    Network *genesis(int);
+    Network *genesis();
     
     // Dump this genome to specified file
     void print_to_file(std::ostream &outFile);
@@ -85,8 +84,8 @@ namespace PURENEAT
     //Check out properties file, section NEAT - paramerters for the probabilities
     Genome *mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNum);
     
-    // Add Gaussian noise to linkweights either GAUSSIAN or COLDGAUSSIAN (from zero)
-    void mutate_link_weights(double power,double rate,mutator mut_type);
+    // Add Gaussian noise to all linkweights with variance power ^ 2
+    void mutate_link_weights(double power);
     
     // toggle genes on or off 
     void mutate_toggle_enable(int times);

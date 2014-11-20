@@ -4,7 +4,7 @@
 #include <sstream>
 using namespace PURENEAT;
 
-Gene::Gene(double w, NNode *inode, NNode *onode, bool recur, double innov, double mnum) 
+Gene::Gene(double w, NNode *inode, NNode *onode, bool recur, double innov)
 {
   lnk = new Link(w, inode, onode, recur);
   innovation_num = innov;
