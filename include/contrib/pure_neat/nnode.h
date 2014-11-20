@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <vector>
+#include "innov.h"
 
 namespace PURENEAT 
 {
@@ -30,6 +31,8 @@ namespace PURENEAT
   
   class Network;
   
+  class Genome;
+
   // ----------------------------------------------------------------------- 
   // A NODE is either a NEURON or a SENSOR.  
   //   - If it's a sensor, it can be loaded with a value for output
@@ -60,13 +63,13 @@ namespace PURENEAT
     std::vector<Link*> incoming; // A list of pointers to incoming weighted signals from other nodes
     std::vector<Link*> outgoing;  // A list of pointers to links carrying this node's signal
     
-    int node_id;  // A node can be given an identification number for saving in files
-    
+    innov node_id;  // A node can be given an identification number for saving in files
+
     nodeplace gen_node_label;  // Used for genetic marking of nodes
 
-    NNode(nodetype ntype,int nodeid);
+    NNode(nodetype ntype,innov nodeid);
     
-    NNode(nodetype ntype,int nodeid, nodeplace placement);
+    NNode(nodetype ntype,innov nodeid, nodeplace placement);
 
     NNode(NNode *n);
 

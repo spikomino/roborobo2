@@ -5,7 +5,7 @@
 #include <sstream>
 using namespace PURENEAT;
 
-NNode::NNode(nodetype ntype,int nodeid)
+NNode::NNode(nodetype ntype,innov nodeid)
 {
 	active_flag=false;
 	activesum=0;
@@ -19,7 +19,7 @@ NNode::NNode(nodetype ntype,int nodeid)
 	analogue=0;
 }
 
-NNode::NNode(nodetype ntype,int nodeid, nodeplace placement)
+NNode::NNode(nodetype ntype,innov nodeid, nodeplace placement)
 {
 	active_flag=false;
 	activesum=0;
@@ -53,7 +53,7 @@ NNode::NNode (const char *argline)
   std::stringstream ss(argline);
 
   int nodety, nodepl;
-  ss >> node_id >> nodety >> nodepl;
+  ss >> node_id.idR >> node_id.gc  >> nodety >> nodepl;
   type = (nodetype)nodety;
   gen_node_label = (nodeplace)nodepl;
 
@@ -223,7 +223,7 @@ NNode *NNode::get_analogue()
 void NNode::print_to_file(std::ostream &outFile)
 {
 	char tempbuf[128];
-	sprintf(tempbuf, "node %d ", node_id);
+    sprintf(tempbuf, "node %d %d ", node_id.idR, node_id.gc);
 	outFile << tempbuf;
 
 	char tempbuf2[128];

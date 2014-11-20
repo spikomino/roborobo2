@@ -2,16 +2,21 @@
 #define _PUREGENOME_H_
 
 #include <vector>
-#include "gene.h"
+#include "innov.h"
+#include <algorithm>
+
 
 namespace PURENEAT 
 {
+  class Gene;
+  class NNode;
+  class Network;
 
   enum mutator 
   {
     GAUSSIAN = 0,
   };
- 
+
   //----------------------------------------------------------------------- 
   //A Genome is the primary source of genotype information used to create   
   //a phenotype.  It contains 3 major constituents:                         
@@ -34,16 +39,18 @@ namespace PURENEAT
     int mom_id;
     int  dad_id;
 
-    int node_id;
-    double innovNumber;
+    //int node_id;
+    //double innovNumber;
+    innov node_id;
+    innov innovNumber;
 
     std::vector<NNode*> nodes; //List of NNodes for the Network
     std::vector<Gene*> genes; //List of innovation-tracking genes
 
     Network *phenotype; //Allows Genome to be matched with its Network
     
-    int get_last_node_id(); //Return id of final NNode in Genome
-    double get_last_gene_innovnum(); //Return last innovation number in Genome
+    innov get_last_node_id(); //Return id of final NNode in Genome
+    innov get_last_gene_innovnum(); //Return last innovation number in Genome
         
     // Copy constructor
     Genome(const Genome& genome);
@@ -54,7 +61,7 @@ namespace PURENEAT
     
     //Special constructor that creates a Genome:
     //Fully linked, no hidden nodes
-    Genome(int num_in,int num_out);
+    Genome(int num_in,int num_out, int idR);
     Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g);
 
       //Destructor kills off all lists (including the trait vector)
@@ -82,7 +89,7 @@ namespace PURENEAT
     
     //Launch all mutations and returns the corresponding mutated genome
     //Check out properties file, section NEAT - paramerters for the probabilities
-    Genome *mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNum);
+    Genome *mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, int &innovNum);
     
     // Add Gaussian noise to all linkweights with variance power ^ 2
     void mutate_link_weights(double power);
@@ -99,10 +106,10 @@ namespace PURENEAT
     //   Generally, if they fail, they can be called again if desired. 
     
     // Mutate genome by adding a node respresentation 
-    bool mutate_add_node(int &curnode_id,double &curinnov);
+    bool mutate_add_node(int idR,int &curnode_id,int &curinnov, int tries);
     
     // Mutate the genome by adding a new link between 2 random NNodes 
-    bool mutate_add_link(double &curinnov,int tries); 
+    bool mutate_add_link(int idR, int &curinnov,int tries);
     
     
     // ****** MATING METHODS ***** 
@@ -131,8 +138,7 @@ namespace PURENEAT
   
   extern "C"
   {
-    //Global variables: external definition
-    extern double  weight_mut_power; // The power of a linkweight mutation 
+    //Global variables: external definition    
     extern double     recur_prob; // Prob. that a link mutation which doesn't have to be recurrent will be made recurrent 
     extern double     mutate_only_prob; // Prob. of a non-mating reproduction 
     extern double     mutate_link_weights_prob;
@@ -143,7 +149,7 @@ namespace PURENEAT
     extern double     mate_multipoint_prob;     
     extern double     mate_only_prob; // Prob. of mating without mutation 
     extern double     recur_only_prob;  // Probability of forcing selection of ONLY links that are naturally recurrent 
-    extern int     newlink_tries;  // Number of tries mutate_add_link will attempt to find an open link 
+    extern int        newstructure_tries;  // Number of tries mutate_add_link or mutate_add_node will attempt to find an open link
     
   }
 } // namespace PURENEAT

@@ -12,7 +12,7 @@ std::string TopEDOSharedData::gEvolutionLogFile = "";
 std::ofstream TopEDOSharedData::gEvoLog;
 int TopEDOSharedData::gSelectionMethod = -1;
 int TopEDOSharedData::gFitness = -1;
-bool TopEDOSharedData::gIsFixedTopo = false;
+//bool TopEDOSharedData::gIsFixedTopo = false;
 
 double TopEDOSharedData::gSigmaMin = 0.0;
 double TopEDOSharedData::gProbaMutation = 0.0;

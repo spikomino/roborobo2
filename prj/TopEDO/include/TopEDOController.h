@@ -41,12 +41,10 @@ private:
 
   void stepBehaviour ();
   std::pair<std::vector<double>,std::vector<double>> act();
-  std::pair<std::vector<double>,std::vector<double>> actFTopo();
+
   float updateFitness (std::vector < double >in, std::vector < double >out);
   void broadcastGenome ();
   void storeGenome (Genome * genome, int senderId, int senderBirthdate,
-		    float sigma, float fitness);  
-  void storeGenomeF (std::vector<double> genome, int senderId, int senderBirthdate,
 		    float sigma, float fitness);  
 
   void stepEvolution ();
@@ -58,12 +56,9 @@ private:
   int selectBinaryTournament (std::map < int, float >lFitness);
   int selectRandom (std::map < int, float >lFitness);
   static bool compareFitness(std::pair<int,float> i,std::pair<int,float> j);
-
-  std::vector<double> mutateF(std::vector<double> g, float sigma);
   
   void printIO(std::pair<std::vector<double>,std::vector<double>> io);
   void printVector(std::vector<double> v);
-  void printGenome();
   void printFitnessList();
     
   bool getNewGenomeStatus ()
@@ -78,11 +73,10 @@ private:
   // evolutionary engine
 
   Genome *_genome;
-  std::vector<double> _genomeF;
+
   std::vector<double> _previousOut;
   
   std::map < int, Genome * >_genomesList;
-  std::map <int, std::vector<double>> _genomesFList;
   std::map < int, float >_sigmaList;
   std::map < int, float >_fitnessList;
   std::map < int, int >_birthdateList;	// store the birthdate of the received controllers (useful for monitoring).
@@ -92,7 +86,7 @@ private:
   float _currentSigma;
 
   //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
-  double innovNumber;
+  int innovNumber;
   int nodeId;
 
   // ANN

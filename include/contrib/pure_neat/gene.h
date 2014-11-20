@@ -3,6 +3,7 @@
 
 #include "pure_neat/link.h"
 #include "pure_neat/nnode.h"
+#include "pure_neat/innov.h"
 
 namespace PURENEAT 
 {
@@ -12,12 +13,12 @@ namespace PURENEAT
   public:
     
     Link *lnk;
-    double innovation_num;
+    innov innovation_num;
     
     bool enable;  //When this is off the Gene is disabled
     
     //Construct a gene with no trait
-    Gene(double w,NNode *inode,NNode *onode,bool recur,double innov);
+    Gene(double w,NNode *inode,NNode *onode,bool recur,int innov,int idR);
     
     //Construct a gene off of another gene as a duplicate
     Gene(Gene *g,NNode *inode,NNode *onode);

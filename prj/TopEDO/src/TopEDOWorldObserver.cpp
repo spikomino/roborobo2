@@ -19,13 +19,13 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
     gProperties.checkAndGetPropertyValue("gGenomeLogFolder",&TopEDOSharedData::gGenomeLogFolder,true);
     gProperties.checkAndGetPropertyValue("gEvolutionLogFile",&TopEDOSharedData::gEvolutionLogFile,true);
 
-    gProperties.checkAndGetPropertyValue("gControllerType",&TopEDOSharedData::gControllerType,false);
+    gProperties.checkAndGetPropertyValue("gControllerType",&TopEDOSharedData::gControllerType,true);
 
     gProperties.checkAndGetPropertyValue("gSelectionMethod",&TopEDOSharedData::gSelectionMethod,true);
     gProperties.checkAndGetPropertyValue("gFitness",&TopEDOSharedData::gFitness,true);
     gProperties.checkAndGetPropertyValue("gSigmaRef",&TopEDOSharedData::gSigmaRef,true);
 
-    gProperties.checkAndGetPropertyValue("gIsFixedTopo",&TopEDOSharedData::gIsFixedTopo,true);
+    //gProperties.checkAndGetPropertyValue("gIsFixedTopo",&TopEDOSharedData::gIsFixedTopo,true);
 
     TopEDOSharedData::gEvoLog.open(TopEDOSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
     if(!TopEDOSharedData::gEvoLog)
@@ -33,7 +33,7 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
 	std::cerr << "[ERROR] Could not open log file " << TopEDOSharedData::gEvolutionLogFile << std::endl;
 	exit(-1);
       }
-    // ====
+
 
     if ( !gRadioNetwork)
       {
@@ -109,7 +109,7 @@ void TopEDOWorldObserver::updateMonitoring()
 	}
     
     // * Every N generations, take a video (one generation)
-    
+    /*
     if ( TopEDOSharedData::gSnapshots )
     {
         if ( ( gWorld->getIterations() ) % ( TopEDOSharedData::gEvaluationTime * TopEDOSharedData::gSnapshotsFrequency ) == 0 )
@@ -126,7 +126,7 @@ void TopEDOWorldObserver::updateMonitoring()
                 saveTrajectoryImage();
             }
     }
-
+*/
     // * Snapshots: take screenshots of first and ~ultimate iteration
     /* //todelete
     if ( gWorld->getIterations() == 1 )
