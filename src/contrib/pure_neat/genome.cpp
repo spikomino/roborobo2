@@ -482,8 +482,7 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, d
 	  if (!(new_genome->mutate_add_link(new_genome->innovNumber,
 					    newlink_tries)))
 	    {
-	      std::cerr << "[FAILURE] No link added. This is not always a problem" << std::endl;
-	      //exit(-1);		  
+         //No link was added. Maybe all links all already present
 	    }
 	}
       
@@ -845,8 +844,6 @@ bool Genome::mutate_add_link(double &curinnov,int tries)
   //Continue only if an open link was found
   if (found) 
     {
-      //TODELETE
-      std::cout << "ADDED GENE" << std::endl;
       //If it was supposed to be recurrent, make sure it gets labeled that way
       if (do_recur) recurflag=1;
       
