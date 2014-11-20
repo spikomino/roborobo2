@@ -5,11 +5,11 @@
 #include <sstream>
 using namespace PURENEAT;
 
-NNode::NNode(nodetype ntype,int nodeid) {
+NNode::NNode(nodetype ntype,int nodeid)
+{
 	active_flag=false;
 	activesum=0;
 	activation=0;
-	output=0;
 	type=ntype; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=nodeid;
@@ -19,11 +19,11 @@ NNode::NNode(nodetype ntype,int nodeid) {
 	analogue=0;
 }
 
-NNode::NNode(nodetype ntype,int nodeid, nodeplace placement) {
+NNode::NNode(nodetype ntype,int nodeid, nodeplace placement)
+{
 	active_flag=false;
 	activesum=0;
 	activation=0;
-	output=0;
 	type=ntype; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=nodeid;
@@ -33,10 +33,10 @@ NNode::NNode(nodetype ntype,int nodeid, nodeplace placement) {
 	analogue=0;
 }
 
-NNode::NNode(NNode *n) {
+NNode::NNode(NNode *n)
+{
 	active_flag=false;
 	activation=0;
-	output=0;
 	type=n->type; //NEURON or SENSOR type
 	activation_count=0; //Inactive upon creation
 	node_id=n->node_id;
@@ -46,8 +46,8 @@ NNode::NNode(NNode *n) {
 	analogue=0;
 }
 
-NNode::NNode (const char *argline) {
-
+NNode::NNode (const char *argline)
+{
   activesum=0;
   
   std::stringstream ss(argline);
@@ -65,7 +65,6 @@ NNode::NNode (const NNode& nnode)
 	active_flag = nnode.active_flag;
 	activesum = nnode.activesum;
 	activation = nnode.activation;
-	output = nnode.output;	
 	type = nnode.type; //NEURON or SENSOR type
 	activation_count = nnode.activation_count; //Inactive upon creation
 	node_id = nnode.node_id;
@@ -79,30 +78,36 @@ NNode::~NNode()
 {
   std::vector<Link*>::iterator curlink;
 	//Kill off all incoming links
-	for(curlink=incoming.begin();curlink!=incoming.end();++curlink) {
+    for(curlink=incoming.begin();curlink!=incoming.end();++curlink)
+    {
 		delete (*curlink);
 	}
 }
 
 //Returns the type of the node, NEURON or SENSOR
-const nodetype NNode::get_type() {
+const nodetype NNode::get_type()
+{
 	return type;
 }
 
 //Allows alteration between NEURON and SENSOR.  Returns its argument
-nodetype NNode::set_type(nodetype newtype) {
+nodetype NNode::set_type(nodetype newtype)
+{
 	type=newtype;
 	return newtype;
 }
 
 //If the node is a SENSOR, returns true and loads the value
-bool NNode::sensor_load(double value) {
-	if (type==SENSOR) {
+bool NNode::sensor_load(double value)
+{
+    if (type==SENSOR)
+    {
 		activation_count++;  //Puts sensor into next time-step
 		activation=value;
 		return true;
 	}
-	else return false;
+    else
+        return false;
 }
 
 // Note: NEAT keeps track of which links are recurrent and which
@@ -112,22 +117,10 @@ bool NNode::sensor_load(double value) {
 // 2. It allows genetic control of the proportion of connections
 //    that may become recurrent
 
-// Add an incoming connection a node
-void NNode::add_incoming(NNode *feednode,double weight,bool recur) {
-	Link *newlink=new Link(weight,feednode,this,recur);
-	incoming.push_back(newlink);
-	(feednode->outgoing).push_back(newlink);
-}
-
-// Nonrecurrent version
-void NNode::add_incoming(NNode *feednode,double weight) {
-	Link *newlink=new Link(weight,feednode,this,false);
-	incoming.push_back(newlink);
-	(feednode->outgoing).push_back(newlink);
-}
 
 // Return activation currently in node, if it has been activated
-double NNode::get_active_out() {
+double NNode::get_active_out()
+{
 	if (activation_count>0)
 		return activation;
 	else return 0.0;
@@ -169,7 +162,8 @@ void NNode::flushback()
 // This recursively checks everything leading into and including this NNode, 
 // including recurrencies
 // Useful for debugging
-void NNode::flushback_check(std::vector<NNode*> &seenlist) {
+void NNode::flushback_check(std::vector<NNode*> &seenlist)
+{
   std::vector<Link*>::iterator curlink;
   
   std::vector<Link*> innodes=incoming;
@@ -220,13 +214,14 @@ void NNode::flushback_check(std::vector<NNode*> &seenlist) {
 }
 
 // Returns the gene that created the node
-NNode *NNode::get_analogue() {
+NNode *NNode::get_analogue()
+{
 	return analogue;
 }
 
 
-void NNode::print_to_file(std::ostream &outFile) {
-
+void NNode::print_to_file(std::ostream &outFile)
+{
 	char tempbuf[128];
 	sprintf(tempbuf, "node %d ", node_id);
 	outFile << tempbuf;
@@ -237,26 +232,31 @@ void NNode::print_to_file(std::ostream &outFile) {
 }
 
 //Find the greatest depth starting from this neuron at depth d
-int NNode::depth(int d, Network *mynet) {
+int NNode::depth(int d, Network *mynet)
+{
   std::vector<Link*> innodes=this->incoming;
   std::vector<Link*>::iterator curlink;
   int cur_depth; //The depth of the current node
   int max=d; //The max depth
 
-  if (d>100) {
-    return 10;
-  }
+  if (d>100)
+    {
+        return 10;
+    }
 
   //Base Case
   if ((this->type)==SENSOR)
     return d;
   //Recursion
-  else {
+  else
+    {
 
-    for(curlink=innodes.begin();curlink!=innodes.end();++curlink) {
-      cur_depth=((*curlink)->in_node)->depth(d+1,mynet);
-      if (cur_depth>max) max=cur_depth;
-    }
+    for(curlink=innodes.begin();curlink!=innodes.end();++curlink)
+        {
+            cur_depth=((*curlink)->in_node)->depth(d+1,mynet);
+            if (cur_depth>max)
+                 max=cur_depth;
+        }
   
     return max;
 

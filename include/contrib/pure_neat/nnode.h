@@ -56,10 +56,7 @@ namespace PURENEAT
     double activesum;  // The incoming activity before being processed 
     double activation; // The total activation entering the NNode 
     bool active_flag;  // To make sure outputs are active
-    
-    // NOT USED IN NEAT - covered by "activation" above
-    double output;  // Output of the NNode- the value in the NNode 
-    
+      
     std::vector<Link*> incoming; // A list of pointers to incoming weighted signals from other nodes
     std::vector<Link*> outgoing;  // A list of pointers to links carrying this node's signal
     
@@ -92,13 +89,7 @@ namespace PURENEAT
     
     // If the node is a SENSOR, returns true and loads the value
     bool sensor_load(double);
-    
-    // Adds a NONRECURRENT Link to a new NNode in the incoming List
-    void add_incoming(NNode*,double);
-    
-    // Adds a Link to a new NNode in the incoming List
-    void add_incoming(NNode*,double,bool);
-    
+
     // Recursively deactivate backwards through the network
     void flushback();
     

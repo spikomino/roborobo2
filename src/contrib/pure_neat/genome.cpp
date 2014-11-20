@@ -270,16 +270,17 @@ Network *Genome::genesis()
   for(curgene=genes.begin();curgene!=genes.end();++curgene) 
     {
       //Only create the link if the gene is enabled
-      if (((*curgene)->enable)==true) {
-	curlink=(*curgene)->lnk;
-	inode=(curlink->in_node)->analogue;
-	onode=(curlink->out_node)->analogue;
+      if (((*curgene)->enable)==true)
+        {
+            curlink=(*curgene)->lnk;
+            inode=(curlink->in_node)->analogue;
+            onode=(curlink->out_node)->analogue;
 
-	//NOTE: This line could be run through a recurrency check if desired
-	newlink=new Link(curlink->weight,inode,onode,curlink->is_recurrent);
+            //NOTE: This line could be run through a recurrency check if desired
+            newlink=new Link(curlink->weight,inode,onode,curlink->is_recurrent);
 	
-	(onode->incoming).push_back(newlink);
-	(inode->outgoing).push_back(newlink);
+            (onode->incoming).push_back(newlink);
+            (inode->outgoing).push_back(newlink);
 	
       }
     }
@@ -431,15 +432,16 @@ Genome *Genome::duplicate()
     }
 
   //Duplicate Genes
-  for(curgene=genes.begin();curgene!=genes.end();++curgene) {
-    //First find the nodes connected by the gene's link
-    inode=(((*curgene)->lnk)->in_node)->dup;
-    onode=(((*curgene)->lnk)->out_node)->dup;
+  for(curgene=genes.begin();curgene!=genes.end();++curgene)
+    {
+        //First find the nodes connected by the gene's link
+        inode=(((*curgene)->lnk)->in_node)->dup;
+        onode=(((*curgene)->lnk)->out_node)->dup;
     
-    newgene=new Gene(*curgene,inode,onode);
-    genes_dup.push_back(newgene);
+        newgene=new Gene(*curgene,inode,onode);
+        genes_dup.push_back(newgene);
     
-  }
+    }
   
   //Finally, return the genome
   newgenome=new Genome(this->genome_id,nodes_dup,genes_dup);
