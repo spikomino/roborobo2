@@ -24,9 +24,9 @@ void save_genome(GenomeAdapted* g){
 
 int main (int argc, char** argv){
     int nb_mut=10;
-    int nb_inputs   =10;
+    int nb_inputs   =5;
     int nb_outputs  =2;
-    double sigma = .5;
+    double sigma = .3;
 
     srand( (unsigned)time( NULL ) );
     

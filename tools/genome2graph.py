@@ -36,15 +36,20 @@ def process_gene(g, d):
     w  = float(d[4])
     g.add_edge(n0, n1, weight=w)
     g.edge[n0][n1]['trait']    =d[1] # ?
+    g.edge[n0][n1]['label']    = "{0: 2.3f}".format(float(d[4]))
     g.edge[n0][n1]['recurent'] =d[5] # 0/1 yes/no
     g.edge[n0][n1]['inov_num'] =d[6] # int
     g.edge[n0][n1]['mut_num']  =d[7] # float
     g.edge[n0][n1]['enable']   =d[8] # 0/1 yes/no
     g.edge[n0][n1]['style'] = 'solid'
     g.edge[n0][n1]['color'] = 'black'
+    g.edge[n0][n1]['labelfontcolor'] = 'black'
+    g.edge[n0][n1]['labelfontsize'] = 4
+
     if d[8]=='0':
         g.edge[n0][n1]['style'] = 'dashed' 
         g.edge[n0][n1]['color'] = 'red'
+        g.edge[n0][n1]['labelfontcolor'] = 'red'
 
 # Reads a neat genome filename and greate the coresponding graph
 # in  : a filename of the genome (neat format)
@@ -101,6 +106,8 @@ def graph_from_graph(G, fname):
         else :
             new.edge[n1][n2]['style'] = small.edge[n1][n2]['style']
             new.edge[n1][n2]['color'] = small.edge[n1][n2]['color']
+            new.edge[n1][n2]['label'] = small.edge[n1][n2]['label']
+            new.edge[n1][n2]['labelfontcolor'] = small.edge[n1][n2]['labelfontcolor']
        
     return new
 
@@ -112,13 +119,14 @@ def graph_from_graph(G, fname):
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
-    if d[6] != '][Genome:' :
+    if d[7] != '][Genome:' :
         return (None, None, None, None)
-    rob     = int( d[7].split('=')[1]) 
-    idtrace = int( d[8].split('=')[1]) 
-    mom     = int( d[9].split('=')[1])
-    dad     = int(d[10].split('=')[1])
-    return (rob,idtrace, mom, dad)
+    rob     = int( d[8].split('=')[1]) 
+    idtrace = int( d[9].split('=')[1]) 
+    mom     = int( d[10].split('=')[1])
+    dad     = int(d[11].split('=')[1])
+    
+    return (rob, idtrace, mom, dad)
 
 # read the number of robots & creates a dictionary with num robots lists 
 # like this one with 3 robots {0: [(tuples), ()], 1: [], 2: []}

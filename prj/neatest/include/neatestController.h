@@ -28,18 +28,19 @@ class neatestController:public Controller {
 private:
     int                     _iteration;
     int                     _birthdate; // iteration at which we are created 
-    GenomeAdapted*          _genome;
-    //double                  _fitness;
+    double                  _fitness;
+    double                  _prev_fitness; // to report to World observer
+    unsigned int            _items; // items collected 
     double                  _sigma;
+    GenomeAdapted*          _genome;
     Network*                _neurocontroller;
     unsigned int            _nbInputs;
     unsigned int            _nbOutputs;
+    
     std::map<int, message>  _glist;
-  
 
-    //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
-    double innovNumber;
-    int nodeId;
+    /* floreano fitness related atribute */
+    double _lv, _rv, _md; /* tran rot velocities and min dist */
    
     /* behavior */ 
     void initRobot     ();
@@ -47,26 +48,30 @@ private:
 
     /* genome list */
     void broadcast       ();
-    void storeGenome     (int, message);  
+    void storeMessage    (int, message);  
     void emptyGenomeList ();
 
     /* neuro controller */
     void createNeuroController ();
 
     /* vvolution */
-    void updateFitness (double); 
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
-    void mutate        (float sigma);
+    void updateFitnessForaging  ();
+    void updateFitnessNavigation ();
+    void emptyBasket   ();
+
+
 
     /* misc */
-    bool lifeTimeOver    ();
+  
     void printRobot      ();
     void printGenomeList ();
     void printMessage    (message);
     void save_genome     ();
     void printAll        ();
+    
 
 public:
 
@@ -74,9 +79,11 @@ public:
     ~neatestController ();
     
     int getId  (){ return _wm->getId(); }
+    double getFitness  (){ return _prev_fitness; }
+
     void reset ();
     void step  ();
-
+    void pickItem      ();
 };
 
 

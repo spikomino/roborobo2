@@ -30,36 +30,48 @@ namespace NEAT
     
   private:
     typedef NEAT::Genome super;
-    int _idTrace;
-    int _mom;
-    int _dad;
-
-    int nodeId;
-    double innovNumber;
+    int    _idTrace;
+    int    _mom;
+    int    _dad;
+    int    _nodeId;
+    double _innovNumber;
     
   public:
     
     GenomeAdapted(int num_in,int num_out,int num_hidden,int type);
     GenomeAdapted(const GenomeAdapted& genome);
-    GenomeAdapted(int id, std::vector<Trait*> t, std::vector<NNode*> n, std::vector<Gene*> g);
+    GenomeAdapted(int id, 
+		  std::vector<Trait*> t, 
+		  std::vector<NNode*> n, 
+		  std::vector<Gene*> g);
+
     ~GenomeAdapted();
-    int getIdTrace() const;
-    int getMom() const;
-    int getDad() const;
+
+    int     getIdTrace() const     { return _idTrace; };
+    int     getMom() const         { return _mom; };
+    int     getDad() const         { return _dad; };
+    int     getNodeId() const      { return _nodeId; };
+    double  getInnovNumber() const { return _innovNumber; };
     
+    void setIdTrace    (int i)   { _idTrace = i; };
+    void setMom        (int m)   { _mom = m; };
+    void setDad        (int d)   { _dad = d; };
+    void setNodeId     (int n)   { _nodeId = n; };
+    void setInnovNumber(double n){ _innovNumber = n; };
+
+
     // Duplicate this Genome to create a new one with the specified id 
     GenomeAdapted* duplicate();
-    GenomeAdapted* mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, double &innovNumber);
+    GenomeAdapted* mutate(float sigma, int idRobot, int newId);
+    GenomeAdapted *mutate_weights(float sigma, int idRobot, int newId);
 
-    GenomeAdapted* mutate(float sigma, int idRobot ,int newId);
+    bool mut_gene_reenable();
+    bool mut_toggle_enable();
+    void mut_link_weights(double sigma); 
+    bool mut_add_node();
+    bool mut_add_link(int tries);
 
-    void setIdTrace(int id);
-    void setMom(int idMom);
-    void setDad(int idDad);
-
-    void setNodeId(int id){nodeId=id;};
-    void setInnovNumber(double n){innovNumber=n;};
-
+    
   };
 } // namespace NEAT
 
