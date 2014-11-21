@@ -1,0 +1,12 @@
+weight_mut_power 1.0
+recur_prob 0.05
+mutate_only_prob 1.0
+mutate_link_weights_prob 1.0
+mutate_toggle_enable_prob 0.30
+mutate_gene_reenable_prob 0.30
+mutate_add_node_prob 0.30
+mutate_add_link_prob 0.30
+mate_multipoint_prob 0.6
+mate_only_prob 0.2
+recur_only_prob 1.0
+newstructure_tries 20
