@@ -137,7 +137,7 @@ Genome::Genome(int id, std::ifstream &iFile)
 
 }
 
-Genome::Genome(int num_in,int num_out, int idR) {
+Genome::Genome(int id,int num_in,int num_out, int idR) {
 
     //Temporary lists of nodes
     std::vector<NNode*> inputs;
@@ -155,9 +155,7 @@ Genome::Genome(int num_in,int num_out, int idR) {
     int count;
     int ncount;
 
-
-    //Assign the id 0
-    genome_id=0;
+    genome_id=id;
 
     //Create the inputs and outputs
 
@@ -402,22 +400,6 @@ void Genome::print_to_filename(char *filename)
     oFile.close();
 }
 
-innov Genome::get_last_node_id()
-{
-    innov result;
-    result.gc =  ((*(nodes.end() - 1))->node_id.gc)+1;
-    result.idR = ((*(nodes.end() - 1))->node_id.idR);
-    return result;
-}
-
-innov Genome::get_last_gene_innovnum()
-{
-    innov result;
-    result.gc =  ((*(genes.end() - 1))->innovation_num.gc)+1;
-    result.idR = ((*(genes.end() - 1))->innovation_num.idR);
-    return result;
-}
-
 Genome *Genome::duplicate() 
 {
     //Collections for the new Genome
@@ -490,18 +472,19 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, i
         //Innovation numbers as pairs <idRobot, genecounter>
         if(!(new_genome->mutate_add_node(idRobot,nodeId,innovNum,newstructure_tries)))
         {
-            //No node was added, no connection found to split. Maybe try again?
+            //No node was added, no connection found to split. Maybe try again?            
         }
     }
     else
     {
         if (randfloat () < mutate_add_link_prob)
         {
-            if (!(new_genome->mutate_add_link(idRobot, innovNum,
+                       if (!(new_genome->mutate_add_link(idRobot, innovNum,
                                               newstructure_tries)))
             {
                 //No link was added. Maybe all links all already present
             }
+
         }
 
         //NOTE:links CANNOT be added directly after a node  because the phenotype
@@ -521,6 +504,7 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, i
             {
                 new_genome->mutate_gene_reenable ();
             }
+
         }
     }
 
@@ -1187,6 +1171,8 @@ Genome *Genome::mate_multipoint(Genome *g,int genomeid,double fitness1,double fi
 
     new_genome=new Genome(genomeid,newnodes,newgenes);
 
+    new_genome->mom_id = genome_id;
+    new_genome->dad_id = g->genome_id;
     //Return the baby Genome
     return (new_genome);
 
@@ -1304,9 +1290,6 @@ bool load_neat_params(const char *filename, bool output)
         printf("NEAT READING IN %s", filename);
 
     paramFile>>curword;
-    paramFile>>recur_prob;
-
-    paramFile>>curword;
     paramFile>>mutate_only_prob;
 
     paramFile>>curword;
@@ -1339,7 +1322,6 @@ bool load_neat_params(const char *filename, bool output)
 
     if(output)
     {
-        printf("recur_prob=%f\n",recur_prob);
         printf("mutate_only_prob=%f\n",mutate_only_prob);
         printf("mutate_link_weights_prob=%f\n",mutate_link_weights_prob);
         printf("mutate_toggle_enable_prob=%f\n",mutate_toggle_enable_prob);
@@ -1356,7 +1338,6 @@ bool load_neat_params(const char *filename, bool output)
 }
 
 
-double     recur_prob = 0; // Prob. that a link mutation which doesn't have to be recurrent will be made recurrent 
 double     mutate_only_prob = 0; // Prob. of a non-mating reproduction 
 double     mutate_link_weights_prob = 0;
 double     mutate_toggle_enable_prob = 0;

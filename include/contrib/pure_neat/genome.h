@@ -39,19 +39,11 @@ namespace PURENEAT
     int mom_id;
     int  dad_id;
 
-    //int node_id;
-    //double innovNumber;
-    innov node_id;
-    innov innovNumber;
-
     std::vector<NNode*> nodes; //List of NNodes for the Network
     std::vector<Gene*> genes; //List of innovation-tracking genes
 
     Network *phenotype; //Allows Genome to be matched with its Network
     
-    innov get_last_node_id(); //Return id of final NNode in Genome
-    innov get_last_gene_innovnum(); //Return last innovation number in Genome
-        
     // Copy constructor
     Genome(const Genome& genome);
 
@@ -61,7 +53,7 @@ namespace PURENEAT
     
     //Special constructor that creates a Genome:
     //Fully linked, no hidden nodes
-    Genome(int num_in,int num_out, int idR);
+    Genome(int idGenome,int num_in,int num_out, int idR);
     Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g);
 
       //Destructor kills off all lists (including the trait vector)
@@ -139,7 +131,6 @@ namespace PURENEAT
   extern "C"
   {
     //Global variables: external definition    
-    extern double     recur_prob; // Prob. that a link mutation which doesn't have to be recurrent will be made recurrent 
     extern double     mutate_only_prob; // Prob. of a non-mating reproduction 
     extern double     mutate_link_weights_prob;
     extern double     mutate_toggle_enable_prob;

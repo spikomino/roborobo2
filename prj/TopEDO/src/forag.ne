@@ -1,4 +1,3 @@
-recur_prob 0.05
 mutate_only_prob 1.0
 mutate_link_weights_prob 1.0
 mutate_toggle_enable_prob 0.30

@@ -78,9 +78,13 @@ TopEDOController::initRobot ()
 
     _nbOutputs = 2;
 
-    // Inputs, outputs, 0 hidden neurons, fully connected. Start with Simple Perceptron
-    _genome = new Genome (_nbInputs, _nbOutputs,_wm->getId());
-
+    // Inputs, outputs, 0 hidden neurons, fully connected.
+    //Start with Simple Perceptron
+    //All agents are given the same initial topology.
+    //Thus, those genes are not identified by <idrobot,genecounter>
+    //but just <-1, genecounter>, -1 meaning that the genes are shared
+    //by all agents
+    _genome = new Genome (_wm->getId(),_nbInputs, _nbOutputs,-1);
     _genome->mom_id = -1;
     _genome->dad_id = -1;
     _genome->genome_id = _wm->getId ();

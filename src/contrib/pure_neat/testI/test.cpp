@@ -15,9 +15,9 @@ using namespace PURENEAT;
 int main(int argc, char* argv[])
 {
     load_neat_params ("forag.ne", false);
-    int nbI = 2, nbO = 1;
+    int nbI = 15, nbO = 3;
     int idR = 0;
-    Genome* g = new Genome(nbI,nbO,idR);//inputs,outputs, idRobot
+    Genome* g = new Genome(0,nbI,nbO,idR);//idGenome,inputs,outputs, idRobot
 
     Network* n = g -> genesis();
 
@@ -30,9 +30,9 @@ int main(int argc, char* argv[])
 
     //Test individual mutations
     std::vector<int> mut(5);
-    int mutL = 1;
-    int mutN = 0;
-    int mutW = 0;
+    int mutL = 5;
+    int mutN = 3;
+    int mutW = 2;
     double power = 1.0;
     int mutTog = 0;
     int mutReen = 0;
