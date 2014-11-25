@@ -209,8 +209,6 @@ void neatestController::stepBehaviour(){
     /* outputs[L] = 0.0; */
     /* outputs[R] = 0.0; */
 
-  
-
     _wm->_desiredTranslationalValue =  (outputs[R] + outputs[L]) / 2.0 ;
     _wm->_desiredRotationalVelocity =  outputs[R] - outputs[L] ;
 
@@ -220,11 +218,8 @@ void neatestController::stepBehaviour(){
     _wm->_desiredRotationalVelocity =
     	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
     
-    
-
-
     // print things
-    if(gVerbose){
+    /*if(gVerbose){
 	std::cout << "[Controller] "
 		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
 		  << "\t\t[lv=" << _lv 
@@ -245,7 +240,7 @@ void neatestController::stepBehaviour(){
 	    std::cout << to_string(*itr) + " ";
 	std::cout << "]"
 		  << std::endl;
-		  }
+		  }*/
 
 } 
 
