@@ -26,6 +26,10 @@ void neatestAgentObserver::reset(){
     // nothing to do.
 }
 
+static bool is_energy_item(int id){
+    return (gPhysicalObjects[id-gPhysicalObjectIndexStartOffset]->getType()==1);
+} 
+
 void neatestAgentObserver::step(){
     /* if(gVerbose) */
     /*   std::cout << "[Observer]\n"; */
@@ -64,15 +68,26 @@ void neatestAgentObserver::step(){
     // cf. groundsensorvalues image)
     if ( PhysicalObject::isInstanceOf(targetIndex) ) {
         targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
-	gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
 	
-	/* notify the robot that it picked an item  */
-	neatestController *cont = 
-	    dynamic_cast <
-	    neatestController *
-	    >(gWorld->getRobot (_wm->getId())->getController ());
-	cont->pickItem();
+	/* if energy item */
+	if(is_energy_item(targetIndex)){
+	
+	    /* get the controller */
+	    neatestController *cont = 
+		dynamic_cast <
+		neatestController *
+		>(gWorld->getRobot (_wm->getId())->getController ());
 
+	    /* does the agent have room in its basket */ 
+	    if(cont->stillRoomInBasket()){
+	    
+		/* notify the object to diapear */
+		gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
+	
+		/* notify the robot that it picked an item  */
+		cont->pickItem();
+	    }
+	}
 
 	/* if(gVerbose) */
 	    /* std::cout << "\t[Robot #" + to_string(_wm->getId())  */

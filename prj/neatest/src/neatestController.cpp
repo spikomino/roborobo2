@@ -39,6 +39,7 @@ neatestController::neatestController(RobotWorldModel * wm){
   _prev_fitness    = 0.0;
   _fitness         = 0.0;
   _items           = 0;
+  _items_max       = 5;
   _neurocontroller = NULL;
   _sigma           = neatestSharedData::gSigmaRef;
 
@@ -109,7 +110,7 @@ void neatestController::step(){
   _iteration++;
   if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
-      updateFitnessNavigation();
+      updateFitnessForaging();
       broadcast();     // broadcast genome to neighbors
   }
   if(lifeTimeOver()){

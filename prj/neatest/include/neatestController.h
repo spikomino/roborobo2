@@ -31,6 +31,8 @@ private:
     double                  _fitness;
     double                  _prev_fitness; // to report to World observer
     unsigned int            _items; // items collected 
+    unsigned int            _items_max; // basket capacity 
+
     double                  _sigma;
     GenomeAdapted*          _genome;
     Network*                _neurocontroller;
@@ -80,7 +82,7 @@ public:
     
     int getId  (){ return _wm->getId(); }
     double getFitness  (){ return _prev_fitness; }
-
+    bool  stillRoomInBasket () { return _items_max > _items; }
     void reset ();
     void step  ();
     void pickItem      ();
