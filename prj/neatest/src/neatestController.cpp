@@ -59,7 +59,11 @@ void neatestController::initRobot (){
     if (gExtendedSensoryInputs)
 	_nbInputs += (1) * _wm->_cameraSensorsNb;  // object sensor
     _nbInputs += _wm->_cameraSensorsNb;	           // proximity sensors
+    _nbInputs ++;                                  // basket capacity sensor
+    _nbInputs ++;                                  // ground sensor
+
     _nbOutputs = 2;                                // motor output
+    _nbOutputs ++ ;                                // drop  items effector 
 
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
@@ -110,7 +114,6 @@ void neatestController::step(){
   _iteration++;
   if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
-      updateFitnessForaging();
       broadcast();     // broadcast genome to neighbors
   }
   if(lifeTimeOver()){
@@ -138,12 +141,13 @@ bool is_energy_item(int id){
 void neatestController::stepBehaviour(){
     double inputs[_nbInputs]; 
     int    inputToUse = 0;
-    const  int L = 0;
+    const  int L = 0; /* left / right motor*/
     const  int R = 1;
+    const  int D = 2; /* drop effector */
 
     // (1)  Read inputs 
  
-    /* read distance sensors  */
+    /* read distance sensors  [0 -> 1 ] (1 = touching object)  */
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
 	inputs[inputToUse++] = 1 - (
 	    _wm->getDistanceValueFromCameraSensor (i) /
@@ -174,6 +178,18 @@ void neatestController::stepBehaviour(){
 	   gExtendedSensoryInputs && inputs[i+_wm->_cameraSensorsNb] < 1.0)
 	    _md = inputs[i];
     
+    /* Basket capacity sensor */
+    double activation = (double) _items / (double) _items_max; 
+    inputs[inputToUse++] = activation;
+
+    /* ground sensor */
+    const int max_activation = 255*256*256 + 255*256 + 255; 
+    double ground = _wm->getGroundSensorValue() / (double) max_activation;
+    inputs[inputToUse++] = ground;
+    /* are we on a green nest ? */
+    const int nest_color = 255*256; 
+    bool at_nest= _wm->getGroundSensorValue() == nest_color; 
+
     /* bias node : neat put biases after sensors */
     inputs[inputToUse++] = 1.0; 
     
@@ -204,7 +220,7 @@ void neatestController::stepBehaviour(){
     _lv = outputs[L];
     _rv = outputs[R];
 
-    outputs[L] = 2.0 * (outputs[L]-0.5); /* [-1, 1] */
+    outputs[L] = 2.0 * (outputs[L]-0.5); /* rescale to [-1, 1] */
     outputs[R] = 2.0 * (outputs[R]-0.5);
   
     /* outputs[L] = 0.0; */
@@ -218,9 +234,23 @@ void neatestController::stepBehaviour(){
     	_wm->_desiredTranslationalValue * gMaxTranslationalSpeed;
     _wm->_desiredRotationalVelocity =
     	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
+   
+    /* drop items */ 
+    int droped = (int) (outputs[D] * _items);
+    dropItem(droped);
     
+
+    /* check if we dropped at the nest  */
+    if(at_nest){
+	
+	difirentiate items collected from foraged 
+    }
+    //updateFitnessNavigation();
+    //updateFitnessCollecting();
+    updateFitnessForaging();
+
     // print things
-    /*if(gVerbose){
+    if(gVerbose){
 	std::cout << "[Controller] "
 		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
 		  << "\t\t[lv=" << _lv 
@@ -235,13 +265,16 @@ void neatestController::stepBehaviour(){
 	}
 	std::cout <<  " ]" << std::endl;
 
-	std::cout << "\t\t[Outputs : " ;
+	std::cout << "\t\tOutputs :[ " ;
 	std::vector<double>::iterator itr;
 	for(itr = outputs.begin (); itr != outputs.end (); itr++)
 	    std::cout << to_string(*itr) + " ";
 	std::cout << "]"
 		  << std::endl;
-		  }*/
+
+	
+
+    }
 
 } 
 
@@ -359,9 +392,15 @@ void neatestController::updateFitnessNavigation(){
 	(1.0 -sqrt(fabs(_lv - _rv))) * 
 	(1.0 - _md) ;
 }
-void neatestController::updateFitnessForaging(){
+
+void neatestController::updateFitnessCollecting(){
     _fitness = (double) _items / (double) get_lifetime();
 }
+
+void neatestController::updateFitnessForaging(int){
+    _fitness = (double) _items / (double) get_lifetime();
+}
+
 
 void neatestController::pickItem(){
     _items++;
@@ -369,6 +408,13 @@ void neatestController::pickItem(){
 
 void neatestController::emptyBasket(){
     _items = 0;
+}
+
+void neatestController::dropItem(int n){
+    if(_items - n <= 0)
+	_items = 0;
+    else
+	_items -= n;
 }
 
 

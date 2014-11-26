@@ -87,6 +87,8 @@ void neatestAgentObserver::step(){
 		/* notify the robot that it picked an item  */
 		cont->pickItem();
 	    }
+	    /* std::cout << "Robot " << cont->getId()  */
+	    /* 	      << " has "  << cont->ItemsPicked() << std::endl; */
 	}
 
 	/* if(gVerbose) */

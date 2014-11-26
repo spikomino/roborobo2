@@ -60,11 +60,12 @@ private:
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
-    void updateFitnessForaging  ();
+    void updateFitnessForaging   ();
     void updateFitnessNavigation ();
+    void updateFitnessCollecting ();
     void emptyBasket   ();
 
-
+    void dropItem(int n);
 
     /* misc */
   
@@ -83,6 +84,7 @@ public:
     int getId  (){ return _wm->getId(); }
     double getFitness  (){ return _prev_fitness; }
     bool  stillRoomInBasket () { return _items_max > _items; }
+    unsigned int ItemsPicked () { return _items; }
     void reset ();
     void step  ();
     void pickItem      ();
