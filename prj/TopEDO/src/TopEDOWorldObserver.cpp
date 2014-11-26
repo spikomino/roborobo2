@@ -107,50 +107,7 @@ void TopEDOWorldObserver::updateMonitoring()
         gLogManager->write(s);
 		gLogManager->flush();
 	}
-    
-    // * Every N generations, take a video (one generation)
-    /*
-    if ( TopEDOSharedData::gSnapshots )
-    {
-        if ( ( gWorld->getIterations() ) % ( TopEDOSharedData::gEvaluationTime * TopEDOSharedData::gSnapshotsFrequency ) == 0 )
-        {
-            if ( gVerbose )
-                std::cout << "[START] Video recording: generation #" << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << ".\n";
-            gTrajectoryMonitorMode = 0;
-            initTrajectoriesMonitor();
-        }
-        else
-            if ( ( gWorld->getIterations() ) % ( TopEDOSharedData::gEvaluationTime * TopEDOSharedData::gSnapshotsFrequency ) == TopEDOSharedData::gEvaluationTime - 1 )
-            {
-                std::cout << "[STOP]  Video recording: generation #" << (gWorld->getIterations() / TopEDOSharedData::gEvaluationTime ) << ".\n";
-                saveTrajectoryImage();
-            }
-    }
-*/
-    // * Snapshots: take screenshots of first and ~ultimate iteration
-    /* //todelete
-    if ( gWorld->getIterations() == 1 )
-    {
-        saveScreenshot("firstIteration");
-        saveRobotTrackerIndex("firstIteration");
-    }
-    else
-    {
-        if ( gWorld->getIterations() == gMaxIt-2 )
-        {
-            gDisplayMode = 0;
-            //gDisplaySensors = 2; // prepare for next it.
-        }
-        else
-        {
-            if ( gWorld->getIterations() == gMaxIt-1 )
-            {
-                saveScreenshot("lastIteration");
-                saveRobotTrackerIndex("lastIteration");
-            }
-        }
-    }
-    */
+
     if ( gWorld->getIterations() == gMaxIt-1 )
       {
 	TopEDOSharedData::gEvoLog.close();

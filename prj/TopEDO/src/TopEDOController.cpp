@@ -31,14 +31,14 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 
     load_neat_params ("prj/TopEDO/src/forag.ne", false);
 
-    _currentSigma = TopEDOSharedData::gSigmaRef;
+    _sigma = TopEDOSharedData::gSigmaRef;
 
 
     initRobot ();
 
     _iteration = 0;
     _birthdate = 0;
-    _currentFitness = 0.0;
+    _fitness = 0.0;
 
 }
 
@@ -52,15 +52,11 @@ TopEDOController::~TopEDOController ()
 void
 TopEDOController::reset ()
 {
-    _currentFitness = 0.0;
+    _fitness = 0.0;
     _birthdate = gWorld->getIterations ();
 
-
-    _genomesList.clear ();
-
-    _fitnessList.clear ();
-    _sigmaList.clear ();
-    _birthdateList.clear ();
+    emptyBasket();
+    emptyGenomeList();
 
 }
 
@@ -97,12 +93,12 @@ TopEDOController::initRobot ()
 
     setNewGenomeStatus (true);
 
-    _genomesList.clear ();
+    emptyGenomeList();
+    emptyBasket();
     //NEAT-like innovation number and node id FOR THIS ROBOT
-    innovNumber = nn->linkcount () +1;
-    nodeId = 1 + _nbInputs + _nbOutputs;
+    _innovNumber = nn->linkcount () +1;
+    _nodeId = 1 + _nbInputs + _nbOutputs;
 
-    _fitnessList.clear ();
 }
 
 
@@ -130,11 +126,12 @@ TopEDOController::step ()
 
     stepBehaviour ();
     
-    if (dynamic_cast <TopEDOWorldObserver *>
-            (gWorld->getWorldObserver ())->getLifeIterationCount () >=
-            TopEDOSharedData::gEvaluationTime - 1)
+    if (lifeTimeOver())
     {
         stepEvolution ();
+
+        save_genome();
+        printAll();
         reset();
     }
 }
@@ -166,7 +163,7 @@ TopEDOController::stepBehaviour ()
     _wm->_desiredRotationalVelocity =
             _wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
 
-    _currentFitness += updateFitness (inputs, outputs);
+    updateFitness (inputs, outputs);
 
     // broadcasting genome : robot broadcasts its genome
     //to all neighbors (contact-based wrt proximity sensors)
@@ -236,26 +233,18 @@ out_iter != nn->outputs.end (); out_iter++)
 return std::make_pair(inputs,outputs);
 }
 
-float
+void
 TopEDOController::updateFitness (std::vector < double >in,
                                  std::vector < double >out)
 {
     float deltaFit = 0.0;
-    int targetIndex;
     double vT,vR,minSensor;
-
+    float newFitness;
 
     switch(TopEDOSharedData::gFitness)
     {
     case 0:
-        targetIndex = _wm->getGroundSensorValue ();
-
-        if (PhysicalObject::isInstanceOf (targetIndex))
-        {
-            if((gPhysicalObjects[targetIndex - gPhysicalObjectIndexStartOffset]
-                ->getType ()) == 3)
-                deltaFit += 1.0;
-        }
+        updateFitnessForaging();
         break;
     case 1:
         //[Floreano2000] locomotion fitness function
@@ -272,25 +261,40 @@ TopEDOController::updateFitness (std::vector < double >in,
             if(in[i] < minSensor)
                 minSensor = in[i];
         }
+        newFitness= _fitness;
         deltaFit += fabs(vT) * (1 - fabs(vR)) * minSensor;
         if(deltaFit < 0.0)
         {
             std::cerr << "[ERROR] Negative fitness in navigation" << std::endl;
             exit(-1);
         }
+
+        newFitness += deltaFit;
+        _fitness= newFitness;
         break;
 
     default:
         std::cerr << "[ERROR] Unknown fitness function selected. Check gFitness parameter in properties file." << std::endl;
         exit(-1);
     }
-
-    return deltaFit;
+}
+/*
+// update fitness for navigation
+void TopEDOController::updateFitnessNavigation(){
+    _fitness += (fabs(_lv) + fabs(_rv)) *
+    (1.0 -sqrt(fabs(_lv - _rv))) *
+    (1.0 - _md) ;
+}*/
+// update fitness for foraging
+void TopEDOController::updateFitnessForaging(){
+    _fitness = (double) _items / (double) get_lifetime();
 }
 
 void
 TopEDOController::broadcastGenome ()
 {
+    std::vector<TopEDOController *> neighbors;
+
     // only if agent is active (ie. not just revived) and deltaE>0.
     for (int i = 0; i < _wm->_cameraSensorsNb; i++)
     {
@@ -316,28 +320,55 @@ TopEDOController::broadcastGenome ()
                 exit (-1);
             }
 
-            // other agent stores my genome.
-
-            targetRobotController->
-                    storeGenome (_genome, _wm->getId (), _birthdate,
-                                 _currentSigma, _currentFitness);
+            /* add to the list  */
+            neighbors.push_back(targetRobotController);
         }
     }
+
+    /* if found neighbors, broadcast my genome */
+    if(neighbors.size() > 0) {
+        message msg (_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber);
+
+        /* remove duplicates */
+        std::sort(neighbors.begin(), neighbors.end());
+        auto last = std::unique(neighbors.begin(), neighbors.end());
+        neighbors.erase(last, neighbors.end());
+
+        /* send */
+        for (const auto& c : neighbors)
+            c->storeMessage (_wm->getId(), msg);
+
+        /* some screen output */
+        if (gVerbose){
+            std::cout << "@"  << _iteration << " R" << _wm->getId() << " -> " ;
+            for (const auto& c : neighbors)
+                std::cout << c->_wm->getId() << " ";
+            std::cout << std::endl;
+        }
+        /* delete neighbors list */
+        neighbors.clear();
+    }
+}
+void TopEDOController::storeMessage(int id, message msg){
+    _gList[id] = msg;
+
+    //Update genetic clocks for nodes and links
+    //This minimizes the number of arbitrary sorting orders in genome alignment
+    //due to concurrent mutations in different agents
+    _nodeId = max(_nodeId,std::get<4>(msg));
+    _innovNumber = max(_innovNumber,std::get<5>(msg));
+
 }
 
-void
-TopEDOController::storeGenome (Genome *genome, int senderId,
-                               int senderBirthdate, float sigma,
-                               float fitness)
-{
-    //08/10/14 (storeGenome Adaptedto NEAT, I think)
-    _genomesList[senderId] = genome;
-    _sigmaList[senderId] = sigma;
-    _birthdateList[senderId] = senderBirthdate;
-    _fitnessList[senderId] = fitness;
-
+void TopEDOController::emptyGenomeList(){
+    _gList.clear();
 }
-
+void TopEDOController::pickItem(){
+    _items++;
+}
+void TopEDOController::emptyBasket(){
+    _items = 0;
+}
 // ################ ######################## ################
 // ################ EVOLUTION ENGINE METHODS ################
 // ################ ######################## ################
@@ -347,46 +378,40 @@ TopEDOController::stepEvolution ()
 {
 
     logGenome();
-    
+    message msg (_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber);
     //L = L + A
+    storeMessage(_wm->getId(), msg);
 
-    _genomesList[_wm->getId ()] = _genome;
-
-    _fitnessList[_wm->getId()] = _currentFitness;
-
-    _sigmaList[_wm->getId ()] = _currentSigma;
-    _birthdateList[_wm->getId ()] = _birthdate;
-    
     int selected =-1;
     switch(TopEDOSharedData::gSelectionMethod)
     {
     case 1:
-        selected = selectBest (_fitnessList);
+        selected = selectBest ();
         break;
     case 2:
-        selected = selectRankBased (_fitnessList);
+        selected = selectRankBased ();
         break;
     case 3:
-        selected = selectBinaryTournament (_fitnessList);
+        selected = selectBinaryTournament ();
         break;
     case 4:
-        selected = selectRandom(_fitnessList);
+        selected = selectRandom();
         break;
     default:
         std::cerr << "[ERROR] Selection method unknown (value: " << TopEDOSharedData::gSelectionMethod << ").\n";
         exit(-1);
     }
 
-    if(_genomesList[selected] == NULL)
+    if(_gList.find(selected) == _gList.end())
     {
         std::cerr << "[ERROR] Selected genome not existing: " << selected << " in robot " << _wm->getId() << std::endl;
         exit(-1);
     }
 
 
-    _genome = _genomesList[selected];
+    _genome = std::get<0>(_gList[selected]);
 
-    _currentFitness = _fitnessList[selected];
+    _fitness = std::get<1>(_gList[selected]);
 
     
     int newId =
@@ -395,12 +420,12 @@ TopEDOController::stepEvolution ()
                                       TopEDOSharedData::gEvaluationTime));
     if(TopEDOSharedData::gControllerType == 0)
     {
-        _genome = _genome -> mutate (_currentSigma,
-                                     _wm->getId (), newId, nodeId, innovNumber);
+        _genome = _genome -> mutate (_sigma,
+                                     _wm->getId (), newId, _nodeId, _innovNumber);
         createNN ();
     }
     else if(TopEDOSharedData::gControllerType == 1)
-        _genome -> mutate_link_weights(_currentSigma);
+        _genome -> mutate_link_weights(_sigma);
     else
     {
         std::cerr << "[ERROR] Undefined gControllerType: " << TopEDOSharedData::gControllerType << std::endl;
@@ -418,7 +443,7 @@ void TopEDOController::logGenome()
                                  dynamic_cast <TopEDOWorldObserver *>
                                  (gWorld->getWorldObserver ())->getGenerationCount() +1
                               << " " << _wm->getId () << " " <<
-                                 _currentFitness << " " << _fitnessList.size() << " " << _genome->genome_id << " " << _genome->mom_id << std::endl;
+                                 _fitness << " " << _gList.size() << " " << _genome->genome_id << " " << _genome->mom_id << std::endl;
 
 
 
@@ -434,18 +459,18 @@ void TopEDOController::logGenome()
 
 
 int
-TopEDOController::selectBest (std::map < int, float >lFitness)
+TopEDOController::selectBest ()
 {
-    std::map < int, float >::iterator it = lFitness.begin();
+    std::map < int, message >::iterator it = _gList.begin();
 
-    float bestFit = it->second;
+    double bestFit = std::get<1>(it->second);
     int idx = it->first;
 
-    for (; it != lFitness.end (); it++)
+    for (; it != _gList.end (); it++)
     {
-        if (it->second > bestFit)
+        if (std::get<1>(it->second) > bestFit)
         {
-            bestFit = it->second;
+            bestFit = std::get<1>(it->second);
             idx = it->first;
         }
 
@@ -453,17 +478,17 @@ TopEDOController::selectBest (std::map < int, float >lFitness)
     return idx;
 }
 int
-TopEDOController::selectRankBased(std::map < int, float >lFitness)
+TopEDOController::selectRankBased()
 {       
-    std::map < int, float >::iterator it = lFitness.begin();
+    std::map < int, message>::iterator it = _gList.begin();
 
     std::vector<std::pair<int,float>> rankedFitness;
     //sum of indexes from (1:n) = n(n+1)/2
-    int totalIndex = (lFitness.size()) *( lFitness.size()+1) / 2;
+    int totalIndex = (_gList.size()) *( _gList.size()+1) / 2;
     //Vector for Rank for each individual
-    for (it->first; it != lFitness.end (); it++)
+    for (it->first; it != _gList.end (); it++)
     {
-        rankedFitness.push_back(std::make_pair(it->first,it->second));
+        rankedFitness.push_back(std::make_pair(it->first,std::get<1>(it->second)));
     }
 
     int random = (rand() % totalIndex) + 1; //Uniform between 1 and n * (n+1) / 2
@@ -480,37 +505,37 @@ TopEDOController::selectRankBased(std::map < int, float >lFitness)
     return -1;
 }
 int
-TopEDOController::selectBinaryTournament(std::map < int, float >lFitness)
+TopEDOController::selectBinaryTournament()
 {
     int result = -1;
 
     std::vector<int> v;
 
     //Vector for storing the keys (robot ID)
-    for(std::map<int,float>::iterator it = lFitness.begin(); it != lFitness.end(); ++it) {
+    for(std::map<int,message>::iterator it = _gList.begin(); it != _gList.end(); ++it) {
         v.push_back(it->first);
     }
 
-    if(lFitness.size() > 1)
+    if(_gList.size() > 1)
     {
-        int ind1 =  rand () % lFitness.size ();
+        int ind1 =  rand () % _gList.size ();
         ind1 = v[ind1];
-        int ind2 =  rand () % lFitness.size ();
+        int ind2 =  rand () % _gList.size ();
         ind2 = v[ind2];
 
         while(ind1 == ind2)
         {
-            ind2 =  rand () % lFitness.size ();
+            ind2 =  rand () % _gList.size ();
             ind2 = v[ind2];
         }
 
-        if(lFitness[ind1] >= lFitness[ind2])
+        if(std::get<1>(_gList[ind1]) >= std::get<1>(_gList[ind2]))
             result = ind1;
         else
             result = ind2;
     }
     else
-        result = lFitness.begin()->first;
+        result = _gList.begin()->first;
 
     if(result == -1)
     {
@@ -518,7 +543,7 @@ TopEDOController::selectBinaryTournament(std::map < int, float >lFitness)
         exit(-1);
     }
 
-    if(lFitness.find(result) == lFitness.end())
+    if(_gList.find(result) == _gList.end())
     {
         std::cerr << "[ERROR] Unexisting individual selected by binary tournament." << std::endl << std::flush;
         exit(-1);
@@ -527,10 +552,10 @@ TopEDOController::selectBinaryTournament(std::map < int, float >lFitness)
     return result;
 }
 int
-TopEDOController::selectRandom(std::map < int, float >lFitness)
+TopEDOController::selectRandom()
 {       
-    int randomIndex = rand()%lFitness.size();
-    std::map<int, float >::iterator it = lFitness.begin();
+    int randomIndex = rand()%_gList.size();
+    std::map<int, message >::iterator it = _gList.begin();
     while (randomIndex !=0 )
     {
         it ++;
@@ -540,7 +565,7 @@ TopEDOController::selectRandom(std::map < int, float >lFitness)
     return it->first;
 }
 
-bool TopEDOController::compareFitness(std::pair<int,float> i,std::pair<int,float> j) 
+bool TopEDOController::compareFitness(std::pair<int,float> i,std::pair<int,float> j)
 {
     return (i.second < j.second);
 }
@@ -574,11 +599,52 @@ void TopEDOController::printVector(std::vector<double> v)
 void TopEDOController::printFitnessList()
 {
     std::cout << "------------------------------" << std::endl;
-    std::map<int,float>::iterator it = _fitnessList.begin();
+    std::map<int,message>::iterator it = _gList.begin();
     std::cout << "Fitness List" << std::endl;
-    for(;it != _fitnessList.end(); it++)
+    for(;it != _gList.end(); it++)
     {
-        std::cout << "R[" << it->first << "] " << it->second << std::endl;
+        std::cout << "R[" << it->first << "] " << std::get<1>(it->second) << std::endl;
     }
     std::cout << "------------------------------" << std::endl;
+}
+// Save a genome (file name = robot_id-genome_id.gen)
+void TopEDOController::save_genome(){
+    char fname[128];
+    snprintf(fname, 127, "logs/%04d-%010d.gen",
+             _wm->getId(), _genome->genome_id);
+    std::ofstream oFile(fname);
+    _genome->print_to_file(oFile);
+    oFile.close();
+}
+
+
+void TopEDOController::print_genome(Genome* g){
+    std::cout << "[Genome: id=" << _wm->getId()
+              << " idtrace="    << g->genome_id
+              << " mom="        << g->mom_id
+              << " dad="        << g->dad_id << " ]";
+}
+
+void TopEDOController::printRobot(){
+    std::cout << "[Robot: id=" + to_string(_wm->getId())
+              << " iteration=" + to_string(_iteration)
+              << " birthdate=" + to_string(_birthdate)
+              << " fitness="   + to_string(_fitness)
+              << " items="     + to_string(_items)
+              << " sigma="     + to_string(_sigma) + " ]";
+}
+
+void TopEDOController::printAll(){
+    printRobot();
+    print_genome(_genome);
+    std::cout << "\n";
+}
+bool TopEDOController::lifeTimeOver(){
+    return get_lifetime()
+            >= TopEDOSharedData::gEvaluationTime - 1;
+}
+
+int TopEDOController::get_lifetime(){
+    return dynamic_cast <TopEDOWorldObserver*>
+            (gWorld->getWorldObserver())->getLifeIterationCount();
 }

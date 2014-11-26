@@ -63,5 +63,12 @@ void TopEDOAgentObserver::step()
         targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
         //std::cout << "[DEBUG] #" << _wm->getId() << " walked upon " << targetIndex << "\n";
         gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
+        /* notify the robot that it picked an item  */
+        TopEDOController *cont =
+            dynamic_cast <
+            TopEDOController *
+            >(gWorld->getRobot (_wm->getId())->getController ());
+        cont->pickItem();
     }
+
 }

@@ -19,95 +19,107 @@
 
 #include <iomanip>
 
-using namespace Neural;
 using namespace PURENEAT;
+using namespace std;
 
+typedef tuple<Genome*, double, double, int,int,int> message; //Genome, fitness, sigma, birthdate, node id, link gene counter
 
 class TopEDOController:public Controller
 {
 private:
-  int _iteration;
-  
-  int _birthdate;		// evaluation when this controller was initialized.
+    int _iteration;
 
-  Network *nn;
+    int _birthdate;		// evaluation when this controller was initialized.
 
-  void createNN ();
-  unsigned int computeRequiredNumberOfWeights ();
-  void initRobot ();
+    Network *nn;
 
-  bool _isNewGenome;
-  bool _isFixedTopo;
+    void createNN ();
+    unsigned int computeRequiredNumberOfWeights ();
+    void initRobot ();
 
-  void stepBehaviour ();
-  std::pair<std::vector<double>,std::vector<double>> act();
+    bool _isNewGenome;
+    bool _isFixedTopo;
 
-  float updateFitness (std::vector < double >in, std::vector < double >out);
-  void broadcastGenome ();
-  void storeGenome (Genome * genome, int senderId, int senderBirthdate,
-		    float sigma, float fitness);  
+    void stepBehaviour ();
+    std::pair<std::vector<double>,std::vector<double>> act();
 
-  void stepEvolution ();
-  void logGenome();
-  void loadNewGenome ();
+    void updateFitness (std::vector < double >in, std::vector < double >out);
+    void updateFitnessForaging();
+    void broadcastGenome ();
 
-  int selectBest (std::map < int, float >lFitness);
-  int selectRankBased(std::map < int, float >lFitness);
-  int selectBinaryTournament (std::map < int, float >lFitness);
-  int selectRandom (std::map < int, float >lFitness);
-  static bool compareFitness(std::pair<int,float> i,std::pair<int,float> j);
-  
-  void printIO(std::pair<std::vector<double>,std::vector<double>> io);
-  void printVector(std::vector<double> v);
-  void printFitnessList();
+    void storeMessage(int id, message msg);
+
+    void stepEvolution ();
+    int get_lifetime();
+    bool lifeTimeOver();
+    void logGenome();
+    void loadNewGenome ();
+    void emptyGenomeList();
+
+    int selectBest ();
+    int selectRankBased();
+    int selectBinaryTournament ();
+    int selectRandom ();
+
+    static bool compareFitness(std::pair<int,float> i,std::pair<int,float> j);
+
+
+    /* misc */
+
+    void printRobot      ();
+    void print_genome     (Genome* g);
+    void save_genome     ();
+    void printAll        ();
+
+    void printIO(std::pair<std::vector<double>,std::vector<double>> io);
+    void printVector(std::vector<double> v);
+    void printFitnessList();
     
-  bool getNewGenomeStatus ()
-  {
-    return _isNewGenome;
-  }
-  void setNewGenomeStatus (bool __status)
-  {
-    _isNewGenome = __status;
-  }
+    bool getNewGenomeStatus ()
+    {
+        return _isNewGenome;
+    }
+    void setNewGenomeStatus (bool __status)
+    {
+        _isNewGenome = __status;
+    }
 
-  // evolutionary engine
+    // evolutionary engine
 
-  Genome *_genome;
+    Genome *_genome;
 
-  std::vector<double> _previousOut;
-  
-  std::map < int, Genome * >_genomesList;
-  std::map < int, float >_sigmaList;
-  std::map < int, float >_fitnessList;
-  std::map < int, int >_birthdateList;	// store the birthdate of the received controllers (useful for monitoring).
+    std::vector<double> _previousOut;
+
+    std::map<int, message>  _gList;
+
+    float _fitness;
+    int _items;
+    float _sigma;
+
+    //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
+    int _innovNumber;
+    int _nodeId;
+
+    // ANN
+    unsigned int _nbInputs;
+    unsigned int _nbOutputs;
 
 
-  float _currentFitness;
-  float _currentSigma;
-
-  //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
-  int innovNumber;
-  int nodeId;
-
-  // ANN
-  unsigned int _nbInputs;
-  unsigned int _nbOutputs;
-
-  
 
 public:
 
-  TopEDOController (RobotWorldModel * wm);
-  ~TopEDOController ();
+    TopEDOController (RobotWorldModel * wm);
+    ~TopEDOController ();
 
-  void reset ();
-  void step ();
+    void reset ();
+    void step ();
+    void pickItem();
+    void emptyBasket();
+    int getBirthdate ()
+    {
+        return _birthdate;
+    }
 
-  int getBirthdate ()
-  {
-    return _birthdate;
-  }
-  
 };
 
 
