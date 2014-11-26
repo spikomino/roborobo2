@@ -321,7 +321,7 @@ void neatestController::stepEvolution() {
     storeMessage(_wm->getId(), msg);
        
     /* select an offspring */
-    int selected = selectBest();
+    int selected = selectRandom();
     _genome = std::get<0>(_glist[selected]);
     _sigma  = std::get<2>(_glist[selected]);
     
