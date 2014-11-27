@@ -27,7 +27,7 @@ void neatestAgentObserver::reset(){
 }
 
 static bool is_energy_item(int id){
-    return (gPhysicalObjects[id-gPhysicalObjectIndexStartOffset]->getType()==1);
+    return (gPhysicalObjects[id]->getType()==1);
 } 
 
 void neatestAgentObserver::step(){
@@ -87,7 +87,7 @@ void neatestAgentObserver::step(){
 		/* notify the robot that it picked an item  */
 		cont->pickItem();
 	    }
-	    /* std::cout << "Robot " << cont->getId()  */
+	    /* std::cout << "Robot " << cont->getId() */
 	    /* 	      << " has "  << cont->ItemsPicked() << std::endl; */
 	}
 

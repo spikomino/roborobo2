@@ -36,10 +36,15 @@ neatestController::neatestController(RobotWorldModel * wm){
   _wm              = wm;
   _iteration       = 0;
   _birthdate       = 0;
-  _prev_fitness    = 0.0;
-  _fitness         = 0.0;
-  _items           = 0;
-  _items_max       = 5;
+
+  _reported_fitness  = 0.0;
+  _fitness           = 0.0;
+
+  _items_collected   = 0;
+  _items_forraged    = 0;
+  
+  _items_max         = 5;
+
   _neurocontroller = NULL;
   _sigma           = neatestSharedData::gSigmaRef;
 
@@ -101,12 +106,14 @@ void neatestController::createNeuroController (){
 }
 
 void neatestController::reset(){
-    
-    /* fitness related resets */ 
-    _prev_fitness = _fitness;
-    _fitness = 0.0;
-    emptyBasket();
     _birthdate = gWorld->getIterations();
+
+    /* fitness related resets */ 
+    _reported_fitness = _fitness;
+    _fitness = 0.0;
+
+    emptyBasket();
+
     emptyGenomeList();
 }
 
@@ -115,6 +122,7 @@ void neatestController::step(){
   if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
       broadcast();     // broadcast genome to neighbors
+      printAll();
   }
   if(lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
@@ -134,6 +142,21 @@ bool is_energy_item(int id){
     return (gPhysicalObjects[id-gPhysicalObjectIndexStartOffset]->getType()==1);
 } 
 
+void neatestController::pickItem(){
+    _items_collected++;
+}
+
+void neatestController::emptyBasket(){
+    _items_collected = 0;
+}
+
+void neatestController::dropItem(int n){
+    if(_items_collected - n <= 0)
+	_items_collected = 0;
+    else
+	_items_collected -= n;
+}
+
 /*
  * Step the neuro controller and execute command
  *
@@ -144,6 +167,10 @@ void neatestController::stepBehaviour(){
     const  int L = 0; /* left / right motor*/
     const  int R = 1;
     const  int D = 2; /* drop effector */
+    
+    /* floreano fitness related atribute */
+    double lv, rv, md; /* tran rot velocities and min dist */
+
 
     // (1)  Read inputs 
  
@@ -172,14 +199,14 @@ void neatestController::stepBehaviour(){
 	}
     
     /* get the most activated obstacle sensor for floreano fitness*/
-    _md =-10.0;
+    md =-10.0;
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
-	if(_md < inputs[i] && 
+	if(md < inputs[i] && 
 	   gExtendedSensoryInputs && inputs[i+_wm->_cameraSensorsNb] < 1.0)
-	    _md = inputs[i];
+	    md = inputs[i];
     
     /* Basket capacity sensor */
-    double activation = (double) _items / (double) _items_max; 
+    double activation = (double) _items_collected / (double) _items_max; 
     inputs[inputToUse++] = activation;
 
     /* ground sensor */
@@ -217,8 +244,8 @@ void neatestController::stepBehaviour(){
     /* output = L & R velocity (differential drive) */ 
     
     /* store velocities for floreano fitness */
-    _lv = outputs[L];
-    _rv = outputs[R];
+    lv = outputs[L];
+    rv = outputs[R];
 
     outputs[L] = 2.0 * (outputs[L]-0.5); /* rescale to [-1, 1] */
     outputs[R] = 2.0 * (outputs[R]-0.5);
@@ -236,26 +263,42 @@ void neatestController::stepBehaviour(){
     	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
    
     /* drop items */ 
-    int droped = (int) (outputs[D] * _items);
+    int droped = (int) (outputs[D] * _items_collected);
     dropItem(droped);
     
 
-    /* check if we dropped at the nest  */
-    if(at_nest){
-	
-	difirentiate items collected from foraged 
+    
+    /* (5) update the fitness function */
+    switch(neatestSharedData::gFitnessFunction) {
+
+    case 0: /* locomotion */
+	_fitness += (fabs(lv) + fabs(rv)) * 
+	    (1.0 - sqrt(fabs(lv - rv))) * 
+	    (1.0 - md) ;
+	break;
+
+    case 1: /* Collection */
+	_fitness = (double) _items_collected / (double) get_lifetime();
+	break;
+
+    case 2: /* Forraging */ 
+	if(at_nest)
+	    _items_forraged += droped;
+	_fitness = (double) _items_forraged / (double) get_lifetime(); 
+	break;
+    default:
+	std::cerr << "Error unknown fitness function" << std::endl;
+	exit (-1);
     }
-    //updateFitnessNavigation();
-    //updateFitnessCollecting();
-    updateFitnessForaging();
+   
 
     // print things
     if(gVerbose){
 	std::cout << "[Controller] "
 		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
-		  << "\t\t[lv=" << _lv 
-		  << " rv="     << _rv 
-		  << " max_sens=" << _md 
+		  << "\t\t[lv="   << lv 
+		  << " rv="       << rv 
+		  << " max_sens=" << md 
 		  << "]" << std::endl 
 		  << "\t\tInputs :[ " ;
 	for(unsigned int i = 1; i <= _nbInputs; i++){
@@ -365,10 +408,10 @@ void neatestController::stepEvolution() {
 	      neatestSharedData::gEvaluationTime));
     
     switch(neatestSharedData::gControllerType) {
-    case 0:
+    case 0: /* neat*/
 	_genome = _genome->mutate(_sigma, getId(), newId);
 	break;
-    case 1:
+    case 1: /* FFNN*/
 	_genome = _genome->mutate_weights(_sigma, getId(), newId);
 	break;
     default:
@@ -385,37 +428,6 @@ void neatestController::stepEvolution() {
 	could be selected at some other agent ???? **/
 }
 
-
-// update fitness for foraging 
-void neatestController::updateFitnessNavigation(){
-    _fitness += (fabs(_lv) + fabs(_rv)) * 
-	(1.0 -sqrt(fabs(_lv - _rv))) * 
-	(1.0 - _md) ;
-}
-
-void neatestController::updateFitnessCollecting(){
-    _fitness = (double) _items / (double) get_lifetime();
-}
-
-void neatestController::updateFitnessForaging(int){
-    _fitness = (double) _items / (double) get_lifetime();
-}
-
-
-void neatestController::pickItem(){
-    _items++;
-}
-
-void neatestController::emptyBasket(){
-    _items = 0;
-}
-
-void neatestController::dropItem(int n){
-    if(_items - n <= 0)
-	_items = 0;
-    else
-	_items -= n;
-}
 
 
 int  neatestController::selectRandom(){
@@ -501,12 +513,15 @@ void neatestController::printGenomeList(){
 }
 
 void neatestController::printRobot(){
-    std::cout << "[Robot: id=" + to_string(getId())
-	      << " iteration=" + to_string(_iteration)
-	      << " birthdate=" + to_string(_birthdate) 
-	      << " fitness="   + to_string(_fitness) 
-	      << " items="     + to_string(_items) 
-	      << " sigma="     + to_string(_sigma) + " ]";
+    std::cout << "[Robot: id="         <<  getId() 
+	      << " iteration="         <<  _iteration
+	      << " birthdate="         <<  _birthdate
+	      << " fitness="           <<  _fitness
+	      << " reported fitness="  <<  _reported_fitness
+	      << " collected="         <<  _items_collected << "/" << _items_max
+	      << " forraged="          <<  _items_forraged 
+	      << " sigma="             <<  _sigma 
+	      << " ]";
 }
 
 void neatestController::printAll(){

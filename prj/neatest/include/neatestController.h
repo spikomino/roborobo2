@@ -28,10 +28,14 @@ class neatestController:public Controller {
 private:
     int                     _iteration;
     int                     _birthdate; // iteration at which we are created 
+
     double                  _fitness;
-    double                  _prev_fitness; // to report to World observer
-    unsigned int            _items; // items collected 
+    double                  _reported_fitness; // to report to World observer
+
+    unsigned int            _items_collected; // items collected 
+    unsigned int            _items_forraged;  // items brought back to the nest
     unsigned int            _items_max; // basket capacity 
+    
 
     double                  _sigma;
     GenomeAdapted*          _genome;
@@ -41,8 +45,7 @@ private:
     
     std::map<int, message>  _glist;
 
-    /* floreano fitness related atribute */
-    double _lv, _rv, _md; /* tran rot velocities and min dist */
+   
    
     /* behavior */ 
     void initRobot     ();
@@ -80,14 +83,15 @@ public:
 
     neatestController  (RobotWorldModel * wm);
     ~neatestController ();
+    void reset         ();
+    void step          ();
     
-    int getId  (){ return _wm->getId(); }
-    double getFitness  (){ return _prev_fitness; }
-    bool  stillRoomInBasket () { return _items_max > _items; }
-    unsigned int ItemsPicked () { return _items; }
-    void reset ();
-    void step  ();
-    void pickItem      ();
+    int          getId             () { return _wm->getId(); }
+    double       getFitness        () { return _reported_fitness; }
+    bool         stillRoomInBasket () { return _items_max > _items_collected; }
+    unsigned int ItemsPicked       () { return _items_collected; }
+    void         pickItem          ();
+
 };
 
 

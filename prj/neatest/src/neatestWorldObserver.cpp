@@ -25,6 +25,11 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
 					 &neatestSharedData::gSigmaRef,
 					 false);
 
+    gProperties.checkAndGetPropertyValue("gFitnessFunction",
+					 &neatestSharedData::gFitnessFunction,
+					 true);
+
+
     gProperties.checkAndGetPropertyValue("gNeatParameters",
 					 &neatestSharedData::gNeatParameters,
 					 true);
