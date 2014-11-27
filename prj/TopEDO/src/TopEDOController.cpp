@@ -29,7 +29,7 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 
     nn = NULL;
 
-    load_neat_params ("prj/TopEDO/src/forag.ne", false);
+    //load_neat_params ("prj/TopEDO/src/forag.ne", false);
 
     _sigma = TopEDOSharedData::gSigmaRef;
 
