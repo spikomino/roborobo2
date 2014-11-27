@@ -98,6 +98,13 @@ TopEDOController::initRobot ()
     //NEAT-like innovation number and node id FOR THIS ROBOT
     _innovNumber = nn->linkcount () +1;
     _nodeId = 1 + _nbInputs + _nbOutputs;
+    if(gVerbose){
+        std::cout << "[initRobot] "
+                  << "id="  << _wm->getId() << " "
+                  << "in="  << _nbInputs    << " "
+                  << "out=" << _nbOutputs
+                  << std::endl;
+    }
 
 }
 
@@ -128,10 +135,11 @@ TopEDOController::step ()
     
     if (lifeTimeOver())
     {
-        stepEvolution ();
-
         save_genome();
         printAll();
+
+        stepEvolution ();
+
         reset();
     }
 }
@@ -340,10 +348,10 @@ TopEDOController::broadcastGenome ()
 
         /* some screen output */
         if (gVerbose){
-            std::cout << "@"  << _iteration << " R" << _wm->getId() << " -> " ;
+           /* std::cout << "@"  << _iteration << " R" << _wm->getId() << " -> " ;
             for (const auto& c : neighbors)
                 std::cout << c->_wm->getId() << " ";
-            std::cout << std::endl;
+            std::cout << std::endl;*/
         }
         /* delete neighbors list */
         neighbors.clear();
@@ -452,7 +460,7 @@ void TopEDOController::logGenome()
     filename = TopEDOSharedData::gGenomeLogFolder;
     filename += std::to_string(_genome -> genome_id);
 
-    _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
+    // _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
 
 
 }
@@ -610,7 +618,7 @@ void TopEDOController::printFitnessList()
 // Save a genome (file name = robot_id-genome_id.gen)
 void TopEDOController::save_genome(){
     char fname[128];
-    snprintf(fname, 127, "logs/%04d-%010d.gen",
+    snprintf(fname, 127, "logs/genomes/%04d-%010d.gen",
              _wm->getId(), _genome->genome_id);
     std::ofstream oFile(fname);
     _genome->print_to_file(oFile);
@@ -631,7 +639,10 @@ void TopEDOController::printRobot(){
               << " birthdate=" + to_string(_birthdate)
               << " fitness="   + to_string(_fitness)
               << " items="     + to_string(_items)
-              << " sigma="     + to_string(_sigma) + " ]";
+              << " sigma="     + to_string(_sigma)
+              << " nodeId="     + to_string(_nodeId)
+              << " geneId="     + to_string(_innovNumber)
+              << " ]";
 }
 
 void TopEDOController::printAll(){
