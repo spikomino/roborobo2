@@ -32,9 +32,9 @@ private:
     double                  _fitness;
     double                  _reported_fitness; // to report to World observer
 
-    unsigned int            _items_collected; // items collected 
-    unsigned int            _items_forraged;  // items brought back to the nest
-    unsigned int            _items_max; // basket capacity 
+    int            _items_collected; // items collected 
+    int            _items_forraged;  // items brought back to the nest
+    int            _items_max; // basket capacity 
     
 
     double                  _sigma;
@@ -89,7 +89,7 @@ public:
     int          getId             () { return _wm->getId(); }
     double       getFitness        () { return _reported_fitness; }
     bool         stillRoomInBasket () { return _items_max > _items_collected; }
-    unsigned int ItemsPicked       () { return _items_collected; }
+    int ItemsPicked       () { return _items_collected; }
     void         pickItem          ();
 
 };

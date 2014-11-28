@@ -111,9 +111,10 @@ void neatestController::reset(){
     /* fitness related resets */ 
     _reported_fitness = _fitness;
     _fitness = 0.0;
-
+    _items_collected   = 0;
+    _items_forraged    = 0;
+  
     emptyBasket();
-
     emptyGenomeList();
 }
 
@@ -122,7 +123,6 @@ void neatestController::step(){
   if(_wm->isAlive()){
       stepBehaviour(); // execure the neuro controller
       broadcast();     // broadcast genome to neighbors
-      printAll();
   }
   if(lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
@@ -197,7 +197,7 @@ void neatestController::stepBehaviour(){
 	    else
 		inputs[inputToUse++] = 0.0;
 	}
-    
+     
     /* get the most activated obstacle sensor for floreano fitness*/
     md =-10.0;
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
@@ -284,6 +284,9 @@ void neatestController::stepBehaviour(){
     case 2: /* Forraging */ 
 	if(at_nest)
 	    _items_forraged += droped;
+	else
+	    _items_forraged -= droped;
+	    
 	_fitness = (double) _items_forraged / (double) get_lifetime(); 
 	break;
     default:
@@ -398,7 +401,7 @@ void neatestController::stepEvolution() {
     storeMessage(_wm->getId(), msg);
        
     /* select an offspring */
-    int selected = selectRandom();
+    int selected = selectBest();
     _genome = std::get<0>(_glist[selected]);
     _sigma  = std::get<2>(_glist[selected]);
     
@@ -428,9 +431,7 @@ void neatestController::stepEvolution() {
 	could be selected at some other agent ???? **/
 }
 
-
-
-int  neatestController::selectRandom(){
+int neatestController::selectRandom(){
     auto it = _glist.begin();
     std::advance(it, rand() % _glist.size());
     return it->first;

@@ -142,28 +142,28 @@ GenomeAdapted *GenomeAdapted::mutate(float sigma,
  
   /* add a node */
   if (randfloat () < NEAT::mutate_add_node_prob){
-      if (new_genome->mut_add_node())
-	  std::cout << "Mutation: Node added" <<std::endl; 
+      new_genome->mut_add_node();
+      //	  std::cout << "Mutation: Node added" <<std::endl; 
   }
   /* add a link */
   else if (randfloat () < NEAT::mutate_add_link_prob){
-      if (new_genome->mut_add_link(NEAT::newlink_tries))
-	  std::cout << "Mutation: Link added" <<std::endl; 
+      new_genome->mut_add_link(NEAT::newlink_tries);
+      //std::cout << "Mutation: Link added" <<std::endl; 
   }
   
   /* If we didn't do a structural mutation, we do the other kinds */
   else{
       if (randfloat () < NEAT::mutate_link_weights_prob){
 	  new_genome->mut_link_weights(sigma);
-	  std::cout << "Mutation: link weight changed" <<std::endl; 
+	  //std::cout << "Mutation: link weight changed" <<std::endl; 
       }
       if (randfloat () < NEAT::mutate_toggle_enable_prob)
-	  if(new_genome->mut_toggle_enable())
-	      std::cout << "Mutation: toggle a link" <<std::endl; 
+	  new_genome->mut_toggle_enable();
+      // std::cout << "Mutation: toggle a link" <<std::endl; 
  
       if (randfloat () < NEAT::mutate_gene_reenable_prob)
-	  if(new_genome->mut_gene_reenable ())
-	      std::cout << "Mutation: reenable a link" <<std::endl; 
+	  new_genome->mut_gene_reenable();
+      //std::cout << "Mutation: reenable a link" <<std::endl; 
   }
   
   return new_genome;
