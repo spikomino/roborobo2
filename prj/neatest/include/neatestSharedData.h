@@ -51,7 +51,7 @@ class neatestSharedData {
   
   static int gControllerType; // controller type (0: MLP, 1: Perceptron, 2: Elman)
   static int gFitnessFunction;  
- 
+  static double gSelectionPressure;
   // -----  
   
 };

@@ -63,6 +63,8 @@ private:
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
+    int  select        (double sp);
+
     void updateFitnessForaging   ();
     void updateFitnessNavigation ();
     void updateFitnessCollecting ();

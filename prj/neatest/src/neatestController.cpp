@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <string>
+#include <algorithm>
 
 #include "World/World.h"
 #include "Utilities/Misc.h"
@@ -244,15 +245,12 @@ void neatestController::stepBehaviour(){
     /* output = L & R velocity (differential drive) */ 
     
     /* store velocities for floreano fitness */
-    lv = outputs[L];
-    rv = outputs[R];
+    lv = outputs[L]-0.5;
+    rv = outputs[R]-0.5;
 
     outputs[L] = 2.0 * (outputs[L]-0.5); /* rescale to [-1, 1] */
     outputs[R] = 2.0 * (outputs[R]-0.5);
   
-    /* outputs[L] = 0.0; */
-    /* outputs[R] = 0.0; */
-
     _wm->_desiredTranslationalValue =  (outputs[R] + outputs[L]) / 2.0 ;
     _wm->_desiredRotationalVelocity =  outputs[R] - outputs[L] ;
 
@@ -265,9 +263,7 @@ void neatestController::stepBehaviour(){
     /* drop items */ 
     int droped = (int) (outputs[D] * _items_collected);
     dropItem(droped);
-    
-
-    
+       
     /* (5) update the fitness function */
     switch(neatestSharedData::gFitnessFunction) {
 
@@ -321,6 +317,11 @@ void neatestController::stepBehaviour(){
 	
 
     }
+
+    
+
+    /* _wm->_desiredTranslationalValue = 0.0; */
+    /* _wm->_desiredRotationalVelocity = 0.0; */
 
 } 
 
@@ -401,7 +402,7 @@ void neatestController::stepEvolution() {
     storeMessage(_wm->getId(), msg);
        
     /* select an offspring */
-    int selected = selectBest();
+    int selected = select(neatestSharedData::gSelectionPressure);
     _genome = std::get<0>(_glist[selected]);
     _sigma  = std::get<2>(_glist[selected]);
     
@@ -431,33 +432,41 @@ void neatestController::stepEvolution() {
 	could be selected at some other agent ???? **/
 }
 
-int neatestController::selectRandom(){
-    auto it = _glist.begin();
-    std::advance(it, rand() % _glist.size());
-    return it->first;
-}
 
-int neatestController::selectBest(){
-    //printGenomeList() ;
+
+int neatestController::select(double sp){
+    /* the size of the tournament */
+    int inspected = sp * (double) _glist.size();
+   
+    /* shuffle indexes */
+    vector<int> v;
+    for(auto i: _glist)
+	v.push_back(i.first);
+    std::random_shuffle(v.begin(), v.end());
     
-    std::map<int, message>::iterator it = _glist.begin();
-    double max_fit =  std::get<1>(it->second);
-    int    best_g  =  it->first;
-    for ( ; it != _glist.end(); it++){
-	GenomeAdapted* g;
-	double f,s;
-	int b;
-	std::tie (g,f,s,b) = it->second;
+    /* get the best from the inspected */
+    double max_fit =  std::get<1>(_glist[v[0]]);
+    int    best_g  =  v[0];
+    int    j=1; /* index in v */
+    for (int i=1 ; i<inspected; i++){
+	double f  = std::get<1>(_glist[v[j]]);
 	if(f > max_fit){
 	    max_fit = f;
-	    best_g = it->first ;
+	    best_g = v[j] ;
 	}
-    }
-       
-    //std::cout << "best = " << best_g << std::endl; 
+	j++;
+    } 
+    
+    /* printGenomeList() ;
+    std::cout << "\t\tShuffled :[" << v[0];
+    for (int i=1 ; i<inspected ; i++)
+	std::cout << ", " << v[i];
+    std::cout << "] "  
+    << "selected = " << best_g << std::endl; */
 
     return best_g;
 }
+
 
 // ################ ######################## ################
 // ################ OUTPUT (FILES / SCREEN) METHODS #########

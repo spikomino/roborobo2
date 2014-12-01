@@ -28,7 +28,10 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
     gProperties.checkAndGetPropertyValue("gFitnessFunction",
 					 &neatestSharedData::gFitnessFunction,
 					 true);
-
+    
+    gProperties.checkAndGetPropertyValue("gSelectionPressure",
+					 &neatestSharedData::gSelectionPressure,
+					 true);
 
     gProperties.checkAndGetPropertyValue("gNeatParameters",
 					 &neatestSharedData::gNeatParameters,
@@ -106,7 +109,7 @@ void neatestWorldObserver::updateMonitoring(){
         std::string s = std::string("") + 
 	    "{" + std::to_string(gWorld->getIterations()) + 
 	    "}[all] [pop_alive:" + std::to_string(activeCount) + 
-	    " [fit:" + std::to_string(fitness) + "]\n";
+	    "] [fit:" + std::to_string(fitness) + "]\n";
         gLogManager->write(s);
 	gLogManager->flush();
     }
