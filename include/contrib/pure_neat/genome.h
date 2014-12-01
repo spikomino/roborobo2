@@ -136,8 +136,7 @@ namespace PURENEAT
     extern double     mutate_toggle_enable_prob;
     extern double     mutate_gene_reenable_prob;
     extern double     mutate_add_node_prob;
-    extern double     mutate_add_link_prob;
-    extern double     mate_multipoint_prob;     
+    extern double     mutate_add_link_prob; 
     extern double     mate_only_prob; // Prob. of mating without mutation 
     extern double     recur_only_prob;  // Probability of forcing selection of ONLY links that are naturally recurrent 
     extern int        newstructure_tries;  // Number of tries mutate_add_link or mutate_add_node will attempt to find an open link

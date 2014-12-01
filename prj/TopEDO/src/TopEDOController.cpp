@@ -348,7 +348,7 @@ TopEDOController::broadcastGenome ()
 
         /* some screen output */
         if (gVerbose){
-           /* std::cout << "@"  << _iteration << " R" << _wm->getId() << " -> " ;
+            /* std::cout << "@"  << _iteration << " R" << _wm->getId() << " -> " ;
             for (const auto& c : neighbors)
                 std::cout << c->_wm->getId() << " ";
             std::cout << std::endl;*/
@@ -427,9 +427,25 @@ TopEDOController::stepEvolution ()
                                      (gWorld->getIterations () /
                                       TopEDOSharedData::gEvaluationTime));
     if(TopEDOSharedData::gControllerType == 0)
-    {
-        _genome = _genome -> mutate (_sigma,
-                                     _wm->getId (), newId, _nodeId, _innovNumber);
+    {       //Mutate
+        if(randfloat() < mutate_only_prob)
+        {
+            _genome = _genome -> mutate (_sigma,_wm->getId (), newId, _nodeId, _innovNumber);
+        }
+        else //Mate
+        {
+            int selected2 = selectRankBased();
+
+            Genome* parent2 = std::get<0>(_gList[selected2]);
+            float fitness2 = std::get<1>(_gList[selected2]);
+
+            _genome = _genome->mate_multipoint(parent2,newId, _fitness,fitness2);
+            //Mutate after mate
+            if(randfloat() > mate_only_prob)
+            {
+                _genome = _genome -> mutate (_sigma,_wm->getId (), newId, _nodeId, _innovNumber);
+            }
+        }
         createNN ();
     }
     else if(TopEDOSharedData::gControllerType == 1)
@@ -460,7 +476,7 @@ void TopEDOController::logGenome()
     filename = TopEDOSharedData::gGenomeLogFolder;
     filename += std::to_string(_genome -> genome_id);
 
-    // _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
+    _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
 
 
 }

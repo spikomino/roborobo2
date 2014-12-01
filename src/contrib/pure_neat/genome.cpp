@@ -1344,7 +1344,6 @@ double     mutate_toggle_enable_prob = 0;
 double     mutate_gene_reenable_prob = 0;
 double     mutate_add_node_prob = 0;
 double     mutate_add_link_prob = 0;
-double     mate_multipoint_prob = 0;     
 double     mate_only_prob = 0; // Prob. of mating without mutation 
 double     recur_only_prob = 0;  // Probability of forcing selection of ONLY links that are naturally recurrent 
 int        newstructure_tries = 0;  // Number of tries mutate_add_link will attempt to find an open link
