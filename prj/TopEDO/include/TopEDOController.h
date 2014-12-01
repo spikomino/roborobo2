@@ -41,10 +41,11 @@ private:
     bool _isFixedTopo;
 
     void stepBehaviour ();
-    std::pair<std::vector<double>,std::vector<double>> act();
+    void act();
 
-    void updateFitness (std::vector < double >in, std::vector < double >out);
+    void updateFitness ();
     void updateFitnessForaging();
+    void updateFitnessNavigation();
     void broadcastGenome ();
 
     void storeMessage(int id, message msg);
@@ -95,6 +96,8 @@ private:
     float _fitness;
     int _items;
     float _sigma;
+    /* Floreano's navigation fitness related attributes */
+    double _transV, _rotV, _md; /* tran rot velocities and min dist */
 
     //NOTE: NEAT-like innovation number and number of nodes FOR THIS ROBOT
     int _innovNumber;

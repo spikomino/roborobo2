@@ -137,9 +137,7 @@ TopEDOController::step ()
     {
         save_genome();
         printAll();
-
         stepEvolution ();
-
         reset();
     }
 }
@@ -153,15 +151,89 @@ TopEDOController::step ()
 void
 TopEDOController::stepBehaviour ()
 {
-    std::pair<std::vector<double>,std::vector<double>> io ;
+    act();
+    updateFitness ();
+    // broadcasting genome : robot broadcasts its genome
+    //to all neighbors (contact-based wrt proximity sensors)
+    broadcastGenome();
+}
+
+void TopEDOController::act()
+{
+    // ---- Build inputs ----
+
+    std::vector < double >inputs(_nbInputs);
+    int inputToUse = 0;
+
+
+    // distance sensors
+    for (int i = 0; i < _wm->_cameraSensorsNb; i++)
+    {
+        inputs[inputToUse] =
+                _wm->getDistanceValueFromCameraSensor (i) /
+                _wm->getCameraSensorMaximumDistanceValue (i);
+        inputToUse++;
+
+        if (gExtendedSensoryInputs && (TopEDOSharedData::gFitness == 0))
+        {
+            int objectId = _wm->getObjectIdFromCameraSensor (i);
+
+            // input: physical object? which type?
+            if (PhysicalObject::isInstanceOf (objectId))
+            {
+                //Switch is type 3
+                if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
+                     ->getType ()) == 3)
+                {
+                    inputs[inputToUse] = 	_wm->getDistanceValueFromCameraSensor (i) /
+                            _wm->getCameraSensorMaximumDistanceValue (i);//Match
+                }
+                else
+                    inputs[inputToUse] = 1.0;
+                inputToUse++;
+            }
+            else //Not physical object
+            {
+                inputs[inputToUse] = 1.0;
+                inputToUse++;
+            }
+
+        }
+    }
+
+    /* get the most activated obstacle sensor for floreano fitness*/
+    _md =10.0;
+    for(int i = 0; i < _wm->_cameraSensorsNb; i++)
+        if(_md > inputs[i] &&
+                gExtendedSensoryInputs && inputs[i+_wm->_cameraSensorsNb] < 1.0)
+            _md = inputs[i];
+
+    //Bias
+    inputs[inputToUse++] = 1.0;
+
+    // ---- compute and read out ----
+    nn->load_sensors (&(inputs[0]));
+
+    if (!(nn->activate ()))
+    {
+        std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
+        exit (-1);
+    }
+    // Read the output
     std::vector<double> outputs;
-    std::vector < double >inputs;
+    std::vector<NNode*>::iterator out_iter;
+    for (out_iter  = nn->outputs.begin();
+         out_iter != nn->outputs.end();
+         out_iter++)
+        outputs.push_back((*out_iter)->activation);
 
-    io = act();
-    outputs= io.second;
-    inputs= io.first;
+    /* store translational and rotational velocities for floreano fitness */
+    _transV = 2 * (outputs[0] - 0.5);
+    _rotV = 2 * (outputs[1] - 0.5);
 
-    _wm->_desiredTranslationalValue = outputs[0];
+    //Set the outputs to the right effectors, and rescale the intervals
+    //Translational velocity in [-1,+1]. Robots can move backwards. Neat uses sigmoid [0,+1]
+    _wm->_desiredTranslationalValue = 2 * (outputs[0] - 0.5);
     //Rotational velocity in [-1,+1]. Neat uses sigmoid [0,+1]
     _wm->_desiredRotationalVelocity = 2 * (outputs[1] - 0.5);
 
@@ -171,114 +243,18 @@ TopEDOController::stepBehaviour ()
     _wm->_desiredRotationalVelocity =
             _wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
 
-    updateFitness (inputs, outputs);
-
-    // broadcasting genome : robot broadcasts its genome
-    //to all neighbors (contact-based wrt proximity sensors)
-    broadcastGenome();
-}
-
-std::pair<std::vector<double>,std::vector<double>> TopEDOController::act()
-{
-                                                   // ---- Build inputs ----
-
-                                                   std::vector < double >inputs(_nbInputs);
-                                                   int inputToUse = 0;
-
-
-                                                   // distance sensors
-                                                   for (int i = 0; i < _wm->_cameraSensorsNb; i++)
-{
-    inputs[inputToUse] =
-            _wm->getDistanceValueFromCameraSensor (i) /
-            _wm->getCameraSensorMaximumDistanceValue (i);
-    inputToUse++;
-
-    if (gExtendedSensoryInputs && (TopEDOSharedData::gFitness == 0))
-    {
-        int objectId = _wm->getObjectIdFromCameraSensor (i);
-
-        // input: physical object? which type?
-        if (PhysicalObject::isInstanceOf (objectId))
-        {
-            //Switch is type 3
-            if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
-                 ->getType ()) == 3)
-            {
-                inputs[inputToUse] = 	_wm->getDistanceValueFromCameraSensor (i) /
-                        _wm->getCameraSensorMaximumDistanceValue (i);//Match
-            }
-            else
-                inputs[inputToUse] = 1.0;
-            inputToUse++;
-        }
-        else //Not physical object
-        {
-            inputs[inputToUse] = 1.0;
-            inputToUse++;
-        }
-
-    }
-}
-//Bias
-inputs[inputToUse++] = 1.0;
-
-// ---- compute and read out ----
-nn->load_sensors (&(inputs[0]));
-
-if (!(nn->activate ()))
-{
-    std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
-    exit (-1);
-}
-
-std::vector < double >outputs;
-for (std::vector < NNode * >::iterator out_iter = nn->outputs.begin ();
-out_iter != nn->outputs.end (); out_iter++)
-{
-    outputs.push_back ((*out_iter)->activation);
-}
-return std::make_pair(inputs,outputs);
 }
 
 void
-TopEDOController::updateFitness (std::vector < double >in,
-                                 std::vector < double >out)
+TopEDOController::updateFitness ()
 {
-    float deltaFit = 0.0;
-    double vT,vR,minSensor;
-    float newFitness;
-
     switch(TopEDOSharedData::gFitness)
     {
     case 0:
         updateFitnessForaging();
         break;
     case 1:
-        //[Floreano2000] locomotion fitness function
-        //abs(Translational speed) * (1 - abs(Rotational Speed)) * minimal(distance to obstacle)
-
-        //Neat uses sigmoid[0,1] activation function
-        vT = 2 * (out[0] - 0.5);
-        vR =  2 * (out[1] - 0.5);
-
-        minSensor = in[_wm->_cameraSensorsNb - 1];
-
-        for (int i = 0; i < _wm->_cameraSensorsNb; i++)
-        {
-            if(in[i] < minSensor)
-                minSensor = in[i];
-        }
-        newFitness= _fitness;
-        deltaFit += fabs(vT) * (1 - fabs(vR)) * minSensor;
-        if(deltaFit < 0.0)
-        {
-            std::cerr << "[ERROR] Negative fitness in navigation" << std::endl;
-            exit(-1);
-        }
-
-        newFitness += deltaFit;
-        _fitness= newFitness;
+        updateFitnessNavigation();
         break;
 
     default:
@@ -286,13 +262,14 @@ TopEDOController::updateFitness (std::vector < double >in,
         exit(-1);
     }
 }
-/*
+
 // update fitness for navigation
 void TopEDOController::updateFitnessNavigation(){
-    _fitness += (fabs(_lv) + fabs(_rv)) *
-    (1.0 -sqrt(fabs(_lv - _rv))) *
-    (1.0 - _md) ;
-}*/
+    //[Floreano2000] locomotion fitness function
+    //abs(Translational speed) * (1 - abs(Rotational Speed)) * minimal(distance to obstacle)
+    _fitness += (fabs(_transV)) *
+            (1.0 -sqrt(fabs(_rotV))) * _md;
+}
 // update fitness for foraging
 void TopEDOController::updateFitnessForaging(){
     _fitness = (double) _items / (double) get_lifetime();

@@ -1308,9 +1308,6 @@ bool load_neat_params(const char *filename, bool output)
     paramFile>>mutate_add_link_prob;
 
     paramFile>>curword;
-    paramFile>>mate_multipoint_prob;
-
-    paramFile>>curword;
     paramFile>>mate_only_prob;
 
     paramFile>>curword;
@@ -1327,8 +1324,7 @@ bool load_neat_params(const char *filename, bool output)
         printf("mutate_toggle_enable_prob=%f\n",mutate_toggle_enable_prob);
         printf("mutate_gene_reenable_prob=%f\n",mutate_gene_reenable_prob);
         printf("mutate_add_node_prob=%f\n",mutate_add_node_prob);
-        printf("mutate_add_link_prob=%f\n",mutate_add_link_prob);
-        printf("mate_multipoint_prob=%f\n",mate_multipoint_prob);
+        printf("mutate_add_link_prob=%f\n",mutate_add_link_prob);        
         printf("mate_only_prob=%f\n",mate_only_prob);
         printf("recur_only_prob=%f\n",recur_only_prob);
         printf("newstructure_tries=%d\n",newstructure_tries);
