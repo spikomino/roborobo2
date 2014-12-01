@@ -119,12 +119,12 @@ def graph_from_graph(G, fname):
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
-    if d[7] != '][Genome:' :
+    if d[10] != '][Genome:' :
         return (None, None, None, None)
-    rob     = int( d[8].split('=')[1]) 
-    idtrace = int( d[9].split('=')[1]) 
-    mom     = int( d[10].split('=')[1])
-    dad     = int(d[11].split('=')[1])
+    rob     = int(d[11].split('=')[1]) 
+    idtrace = int(d[12].split('=')[1]) 
+    mom     = int(d[13].split('=')[1])
+    dad     = int(d[14].split('=')[1])
     
     return (rob, idtrace, mom, dad)
 
