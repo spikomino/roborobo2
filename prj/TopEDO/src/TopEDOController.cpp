@@ -105,7 +105,7 @@ TopEDOController::initRobot ()
                   << "out=" << _nbOutputs
                   << std::endl;
     }
-
+    save_genome();
 }
 
 
@@ -205,7 +205,7 @@ void TopEDOController::act()
     _md =10.0;
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
         if(_md > inputs[i] &&
-                gExtendedSensoryInputs && inputs[i+_wm->_cameraSensorsNb] < 1.0)
+                gExtendedSensoryInputs)//TOFIX (if the activation does not correspond to an item) && inputs[i+_wm->_cameraSensorsNb] < 1.0)
             _md = inputs[i];
 
     //Bias
@@ -393,8 +393,7 @@ TopEDOController::stepEvolution ()
         exit(-1);
     }
 
-
-    _genome = std::get<0>(_gList[selected]);
+   _genome  = new Genome(*(std::get<0>(_gList[selected])));
 
     _fitness = std::get<1>(_gList[selected]);
 
@@ -413,7 +412,7 @@ TopEDOController::stepEvolution ()
         {
             int selected2 = selectRankBased();
 
-            Genome* parent2 = std::get<0>(_gList[selected2]);
+            Genome* parent2 = new Genome(*(std::get<0>(_gList[selected2])));
             float fitness2 = std::get<1>(_gList[selected2]);
 
             _genome = _genome->mate_multipoint(parent2,newId, _fitness,fitness2);
@@ -453,7 +452,7 @@ void TopEDOController::logGenome()
     filename = TopEDOSharedData::gGenomeLogFolder;
     filename += std::to_string(_genome -> genome_id);
 
-    _genome -> print_to_filename(const_cast<char*>(filename.c_str()));
+    //_genome -> print_to_filename(const_cast<char*>(filename.c_str()));
 
 
 }

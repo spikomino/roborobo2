@@ -19,6 +19,41 @@ Genome::Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g)
     mom_id = -1;
     dad_id = -1;
 }
+Genome& Genome::operator=(const Genome& genome)
+{
+    genome_id = genome.genome_id;
+
+    std::vector<NNode*>::const_iterator curnode;
+    std::vector<Gene*>::const_iterator curgene;
+
+    //Duplicate NNodes
+    for(curnode=genome.nodes.begin();curnode!=genome.nodes.end();++curnode)
+    {
+        NNode* newnode=new NNode(*curnode);
+        (*curnode)->dup=newnode;
+        //Remember this node's old copy
+        nodes.push_back(newnode);
+    }
+
+    NNode *inode; //For forming a gene
+    NNode *onode; //For forming a gene
+
+    //Duplicate Genes
+    for(curgene=genome.genes.begin(); curgene!=genome.genes.end(); ++curgene)
+    {
+        //First find the nodes connected by the gene's link
+
+        inode=(((*curgene)->lnk)->in_node)->dup;
+        onode=(((*curgene)->lnk)->out_node)->dup;
+
+        Gene* newgene=new Gene(*curgene,inode,onode);
+        genes.push_back(newgene);
+
+    }
+    mom_id = genome.mom_id;
+    dad_id = genome.dad_id;
+    return *this;
+}
 
 Genome::Genome(const Genome& genome)
 {

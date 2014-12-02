@@ -46,7 +46,7 @@ namespace PURENEAT
     
     // Copy constructor
     Genome(const Genome& genome);
-
+    Genome& operator=(const Genome& genome);
     //Special constructor which spawns off an input file
     //This constructor assumes that some routine has already read in GENOMESTART
     Genome(int id, std::ifstream &iFile);
