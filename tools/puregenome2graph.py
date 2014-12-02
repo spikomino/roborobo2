@@ -168,8 +168,7 @@ def trac_genome(gl, id, G, col):
                 G.node[tr]['color'] = col[i%len(col)]
                 G.add_edge(id, tr)                
                 trac_genome(gl, tr, G, col)
-                #G.add_edge(d,tr,color='red')
-
+               
 
 # Crete a phylogenetic tree 
 # in  : log file in the correct format see above
