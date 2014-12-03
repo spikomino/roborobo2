@@ -13,7 +13,7 @@ src_path=os.path.join(config_dir, template_file)
 nb_exec = 30
 
 parameters={
-    'gSelectionPressure': 0.0,
+    'gSelectionPressure': 1.0,
     'gInitialNumberOfRobots': 300,
     'gNbOfPhysicalObjects': 0,
     'gSigmaRef': 0.3,
