@@ -216,7 +216,7 @@ void TopEDOController::act()
 
     if (!(nn->activate ()))
     {
-        std::cerr << "[ERROR] Activation of ANN not correct" << std::endl;
+        std::cerr << "[ERROR] Activation of ANN not correct: genome " << _genome->genome_id << std::endl;
         exit (-1);
     }
     // Read the output
@@ -443,7 +443,7 @@ void TopEDOController::logGenome()
                                  dynamic_cast <TopEDOWorldObserver *>
                                  (gWorld->getWorldObserver ())->getGenerationCount() +1
                               << " " << _wm->getId () << " " <<
-                                 _fitness << " " << _gList.size() << " " << _genome->genome_id << " " << _genome->mom_id << std::endl;
+                                 _fitness << " " << _gList.size() << " " << _genome->genome_id << std::endl;
 
 
 

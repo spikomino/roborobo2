@@ -496,10 +496,15 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, i
     Genome *new_genome;	//For holding baby's genes
 
     new_genome = this -> duplicate ();
-
-    new_genome->genome_id = idNewGenome;
-    new_genome->mom_id = this->genome_id;
-    new_genome->dad_id = -1;
+    //If the genome's ID is the same as the idNewGenome
+    //this mutation takes place just after a crossover
+    //so there is no need to change the ID's
+    if(this->genome_id != idNewGenome)
+    {
+        new_genome->genome_id = idNewGenome;
+        new_genome->mom_id = this->genome_id;
+        new_genome->dad_id = -1;
+    }
 
     //Choose the mutation depending on probabilities
     if (randfloat () < mutate_add_node_prob)
