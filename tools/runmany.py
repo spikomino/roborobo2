@@ -34,7 +34,7 @@ with open(dst_path, 'a') as file:
 
 # run many instances 
 for r in xrange(1,nb_exec+1):
-    print 'roborobo -l config/foo.properties -s > '+log_dir+'/%03d.log'%(r)
+    print 'roborobo -l config/foo.properties  > '+log_dir+'/%03d.log'%(r)
     
 
         
