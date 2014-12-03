@@ -15,10 +15,10 @@ nb_exec = 30
 parameters={
     'gSelectionPressure': 0.0,
     'gInitialNumberOfRobots': 300,
-    'gNbOfPhysicalObjects': 300,
+    'gNbOfPhysicalObjects': 0,
     'gSigmaRef': 0.3,
     'gFitnessFunction': 0,  # 0: locomotion, 1: collection, 2: forraging 
-    'gControllerType': 1, # 0 = NEAT, 1 = FFNN
+    'gControllerType': 1,   # 0 = NEAT, 1 = FFNN
     'gEvaluationTime': 200,
     'gMaxIt': 20000 }
 

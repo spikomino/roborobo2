@@ -26,11 +26,11 @@ typedef tuple<GenomeAdapted*, double, double, int> message;
 class neatestController:public Controller {
 
 private:
-    int                     _iteration;
-    int                     _birthdate; // iteration at which we are created 
+    int            _iteration;
+    int            _birthdate; // iteration at which we are created 
 
-    double                  _fitness;
-    double                  _reported_fitness; // to report to World observer
+    double         _fitness;
+    double         _reported_fitness; // to report to World observer
 
     int            _items_collected; // items collected 
     int            _items_forraged;  // items brought back to the nest
@@ -40,11 +40,11 @@ private:
     double                  _sigma;
     GenomeAdapted*          _genome;
     Network*                _neurocontroller;
+    
     unsigned int            _nbInputs;
     unsigned int            _nbOutputs;
     
-    std::map<int, message>  _glist;
-
+    std::map<int, message>  _glist; // genome list (local population)
    
    
     /* behavior */ 

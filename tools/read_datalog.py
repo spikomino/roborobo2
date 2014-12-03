@@ -20,9 +20,11 @@ def process_file(fname):
 
 def draw_raw_data(data): 
     for d in D:
+        print len(d)
         pylab.plot(d, linewidth=1, linestyle="-", label='', color='0.5')
 
-    box = map(list, zip(*D)) 
+    box = map(list, zip(*D))
+    
     pylab.plot(pylab.mean(box, axis=1), color='black', lw=2, label='Mean')
     pylab.plot(pylab.median(box, axis=1), color='r', lw=2, label='Median')
 

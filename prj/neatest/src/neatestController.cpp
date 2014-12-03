@@ -31,8 +31,6 @@ bool lifeTimeOver(){
 	>= neatestSharedData::gEvaluationTime - 1;
 }
 
-
-
 neatestController::neatestController(RobotWorldModel * wm){
   _wm              = wm;
   _iteration       = 0;
@@ -60,16 +58,22 @@ neatestController::~neatestController (){
 }
 
 void neatestController::initRobot (){
-    // setup the number of input and outputs 
+    // setup the number of input and outputs
+    // Locomotion
     _nbInputs = 1;		                   // bias 
-    if (gExtendedSensoryInputs)
-	_nbInputs += (1) * _wm->_cameraSensorsNb;  // object sensor
     _nbInputs += _wm->_cameraSensorsNb;	           // proximity sensors
-    _nbInputs ++;                                  // basket capacity sensor
-    _nbInputs ++;                                  // ground sensor
 
+    if(neatestSharedData::gFitnessFunction > 0)    // Collection 
+	_nbInputs += (1) * _wm->_cameraSensorsNb;  // object sensor
+
+    if(neatestSharedData::gFitnessFunction > 1){   // Foraging
+	_nbInputs ++;                              // basket capacity sensor
+	_nbInputs ++;                              // ground sensor
+    }
+        
     _nbOutputs = 2;                                // motor output
-    _nbOutputs ++ ;                                // drop  items effector 
+    if (neatestSharedData::gFitnessFunction > 1 )
+	_nbOutputs ++ ;                            // drop  items effector 
 
     // Start with Simple Perceptron Inputs, outputs, 0 hidden neurons. 
     _genome = new GenomeAdapted (_nbInputs, _nbOutputs, 0, 0);
@@ -83,8 +87,7 @@ void neatestController::initRobot (){
     createNeuroController();
     _genome->setInnovNumber( (double) _neurocontroller->linkcount ());
     _genome->setNodeId(1 + _nbInputs + _nbOutputs);    
- 
-        
+         
     // clear the genome list 
     emptyGenomeList();
 
@@ -172,6 +175,9 @@ void neatestController::stepBehaviour(){
     /* floreano fitness related atribute */
     double lv, rv, md; /* tran rot velocities and min dist */
 
+    /* foraging */
+    bool at_nest = false;
+    int droped = 0;
 
     // (1)  Read inputs 
  
@@ -180,12 +186,20 @@ void neatestController::stepBehaviour(){
 	inputs[inputToUse++] = 1 - (
 	    _wm->getDistanceValueFromCameraSensor (i) /
 	    _wm->getCameraSensorMaximumDistanceValue (i));
-
-    /* read object sensors */
-    if(gExtendedSensoryInputs)
+    
+    /* get the most activated obstacle sensor for floreano fitness*/
+    md = inputs[0];
+    for(int i = 1; i < _wm->_cameraSensorsNb; i++)
+	if(md < inputs[i])
+	    md = inputs[i];
+    
+    /* Collecting / Foraging */
+    if(neatestSharedData::gFitnessFunction > 0)
+	
+	/* read object sensors */
 	for(int i = 0; i < _wm->_cameraSensorsNb; i++){
 	    int objectId = _wm->getObjectIdFromCameraSensor(i);
-
+	    
 	    /* if physical object, and of correct type */
 	    if(PhysicalObject::isInstanceOf(objectId)){
 		if(is_energy_item(objectId))
@@ -198,26 +212,24 @@ void neatestController::stepBehaviour(){
 	    else
 		inputs[inputToUse++] = 0.0;
 	}
-     
-    /* get the most activated obstacle sensor for floreano fitness*/
-    md =-10.0;
-    for(int i = 0; i < _wm->_cameraSensorsNb; i++)
-	if(md < inputs[i] && 
-	   gExtendedSensoryInputs && inputs[i+_wm->_cameraSensorsNb] < 1.0)
-	    md = inputs[i];
+
+    /* Forraging */
+    if (neatestSharedData::gFitnessFunction > 1){
     
-    /* Basket capacity sensor */
-    double activation = (double) _items_collected / (double) _items_max; 
-    inputs[inputToUse++] = activation;
+	/* read basket capacity */
+	double activation = (double) _items_collected / (double) _items_max; 
+	inputs[inputToUse++] = activation;
 
-    /* ground sensor */
-    const int max_activation = 255*256*256 + 255*256 + 255; 
-    double ground = _wm->getGroundSensorValue() / (double) max_activation;
-    inputs[inputToUse++] = ground;
-    /* are we on a green nest ? */
-    const int nest_color = 255*256; 
-    bool at_nest= _wm->getGroundSensorValue() == nest_color; 
-
+	/* ground sensor */
+	const int max_activation = 255*256*256 + 255*256 + 255; 
+	double ground = _wm->getGroundSensorValue() / (double) max_activation;
+	inputs[inputToUse++] = ground;
+	
+	/* are we on a green nest ? */
+	const int nest_color = 255*256; 
+	at_nest = _wm->getGroundSensorValue() == nest_color; 
+    }
+	
     /* bias node : neat put biases after sensors */
     inputs[inputToUse++] = 1.0; 
     
@@ -260,10 +272,12 @@ void neatestController::stepBehaviour(){
     _wm->_desiredRotationalVelocity =
     	_wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
    
-    /* drop items */ 
-    int droped = (int) (outputs[D] * _items_collected);
-    dropItem(droped);
-       
+    /* Foraging : drop items */ 
+    if (neatestSharedData::gFitnessFunction > 1 ){
+	droped = (int) (outputs[D] * _items_collected);
+	dropItem(droped);
+    }
+    
     /* (5) update the fitness function */
     switch(neatestSharedData::gFitnessFunction) {
 
@@ -280,8 +294,8 @@ void neatestController::stepBehaviour(){
     case 2: /* Forraging */ 
 	if(at_nest)
 	    _items_forraged += droped;
-	else
-	    _items_forraged -= droped;
+	/*else  
+	  _items_forraged -= droped;*/
 	    
 	_fitness = (double) _items_forraged / (double) get_lifetime(); 
 	break;
@@ -292,7 +306,7 @@ void neatestController::stepBehaviour(){
    
 
     // print things
-    if(gVerbose){
+    /*if(gVerbose){
 	std::cout << "[Controller] "
 		  << "\t[Robot #" + to_string(_wm->getId()) + "]\n"
 		  << "\t\t[lv="   << lv 
@@ -316,7 +330,7 @@ void neatestController::stepBehaviour(){
 
 	
 
-    }
+		  }*/
 
     
 
@@ -373,12 +387,13 @@ void neatestController::broadcast() {
 	    c->storeMessage (getId(), msg);
 	
 	/* some screen output */
-	if (gVerbose){
+	/*if (gVerbose){
 	    std::cout << "@"  << _iteration << " R" << getId() << " -> " ;
 	    for (const auto& c : neighbors)
 		std::cout << c->getId() << " ";
 	    std::cout << std::endl;
-	}
+	    }*/
+	
 	/* delete neighbors list */
 	neighbors.clear();
     }
