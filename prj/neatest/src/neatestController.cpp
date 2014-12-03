@@ -99,7 +99,7 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
 	print_genome(_genome);
-	save_genome();
+	//save_genome();
     }
 }
 
@@ -132,7 +132,7 @@ void neatestController::step(){
       stepEvolution (); // select, mutate, replace
       
       if (gVerbose){
-	  save_genome();
+	  //save_genome();
 	  printAll();
       }
       reset();          // reset fitness and neurocontroller
