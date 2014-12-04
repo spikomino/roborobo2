@@ -20,7 +20,6 @@ def process_file(fname):
 
 def draw_raw_data(data): 
     for d in D:
-        print len(d)
         pylab.plot(d, linewidth=1, linestyle="-", label='', color='0.5')
 
     box = map(list, zip(*D))
