@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 
 import networkx as nx
-import os
+import os, progressbar
 from subprocess import Popen, PIPE
 
 # process trait of genes (not implemented)
@@ -184,7 +184,9 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
     gl = process_file(fname)
 
     # create the phylo-tree
-    for n in gl.keys():
+    prog = progressbar.ProgressBar()
+    
+    for n in prog(gl.keys()):
         G.add_node(n) # the root node (the initial gene)
         G.node[n]['agent'] = n
         G.node[n]['id']    = n

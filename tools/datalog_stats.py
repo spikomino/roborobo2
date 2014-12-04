@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 
-import os, re, sys, pylab
+import os, re, sys, pylab, progressbar 
 from os import listdir
 from os.path import isfile, join
 
@@ -126,7 +126,6 @@ def draw_data(exp, runs=False, tex=False):
     ax11.legend(loc='lower right')
     ax11.set_xlabel('Generations')
     ax11.set_ylabel('Fitness')  
-
     
     ax2 = pylab.subplot2grid((2,3), (0,1))
     stats=[]
