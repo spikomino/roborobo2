@@ -2,13 +2,18 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 
-import os, re, sys
+import os, re, sys, pylab
 from os import listdir
 from os.path import isfile, join
 from datalog_stats import *
 
 # draw a figure
-def draw_data(exp): 
+def draw_data(exp, tex=False): 
+    font = {'family' : 'serif', 'size'   : 8}
+    if tex :
+        pylab.matplotlib.rc('text', usetex=True)
+    pylab.matplotlib.rc('font', **font)
+
     pylab.ion()
     fig = pylab.figure(num=None, figsize=(10, 5), dpi=100)
     pylab.clf()
@@ -16,58 +21,60 @@ def draw_data(exp):
 
     ax1 = pylab.subplot2grid((2,3), (0,0), rowspan=2)
     for e in exp:
-        (p, data, stats) = e
+        (n, data, stats) = e
         box = map(list, zip(*data))
-        #pylab.plot(pylab.mean(box, axis=1), color='black', lw=1, label='Mean')
-        pylab.plot(pylab.median(box, axis=1), lw=1, label=p)
-
-
-    pylab.draw()
-    pylab.legend(loc='lower right')
-    pylab.xlabel('Iterations')
-    pylab.ylabel('Fitness')   
+        ax1.plot(pylab.median(box, axis=1), lw=1, label=re.sub('[_/]', '', n))
+    ax1.set_title('Median swarm fitness over time (%d runs)'%(len(data)))
+    ax1.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    ax1.legend(loc='lower right')
+    ax1.set_xlabel('Generations')
+    ax1.set_ylabel('Fitness')   
 
     ax2 = pylab.subplot2grid((2,3), (0,1))
     stats=[]
+    l=[]
     for e in exp:
-        (dir, d, s) = e 
+        (n, d, s) = e 
         stats.append(s['aasf']) 
-
-    pylab.boxplot(stats)
-    pylab.xlabel('Average accumulated swarm fitness')
-    pylab.ylabel('Fitness') 
+        l.append(re.sub('[_/]', '', n))
+    ax2.boxplot(stats)
+    ax2.set_title('Average accumulated swarm fitness')
+    ax2.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    ax2.set_xticklabels=l
 
     ax3 = pylab.subplot2grid((2,3), (0, 2))
     stats=[]
+    l=[]
     for e in exp:
-        (dir, d, s) = e
+        (n, d, s) = e
         stats.append(s['fbsf']) 
-
-    pylab.boxplot(stats)
-    pylab.xlabel('Fixed budget swarm fitness')
-    pylab.ylabel('Fitness') 
+        l.append(re.sub('[_/]', '', n))
+    ax3.boxplot(stats)
+    ax3.set_title('Fixed budget swarm fitness')
+    ax3.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
 
     ax4 = pylab.subplot2grid((2,3), (1, 1))
     stats=[]
+    l=[]
     for e in exp:
-        (dir, d, s) = e
+        (n, d, s) = e
         stats.append(s['trt']) 
-
-    pylab.boxplot(stats)
-    pylab.xlabel('Time to reach target')
-    pylab.ylabel('Generation') 
-
+        l.append(re.sub('[_/]', '', n))
+    ax4.boxplot(stats)
+    ax4.set_title('Time to reach target')
+    
     ax5 = pylab.subplot2grid((2,3), (1, 2))
     stats=[]
+    l=[]
     for e in exp:
-        (dir, d, s) = e
+        (n, d, s) = e
         stats.append(s['aat']) 
+        l.append(re.sub('[_/]', '', n))
+    ax5.boxplot(stats)
+    ax5.set_title('Accumulated fitness above target')
+    ax5.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
 
-    pylab.boxplot(stats)
-    pylab.xlabel('Accumulated fitness above target')
-    pylab.ylabel('Fitness') 
-
-
+    pylab.draw()
     pylab.show()
     print 'Press enter to exit'
     raw_input()
@@ -89,4 +96,4 @@ if __name__ == '__main__':
         D.append((d, data, stats))
     
     
-    draw_data(D)
+    draw_data(D, tex=False)

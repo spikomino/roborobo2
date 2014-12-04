@@ -17,6 +17,7 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
     gProperties.checkAndGetPropertyValue("gEvaluationTime",
 					 &neatestSharedData::gEvaluationTime,
 					 true);
+
     gProperties.checkAndGetPropertyValue("gControllerType",
 					 &neatestSharedData::gControllerType,
 					 true);
