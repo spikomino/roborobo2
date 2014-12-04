@@ -10,7 +10,7 @@ template_file = 'template.properties'
 nb_exec       = 30
 
 parameters={
-    'gSelectionPressure': 0.0,
+    'gSelectionPressure': 0.25,
     'gInitialNumberOfRobots': 300,
     'gNbOfPhysicalObjects': 0,
     'gSigmaRef': 0.3,
@@ -21,7 +21,7 @@ parameters={
 
 # copy the tenmplate file and update the values 
 src_path = os.path.join(config_dir, template_file)
-dst_path = os.path.join(config_dir, 'foo-0.properties') 
+dst_path = os.path.join(config_dir, 'foo-0.25.properties') 
 shutil.copy(src_path, dst_path)
 
 with open(dst_path, 'a') as file:
