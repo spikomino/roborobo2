@@ -2,9 +2,20 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 
-import os, re, sys
-import pylab 
+import os, re, sys, pylab
+from os import listdir
+from os.path import isfile, join
 
+# find datalog in a directory coresponfing to one experiment
+# in  : a directory path
+# out : a tuple of name and a list of file name (name, [datalog, ...])
+def list_datalogs(path):
+    logs = [ f for f in listdir(path) 
+             if isfile(join(path,f)) and f.startswith('datalog') ]
+
+    datalogs = map(lambda f: join(path,f), logs) 
+    return datalogs
+    
 
 # read a datalog and extract the [fit:##.###] component
 # in  : a file name 
@@ -73,5 +84,95 @@ def process_experiment(datalogs):
     return D,S
 
 
+# draw a figure
+def draw_data(exp, runs=False, tex=False): 
+    font = {'family' : 'serif', 'size'   : 8}
+    if tex :
+        pylab.matplotlib.rc('text', usetex=True)
+    pylab.matplotlib.rc('font', **font)
 
+    pylab.ion()
+    fig = pylab.figure(num=None, figsize=(10, 5), dpi=100)
+    pylab.clf()
 
+    # median
+    ax1 = pylab.subplot2grid((2,3), (0,0))
+    for e in exp:
+        (n, data, stats) = e
+        if runs :
+            for d in data:
+                ax1.plot(d, lw=.1, linestyle="-", label='', color='0.2')
+        
+        box = map(list, zip(*data))
+        ax1.plot(pylab.median(box, axis=1), lw=1, label=re.sub('[_/]', '', n))
+    ax1.set_title('Median swarm fitness over time (%d runs)'%(len(data)))
+    ax1.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    ax1.legend(loc='lower right')
+    ax1.set_xlabel('Generations')
+    ax1.set_ylabel('Fitness')   
+
+    # mean 
+    ax11 = pylab.subplot2grid((2,3), (1,0))
+    for e in exp:
+        (n, data, stats) = e
+        if runs :
+            for d in data:
+                ax11.plot(d, lw=.1, linestyle="-", label='', color='0.2')
+        
+        box = map(list, zip(*data))
+        ax11.plot(pylab.mean(box, axis=1), lw=1, label=re.sub('[_/]', '', n))
+    ax11.set_title('Average swarm fitness over time (%d runs)'%(len(data)))
+    ax11.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    ax11.legend(loc='lower right')
+    ax11.set_xlabel('Generations')
+    ax11.set_ylabel('Fitness')  
+
+    
+    ax2 = pylab.subplot2grid((2,3), (0,1))
+    stats=[]
+    l=[]
+    for e in exp:
+        (n, d, s) = e 
+        stats.append(s['aasf']) 
+        l.append(re.sub('[_/]', '', n))
+    ax2.boxplot(stats)
+    ax2.set_title('Average accumulated swarm fitness')
+    ax2.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    ax2.set_xticklabels=l
+
+    ax3 = pylab.subplot2grid((2,3), (0, 2))
+    stats=[]
+    l=[]
+    for e in exp:
+        (n, d, s) = e
+        stats.append(s['fbsf']) 
+        l.append(re.sub('[_/]', '', n))
+    ax3.boxplot(stats)
+    ax3.set_title('Fixed budget swarm fitness')
+    ax3.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+
+    ax4 = pylab.subplot2grid((2,3), (1, 1))
+    stats=[]
+    l=[]
+    for e in exp:
+        (n, d, s) = e
+        stats.append(s['trt']) 
+        l.append(re.sub('[_/]', '', n))
+    ax4.boxplot(stats)
+    ax4.set_title('Time to reach target')
+    
+    ax5 = pylab.subplot2grid((2,3), (1, 2))
+    stats=[]
+    l=[]
+    for e in exp:
+        (n, d, s) = e
+        stats.append(s['aat']) 
+        l.append(re.sub('[_/]', '', n))
+    ax5.boxplot(stats)
+    ax5.set_title('Accumulated fitness above target')
+    ax5.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+
+    pylab.draw()
+    pylab.show()
+    print 'Press enter to exit'
+    raw_input()
