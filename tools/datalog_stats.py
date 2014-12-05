@@ -16,6 +16,15 @@ def list_datalogs(path):
     datalogs = map(lambda f: join(path,f), logs) 
     return datalogs
     
+def list_logfiles(path):
+    files = [ f for f in listdir(path) 
+              if isfile(join(path,f)) and f.endswith('.log') ]
+
+    logs = map(lambda f: join(path,f), files) 
+    return logs
+
+
+
 
 # read a datalog and extract the [fit:##.###] component
 # in  : a file name 
@@ -69,6 +78,10 @@ def acc_above_target(data, trg_gen):
     return result
 
 
+
+        
+
+
 # process multiple datalogs
 def process_experiment(datalogs):
     D=[]
@@ -81,6 +94,8 @@ def process_experiment(datalogs):
     S['trt']  = time_reach_target(D)
     S['aat']  = acc_above_target(D, S['trt']) 
 
+
+    
     return D,S
 
 

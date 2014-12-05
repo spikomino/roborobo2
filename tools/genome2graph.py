@@ -199,18 +199,45 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
     
     return G
 
-# Reads the starting nodes
-def phylo_starting_nodes(fname):
-    result =[]
-    fh = open(fname, 'r')
-    for line in fh :
-        data = line.split()
-        if data != [] and data[0] == '[initRobot]' :
-            # read the id of the robot (which is genome id)
-            gid = int(data[1].split('=')[1]) 
-            result.append(gid)
-    fh.close()   
+# Compute survival rate
+# in  : a phylo genetic graph
+# out : a list of survival rates at each generation
+def compute_survival_rate(G):
+
+    # get the statring and ending nodes 
+    S = [n for n,d in G.in_degree().items() if d==0]
+    E = [n for n,d in G.out_degree().items() if d==0]
+    S.sort()
+    E.sort()
+
+    # get the longest paths length from the sources 
+    LP = {}
+    for s in S:
+        longest=-1;
+        for e in E:
+            if nx.has_path(G, s, e):
+                l = nx.shortest_path_length(G, s, e) + 1
+                if l >= longest :
+                    longest = l
+        LP[s] = l
+ 
+    # compute the survival rate
+    # start from the root nodes until down 
+    result = []
+    for lv in xrange(max(LP.values())) :
+        count = 0
+        for s in S:
+            if LP[s] > lv :
+                count += 1
+        result.append(float(count)/float(len(S)))
+
     return result
+
+    
+    
+
+
+
     
 ################################################################################
 # Animation related functions

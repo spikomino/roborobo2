@@ -13,6 +13,7 @@ if len(sys.argv) < 2 :
 
 # compute raw statistics
 datalogs = list_datalogs(sys.argv[1])
+
 D, S = process_experiment(datalogs)
 
 # plot all

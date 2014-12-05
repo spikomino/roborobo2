@@ -76,28 +76,9 @@ if __name__ == '__main__':
     # create the phylogenetic tree
     G = create_phylo_tree(options.infile)
     
-    # get the statring and ending nodes 
-    S = [n for n,d in G.in_degree().items() if d==0]
-    E = [n for n,d in G.out_degree().items() if d==0]
-    E.sort()
-
-    # get the longest paths length from the sources 
-    LP = {}
-    for s in S:
-        longest=-1;
-        for e in E:
-            if nx.has_path(G,s,e):
-                l = nx.shortest_path_length(G,s,e)
-                if l >= longest :
-                    longest = l
-        LP[s] = l
- 
-    # compute the survival rate
-    result = []
-    for lv in xrange(max(LP.values())) :
-        count = 0
-        for s in S:
-            if LP[s] > lv :
-                count += 1
-        result.append(float(count)/float(len(S)))
+    R = compute_survival_rate(G)
     
+    for r in R :
+        print r
+        
+        
