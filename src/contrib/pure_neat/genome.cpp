@@ -425,7 +425,7 @@ void Genome::print_to_file(std::ostream &outFile)
     }
 
 
-    outFile << "genomeend " << genome_id << std::endl << std::endl << std::endl;
+    outFile << "genomeend " << genome_id << std::endl;
 }
 
 void Genome::print_to_filename(char *filename) 

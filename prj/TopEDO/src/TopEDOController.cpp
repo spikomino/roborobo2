@@ -29,8 +29,6 @@ TopEDOController::TopEDOController (RobotWorldModel * wm)
 
     nn = NULL;
 
-    //load_neat_params ("prj/TopEDO/src/forag.ne", false);
-
     _sigma = TopEDOSharedData::gSigmaRef;
 
 
@@ -105,7 +103,8 @@ TopEDOController::initRobot ()
                   << "out=" << _nbOutputs
                   << std::endl;
     }
-    save_genome();
+    //TOUNCOMMENT : this has been commented to use irace to tune the parameters
+    //save_genome();
 }
 
 
@@ -135,9 +134,10 @@ TopEDOController::step ()
     
     if (lifeTimeOver())
     {
-        save_genome();
         printAll();
         stepEvolution ();
+        //TOUNCOMMENT : this has been commented to use irace to tune the parameters
+        //save_genome();
         reset();
     }
 }
@@ -217,6 +217,7 @@ void TopEDOController::act()
     if (!(nn->activate ()))
     {
         std::cerr << "[ERROR] Activation of ANN not correct: genome " << _genome->genome_id << std::endl;
+        save_genome();
         exit (-1);
     }
     // Read the output

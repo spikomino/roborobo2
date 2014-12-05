@@ -6,12 +6,6 @@ import networkx as nx
 import os
 from subprocess import Popen, PIPE
 
-# process trait of genes (not implemented)
-# in  : a graph object and the splited line from the genome file
-#       called exclusively by process_graph 
-def process_trait(g, d):
-    return 
-
 # add a node in the network
 # in  : a graph object and the splited line from the genome file
 #       called exclusively by process_graph 
@@ -20,7 +14,6 @@ def process_node(g, d):
     colors = ['yellow', 'gray', 'darkorchid', 'cyan']    
     n = int(d[1])
     g.add_node(n)
-    g.node[n]['trait'] = d[2] # ? 
     g.node[n]['type']  = d[3] # 0=>output, 1=>input
     g.node[n]['lbl']   = d[4] # 0=>hidden, 1=>input, 2=>output, 3=>bias
     g.node[n]['shape'] = shapes[ int(d[4]) ]
@@ -35,7 +28,6 @@ def process_gene(g, d):
     n1 = int(d[3])
     w  = float(d[4])
     g.add_edge(n0, n1, weight=w)
-    g.edge[n0][n1]['trait']    =d[1] # ?
     g.edge[n0][n1]['label']    = "{0: 2.3f}".format(float(d[4]))
     g.edge[n0][n1]['recurent'] =d[5] # 0/1 yes/no
     g.edge[n0][n1]['inov_num'] =d[6] # int
@@ -62,8 +54,6 @@ def process_graph(fname):
         if data[0] == 'genomestart' :
             gid = data[1]
             G.graph['name'] = os.path.splitext(fname)[0] # remove extention
-        elif data[0] == 'trait' :
-            process_trait(G,data)
         elif data[0] == 'node' : 
             process_node(G,data)
         elif data[0] == 'gene' :  

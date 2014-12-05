@@ -119,6 +119,9 @@ void TopEDOWorldObserver::updateMonitoring()
 
     if ( gWorld->getIterations() == gMaxIt-1 )
     {
+        //It may be possible to force fitness log on all robots
+        //before closing (for all robots printAll())
+
         TopEDOSharedData::gEvoLog.close();
     }
 }
