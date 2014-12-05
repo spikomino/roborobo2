@@ -186,7 +186,7 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
     # create the phylo-tree
     prog = progressbar.ProgressBar()
     
-    for n in prog(gl.keys()):
+    for n in gl.keys():
         G.add_node(n) # the root node (the initial gene)
         G.node[n]['agent'] = n
         G.node[n]['id']    = n
@@ -199,6 +199,19 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
     
     return G
 
+# Reads the starting nodes
+def phylo_starting_nodes(fname):
+    result =[]
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and data[0] == '[initRobot]' :
+            # read the id of the robot (which is genome id)
+            gid = int(data[1].split('=')[1]) 
+            result.append(gid)
+    fh.close()   
+    return result
+    
 ################################################################################
 # Animation related functions
 ################################################################################
