@@ -158,22 +158,39 @@ def trac_genome(gl, id, G, col):
                 G.node[tr]['color'] = col[i%len(col)]
                 G.add_edge(id, tr)                
                 trac_genome(gl, tr, G, col)
-               
+
+#Add second parent (dad) links to a phylogenetic tree
+#for crossover.
+def add_dad_links(Gr,glist):
+    #Add dad links
+    for n in Gr.nodes():
+        #omit initial genomes, who do not have dad nor mom
+        if (not(n in glist.keys()) and (Gr.node[n]['dad']!=-1)):
+           Gr.add_edge(Gr.node[n]['dad'],Gr.node[n]['id'],style='dashed')
+    return Gr
+
+def prune_tree(Gr,idLast,nbEpochs):
+    #Prune extinct branches (i.e. only keep genomes who 
+    #survive at the end and their predecessors)
+    for i in range(1,nbEpochs):
+        #Compute the leaves
+        leaves=[n for n,d in Gr.out_degree().items() if d==0]
+        for j in leaves:
+            #Only leaves in the last generation survive
+            if j < idLast:
+                Gr.remove_node(j)
+    return Gr
+
+
 #Computes an associated color w.r.t the parents' colors
 #def color(color1,color2)
 #TODO
 #    return newcolor
 
-#TODO
-#Prune extinct branches
-#def prune_extinct(g,id)
-#for  i in g.nodes()
-#if prune_extinct
-
 # Crete a phylogenetic tree 
 # in  : log file in the correct format see above
 # out : the graphe og the phylo tree (root nodes are the initial genes)
-def create_phylo_tree(fname, save=False, dotfile='philo.dot'): 
+def create_phylo_tree(fname, save=False, dotfile='philo.dot', xover=False, prune=False): 
     colors = ['chartreuse', 'chocolate', 'cadetblue', 'cornflowerblue', 'cyan',
               'darkorange', 'darkviolet', 'deeppink']
     #TODO check how to define hexadecimal colors for GraphViz
@@ -193,25 +210,13 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
         G.node[n]['color'] = colors[n%len(colors)]
         trac_genome(gl, n, G, colors)
     
-    #Add dad links
-    for n in G.nodes():
-        #omit initial genomes, who do not have dad nor mom
-        if (not(n in gl.keys()) and (G.node[n]['dad']!=-1)):
-           G.add_edge(G.node[n]['dad'],G.node[n]['id'],style='dashed')
+    if xover:
+        G=add_dad_links(G,gl)
     
-    id_last_epoch= max(G.nodes()) - len(gl.keys()) + 1
-    nb_epochs= len(G.nodes())/len(gl.keys())
-
-    #Prune extinct branches (i.e. only keep genomes who 
-    #survive at the end and their predecessors)
-    for i in range(1,nb_epochs):
-        #Compute the leaves
-        leaves=[n for n,d in G.out_degree().items() if d==0]
-        for j in leaves:
-            #Only leaves in the last generation survive
-            if j < id_last_epoch:
-                G.remove_node(j)
-
+    if prune:
+        id_last_epoch= max(G.nodes()) - len(gl.keys()) + 1
+        nb_epochs= len(G.nodes())/len(gl.keys())
+        G=prune_tree(G,id_last_epoch,nb_epochs)
 
     # write the file 
     if save :
