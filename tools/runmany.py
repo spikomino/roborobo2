@@ -56,7 +56,8 @@ for p in var_values :
             file.write(line)
         
     # prepare the survival rate script
-    logs = list_logfiles(log_dir+'/sp_'+p)
+    #logs = list_logfiles(log_dir+'/sp_'+p)
+    logs = map(lambda f: log_dir+'/sp_'+p+'/%03d.log'%(f), xrange(1,nb_exec+1) )
     with open(sr_extraction_list, 'a') as file:
         for  l in logs :
             line='python tools/'+sr_extraction_script+' -f '+l+' > '+l+'.sr\n' 
