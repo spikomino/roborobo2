@@ -12,10 +12,8 @@ if len(sys.argv) < 2 :
     exit(0)
 
 # compute raw statistics
-datalogs = list_datalogs(sys.argv[1])
-
-D, S = process_experiment(datalogs)
+D, S, R = process_experiment(sys.argv[1])
 
 # plot all
-draw_data([(sys.argv[1], D, S)], runs=True)
+draw_data([(sys.argv[1], D, S, R)], runs=True)
     
