@@ -18,7 +18,7 @@ var_parameter = 'gSelectionPressure'
 var_values = [ '0.00', '0.25', '0.50', '0.75', '1.00' ]
 
 parameters={
-    'gInitialNumberOfRobots': 300,
+    'gInitialNumberOfRobots': 600,
     'gNbOfPhysicalObjects': 0,
     'gSigmaRef': 0.3,
     'gFitnessFunction': 0,  # 0: locomotion, 1: collection, 2: forraging 
@@ -35,6 +35,7 @@ if os.path.isfile(global_script):
 if os.path.isfile(sr_extraction_list):
     os.remove(sr_extraction_list)
 
+count=1
 for p in var_values :
 
     # copy template prameter file 
@@ -65,11 +66,11 @@ for p in var_values :
 
     # append to the global run script
     with open(global_script, 'a') as file:
-        line = '/bin/cat '+ p +' | /usr/bin/parallel\n' + '/bin/mkdir '+ log_dir +'/sp_'+ p +'\n' + '/bin/mv '+ log_dir +'/*.log '+ log_dir +'/*.txt '+ log_dir +'/sp_'+ p +'\n' # + home+'/bin/sms -t \'Experiment '+p+' done\'\n'
+        line = '/bin/cat '+ p +' | /usr/bin/parallel\n' + '/bin/mkdir '+ log_dir +'/sp_'+ p +'\n' + '/bin/mv '+ log_dir +'/*.log '+ log_dir +'/*.txt '+ log_dir +'/sp_'+ p +'\n'
         file.write(line)
-        line = '/bin/cat '+sr_extraction_list+' | /usr/bin/parallel\n' 
+        line = '/bin/cat '+sr_extraction_list+' | /usr/bin/parallel\n' +home+'/bin/sms -t \'Experiment '+str(count)+'/'+str(len(var_values))+' done\'\n'
         file.write(line) 
-    
+    count +=1
 
 
 
