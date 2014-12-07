@@ -90,6 +90,9 @@ timeBack=0.08
 #Since this measure is to be minimized, we take 1/(avgAccumSwarmFit)
 cost=`R --slave --args logs/evolution.log $timeBack < tools/accumMeanEnd.r` #recover it with val=`... `
 
+rm logs/out.log
+rm logs/evolution.log
+
 #Acc. swarm fitness is a performance measure to be maximized
 #Since irace expects a cost measure to be minimized, -1 times the value is returned
 #TOCHECK it could be 1/value
