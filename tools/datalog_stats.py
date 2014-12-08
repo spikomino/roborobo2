@@ -23,7 +23,6 @@ def list_logfiles(path):
     logs = map(lambda f: join(path,f), files) 
     return logs
 
-    
 def list_srfiles(path):
     files = [ f for f in listdir(path) 
               if isfile(join(path,f)) and f.endswith('.log.sr') ]
@@ -41,9 +40,9 @@ def process_datalog(fname):
         data = line.split()
         for o in data :
             if o.startswith('fit', 1, 4):
-                n = re.sub('[:\[\]]', ' ', o)
-                n = float(n.split()[1])
-                d.append(n)
+                f = re.sub('[:\[\]]', ' ', o)
+                f = float(f.split()[1])
+                d.append(f)
     fh.close()
     return d
 
@@ -105,7 +104,6 @@ def process_experiment(path):
     for f in survival:
         R.append(process_srfile(f))
 
-        
     S = {} 
     S['aasf'] = ave_accu_sf(D)
     S['fbsf'] = fix_budg_sf(D)
@@ -116,12 +114,11 @@ def process_experiment(path):
 
 # draw a figure
 def draw_data(exp, runs=False, tex=False): 
-    font = {'family' : 'serif', 'size'   : 8}
+    font = {'family' : 'serif', 'size'   : 6}
     if tex :
         pylab.matplotlib.rc('text', usetex=True)
     pylab.matplotlib.rc('font', **font)
 
-    pylab.ion()
     fig = pylab.figure(num=None, figsize=(10, 5), dpi=100)
     pylab.clf()
 
@@ -153,7 +150,7 @@ def draw_data(exp, runs=False, tex=False):
         ax11.plot(pylab.median(box, axis=1), lw=1, label=re.sub('[_/]', '', n))
     ax11.set_title('Median number of genetic lines over time (%d runs)'%(len(data)))
     ax11.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
-    ax11.legend(loc='lower right')
+    ax11.legend(loc='upper right')
     ax11.set_xlabel('Generations')
     ax11.set_ylabel('Rate of survival')  
 
@@ -207,5 +204,3 @@ def draw_data(exp, runs=False, tex=False):
 
     pylab.draw()
     pylab.show()
-    print 'Press enter to exit'
-    raw_input()

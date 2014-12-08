@@ -41,15 +41,15 @@ for p in var_values :
     # copy template prameter file 
     dst_path = os.path.join(config_dir, 'foo-'+p+'.properties') 
     shutil.copy(src_path, dst_path)
-    # add experiments parameters
+
+    # add the experiments parameters
     with open(dst_path, 'a') as file:
         for k in parameters.keys() :
             line = k+' = '+str(parameters[k])+'\n'
             file.write(line)
         line = var_parameter+' = '+p+'\n'
         file.write(line)
-    
-        
+            
     # create single instances file (fed to parallel)
     with open(p, 'w') as file:
         for r in xrange(1,nb_exec+1):
@@ -66,11 +66,14 @@ for p in var_values :
 
     # append to the global run script
     with open(global_script, 'a') as file:
-        line = '/bin/cat '+ p +' | /usr/bin/parallel\n' + '/bin/mkdir '+ log_dir +'/sp_'+ p +'\n' + '/bin/mv '+ log_dir +'/*.log '+ log_dir +'/*.txt '+ log_dir +'/sp_'+ p +'\n'
+        line = '/bin/cat '+ p +' | /usr/bin/parallel\n' + '/bin/mkdir '+ log_dir +'/sp_'+ p +'\n' + '/bin/mv '+ log_dir +'/*.log '+ log_dir +'/*.txt '+ log_dir +'/sp_'+ p +'\n'+home+'/bin/sms -t \'Experiment '+str(count)+'/'+str(len(var_values))+' done\'\n'
         file.write(line)
-        line = '/bin/cat '+sr_extraction_list+' | /usr/bin/parallel\n' +home+'/bin/sms -t \'Experiment '+str(count)+'/'+str(len(var_values))+' done\'\n'
-        file.write(line) 
     count +=1
+
+# append the survival rate script to the run script        
+with open(global_script, 'a') as file:
+    line = '/bin/cat '+sr_extraction_list+' | /usr/bin/parallel\n' 
+    file.write(line) 
 
 
 
