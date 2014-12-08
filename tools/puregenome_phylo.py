@@ -48,7 +48,16 @@ def read_options(defaults):
                       default=defaults['pngfile']   ,  
                       help="the file to save the png file [default "
                       +str(defaults['pngfile'])+"]")
-    
+    parser.add_option("-x", "--xover", 
+                      dest="xover",
+                      action="store_true",                      
+                      default=defaults['xover'],  
+                      help="Flag for adding dad links to phylogenetic tree")
+    parser.add_option("-c", "--prune", 
+                      dest="prune",
+                      action="store_true",                      
+                      default=defaults['prune'],  
+                      help="Flag for pruning extinct branches in phylogenetic tree")
     return parser.parse_args()
 
 
@@ -62,11 +71,13 @@ if __name__ == '__main__':
     defaults_opts['infile']    = 'evolution.log'
     defaults_opts['dotfile']   = None
     defaults_opts['pngfile']   = None
+    defaults_opts['xover']     = False
+    defaults_opts['prune']     = False
     (options, args) = read_options(defaults_opts)
     
   
     # create the phylogenetic tree
-    g = create_phylo_tree(options.infile)
+    g = create_phylo_tree(options.infile,xover=options.xover,prune=options.prune)
     
     # dot ? png ? window ?
     if options.dotfile != None :
