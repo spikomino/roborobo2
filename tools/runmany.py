@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 
-import os, shutil
+import os, shutil, random
 from datalog_stats import *
 
 home = os.environ["HOME"]
@@ -18,13 +18,14 @@ var_parameter = 'gSelectionPressure'
 var_values = [ '0.00', '0.25', '0.50', '0.75', '1.00' ]
 
 parameters={
-    'gInitialNumberOfRobots': 600,
-    'gNbOfPhysicalObjects': 0,
+    'gInitialNumberOfRobots': 300,
+    'gNbOfPhysicalObjects': 300,
     'gSigmaRef': 0.3,
-    'gFitnessFunction': 0,  # 0: locomotion, 1: collection, 2: forraging 
+    'gFitnessFunction': 1,  # 0: locomotion, 1: collection, 2: forraging 
     'gControllerType': 1,   # 0 = NEAT, 1 = FFNN
     'gEvaluationTime': 200,
-    'gMaxIt'         : 20000 }
+    'gMaxIt'         : 20000, 
+    'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 
 src_path = os.path.join(config_dir, template_file)
@@ -53,7 +54,8 @@ for p in var_values :
     # create single instances file (fed to parallel)
     with open(p, 'w') as file:
         for r in xrange(1,nb_exec+1):
-            line = 'sleep 1 ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
+            rnd = random.random() * 5.0
+            line = 'sleep '+str(rnd)+' ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
             file.write(line)
         
     # prepare the survival rate script
@@ -66,7 +68,7 @@ for p in var_values :
 
     # append to the global run script
     with open(global_script, 'a') as file:
-        line = '/bin/cat '+ p +' | /usr/bin/parallel\n' + '/bin/mkdir '+ log_dir +'/sp_'+ p +'\n' + '/bin/mv '+ log_dir +'/*.log '+ log_dir +'/*.txt '+ log_dir +'/sp_'+ p +'\n'+home+'/bin/sms -t \'Experiment '+str(count)+'/'+str(len(var_values))+' done\'\n'
+        line = '/bin/cat '+ p +' | /usr/bin/parallel\n' + '/bin/mkdir '+ log_dir +'/sp_'+ p +'\n' + '/bin/mv '+ log_dir +'/*.log '+ log_dir +'/*.txt '+ log_dir +'/sp_'+ p +'\n' #+ 'python '+home+'/bin/send_sms.py -t \'Experiment '+str(count)+'/'+str(len(var_values))+' done\'\n'
         file.write(line)
     count +=1
 

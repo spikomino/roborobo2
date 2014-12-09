@@ -160,6 +160,19 @@ void neatestController::dropItem(int n){
     else
 	_items_collected -= n;
 }
+ 
+bool neatestController::stillRoomInBasket() { 
+
+    /* forraging => fixed capacity basket */
+    if (neatestSharedData::gFitnessFunction > 1)
+	return _items_max > _items_collected;
+    /* collection no limit */
+    return true;
+    
+ 
+}
+
+
 
 /*
  * Step the neuro controller and execute command

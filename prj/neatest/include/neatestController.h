@@ -90,7 +90,7 @@ public:
     
     int          getId             () { return _wm->getId(); }
     double       getFitness        () { return _reported_fitness; }
-    bool         stillRoomInBasket () { return _items_max > _items_collected; }
+    bool         stillRoomInBasket () ;
     int ItemsPicked       () { return _items_collected; }
     void         pickItem          ();
 
