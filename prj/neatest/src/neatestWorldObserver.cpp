@@ -98,19 +98,31 @@ void neatestWorldObserver::updateMonitoring(){
 	    fitness += (dynamic_cast<neatestController*>
 			(gWorld->getRobot(i)->getController()))->getFitness();
 	
-	    
+
+	
+	/* get all agents popsize */
+	double popsize =0.0;
+	for ( int i = 0 ; i != gNumberOfRobots ; i++ )
+	    popsize += (dynamic_cast<neatestController*>
+			(gWorld->getRobot(i)->getController()))
+		->getPopsize();
+	popsize /= gNumberOfRobots;
+	
+	
 	if ( gVerbose )
 	    std::cout << "[gen:" 
 		      << (gWorld->getIterations()/
 			  neatestSharedData::gEvaluationTime) 
 		      << ";pop:" << activeCount 
-		      << ";fit:" << fitness << "]\n";		
+		      << ";fit:" << fitness
+		      << ";popsize:" << popsize << "]\n";		
         
         // Logging
         std::string s = std::string("") + 
 	    "{" + std::to_string(gWorld->getIterations()) + 
 	    "}[all] [pop_alive:" + std::to_string(activeCount) + 
-	    "] [fit:" + std::to_string(fitness) + "]\n";
+	    "] [fit:" + std::to_string(fitness) +
+	    "] [popsize:" + std::to_string(popsize) +"]\n";
         gLogManager->write(s);
 	gLogManager->flush();
     }

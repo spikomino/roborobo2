@@ -37,6 +37,7 @@ neatestController::neatestController(RobotWorldModel * wm){
   _birthdate       = 0;
 
   _reported_fitness  = 0.0;
+  _reported_popsize  = 0.0;
   _fitness           = 0.0;
 
   _items_collected   = 0;
@@ -112,7 +113,8 @@ void neatestController::createNeuroController (){
 void neatestController::reset(){
     _birthdate = gWorld->getIterations();
 
-    /* fitness related resets */ 
+    /* fitness related resets */
+    _reported_popsize = _glist.size(); 
     _reported_fitness = _fitness;
     _fitness = 0.0;
     _items_collected   = 0;
@@ -427,33 +429,38 @@ void neatestController::emptyGenomeList(){
 void neatestController::stepEvolution() {
     /* store our genome in the list */
     message msg (_genome, _fitness, _sigma, _birthdate);
-    storeMessage(_wm->getId(), msg);
-       
-    /* select an offspring */
-    int selected = select(neatestSharedData::gSelectionPressure);
-    _genome = std::get<0>(_glist[selected]);
-    _sigma  = std::get<2>(_glist[selected]);
-    
-    /* mutate the offspring */
-    int newId = _wm->getId() + 10000 * 
-	(1 + (gWorld->getIterations() /
-	      neatestSharedData::gEvaluationTime));
-    
-    switch(neatestSharedData::gControllerType) {
-    case 0: /* neat*/
-	_genome = _genome->mutate(_sigma, getId(), newId);
-	break;
-    case 1: /* FFNN*/
-	_genome = _genome->mutate_weights(_sigma, getId(), newId);
-	break;
-    default:
-	std::cerr << "Error unknown mutation for this controller" << std::endl;
-	exit (-1);
-    }
-    
-    /* create a new network */
-    createNeuroController();
+    //storeMessage(_wm->getId(), msg);
 
+    if (_glist.size()>0){
+	_wm->setAlive(true);
+	/* select an offspring */
+	int selected = select(neatestSharedData::gSelectionPressure);
+	_genome = std::get<0>(_glist[selected]);
+	_sigma  = std::get<2>(_glist[selected]);
+	
+	/* mutate the offspring */
+	int newId = _wm->getId() + 10000 * 
+	    (1 + (gWorld->getIterations() /
+		  neatestSharedData::gEvaluationTime));
+    
+	switch(neatestSharedData::gControllerType) {
+	case 0: /* neat*/
+	    _genome = _genome->mutate(_sigma, getId(), newId);
+	    break;
+	case 1: /* FFNN*/
+	    _genome = _genome->mutate_weights(_sigma, getId(), newId);
+	    break;
+	default:
+	    std::cerr << "Error unknown mutation for this controller" << std::endl;
+	    exit (-1);
+	}
+    
+	/* create a new network */
+	createNeuroController();
+    }
+    else
+	_wm->setAlive(false);
+    
     /** there is a memory leak here. Genome is never deleted.
 	Selection selects some other genome and  mutate create a new one, 
 	the previous genome is not deleted. It cannot be deleted since it 
@@ -534,6 +541,11 @@ void print_genome(GenomeAdapted* g){
 	      << " dad="        << g->getDad() << " ]";
 }
 
+void neatestController::printPopsize(){
+    std::cout << "[Popsize: " << _glist.size()  << "] " ; 
+    
+}
+
 void neatestController::printGenomeList(){
     std::cout << "[Genome list at agent " + to_string(getId()) + "]\n";
     std::map<int, message>::iterator it;
@@ -565,6 +577,7 @@ void neatestController::printRobot(){
 void neatestController::printAll(){
     printRobot();
     print_genome(_genome);
+    printPopsize();
     std::cout << "\n";
     //std::cout << "\t";
     //printGenomeList();

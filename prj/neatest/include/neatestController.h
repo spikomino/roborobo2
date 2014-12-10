@@ -31,7 +31,8 @@ private:
 
     double         _fitness;
     double         _reported_fitness; // to report to World observer
-
+    int            _reported_popsize;
+    
     int            _items_collected; // items collected 
     int            _items_forraged;  // items brought back to the nest
     int            _items_max; // basket capacity 
@@ -77,6 +78,7 @@ private:
     void printRobot      ();
     void printGenomeList ();
     void printMessage    (message);
+    void printPopsize    ();
     void save_genome     ();
     void printAll        ();
     
@@ -90,6 +92,7 @@ public:
     
     int          getId             () { return _wm->getId(); }
     double       getFitness        () { return _reported_fitness; }
+    double       getPopsize        () { return _reported_popsize; }
     bool         stillRoomInBasket () ;
     int ItemsPicked       () { return _items_collected; }
     void         pickItem          ();
