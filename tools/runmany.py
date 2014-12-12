@@ -18,7 +18,7 @@ var_parameter = 'gSelectionPressure'
 var_values = [ '0.00', '0.25', '0.50', '0.75', '1.00' ]
 
 parameters={
-    'gInitialNumberOfRobots': 300,
+    'gInitialNumberOfRobots': 600,
     'gNbOfPhysicalObjects': 300,
     'gSigmaRef': 0.3,
     'gFitnessFunction': 1,  # 0: locomotion, 1: collection, 2: forraging 
