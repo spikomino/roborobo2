@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
-
+import pylab
 import networkx as nx
 import os, progressbar
 from subprocess import Popen, PIPE
@@ -78,6 +78,70 @@ def process_graph(fname):
             return None
     fh.close()
     return G
+
+# Reads a neat genome filename and greate the coresponding weight matrix
+# in  : a filename of the genome (neat format)
+# out : a list of list (weight matrix) [inputs][outputs]
+# NOTE : Does not work for MLP only for FF
+def process_weight_matrix(fname):
+    
+    nb_in  = 0
+    nb_out = 0 
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data[0] == 'genomestart' :
+            gid = data[1]
+     
+        elif data[0] == 'node' : 
+            if data[4] == '2' :
+                nb_out = nb_out +1
+            elif data[4] == '1' or  data[4] == '3' :
+                nb_in = nb_in +1
+                 
+        elif data[0] == 'genomeend' :
+            if gid != data[1] : 
+                print 'Error: mismatch genome end tag'
+                return None
+    fh.close()
+
+    m =  [[0 for x in xrange(nb_out)] for x in xrange(nb_in)]
+   
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data[0] == 'genomestart' :
+            gid = data[1]
+     
+        elif data[0] == 'gene' : 
+            n0 = int(data[2])-1
+            n1 = int(data[3])-1 - nb_in
+            
+            w  = float(data[4])
+            
+            m[n0][n1] = w
+            
+        elif data[0] == 'genomeend' :
+            if gid != data[1] : 
+                print 'Error: mismatch genome end tag'
+                return None
+    fh.close()
+    
+    return m
+
+# compute the distance between 2 weight matrices
+# in  : 2 matrices (see above)
+# out : a float the distance between the matrices (Frobenius norm)
+def weight_matrix_dist(m1, m2):
+    
+    sum = 0.0
+    for i in xrange(len(m1)):
+        for j in xrange(len(m1[0])):
+            sum = sum + (m1[i][j] - m2[i][j]) * (m1[i][j] - m2[i][j]) 
+    return pylab.sqrt(sum)
+
+
+
 
 # Create a graph from a larger by hiding nodes and edges not fname
 # in  : a graph object (the larger one) and a genome filename (the smaller) 

@@ -36,8 +36,8 @@ int neatestSharedData::gSnapshotsFrequency = 0; // every N generations
 
 
 
-
-int neatestSharedData::gControllerType = 0; // cf. header for description
-int neatestSharedData::gFitnessFunction = 0; 
-double neatestSharedData::gSelectionPressure = 1.0;
+double      neatestSharedData::gMaturationTime = 0.8;
+int         neatestSharedData::gControllerType = 0; // cf. header file
+int         neatestSharedData::gFitnessFunction = 0; 
+double      neatestSharedData::gSelectionPressure = 1.0;
 std::string neatestSharedData::gNeatParameters="prj/neatest/src/explo.ne";

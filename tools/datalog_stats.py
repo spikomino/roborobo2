@@ -70,7 +70,7 @@ def fix_budg_sf(data, cut=0.9):
         result.append(d[gen])
     return result
 
-def time_reach_target(data, pers=0.8):
+def time_reach_target(data, pers=0.9):
     max_l=[]
     for d in data:
         max_l.append(max(d))

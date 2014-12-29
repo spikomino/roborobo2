@@ -38,6 +38,10 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
 					 &neatestSharedData::gNeatParameters,
 					 true);
 
+    gProperties.checkAndGetPropertyValue("gMaturationTime",
+					 &neatestSharedData::gMaturationTime,
+					 false);
+
     NEAT::load_neat_params (neatestSharedData::gNeatParameters.c_str(), true);
     
     // ====

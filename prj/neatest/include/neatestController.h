@@ -81,7 +81,7 @@ private:
     void printPopsize    ();
     void save_genome     ();
     void printAll        ();
-    
+    bool matured         ();
 
 public:
 

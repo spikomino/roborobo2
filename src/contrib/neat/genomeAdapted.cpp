@@ -264,6 +264,12 @@ GenomeAdapted *GenomeAdapted::mutate_weights(float sigma,
     return new_genome;
 }
 
+void GenomeAdapted::init_weights(double range) {
+    for(const auto& g : genes)	
+	if (!g->frozen)
+	    (g->lnk)->weight = range * randfloat() - range/2.0 ;
+}
+
 void GenomeAdapted::mut_link_weights(double sigma) {
     for(const auto& g : genes)	
 	if (!g->frozen)

@@ -25,6 +25,10 @@ int get_lifetime(){
 	(gWorld->getWorldObserver())->getLifeIterationCount();  
 }
 
+bool neatestController::matured(){
+    return _iteration > (get_lifetime() * neatestSharedData::gMaturationTime);
+}
+
 bool lifeTimeOver(){
     return dynamic_cast <neatestWorldObserver*> 
 	(gWorld->getWorldObserver())->getLifeIterationCount() 
@@ -82,7 +86,7 @@ void neatestController::initRobot (){
     _genome->setIdTrace(getId());
     _genome->setMom(-1);
     _genome->setDad(-1);
-    _genome->mut_link_weights(_sigma);
+    _genome->init_weights(10);
     
     // create a neuro controller from this genome
     createNeuroController();
@@ -127,9 +131,15 @@ void neatestController::reset(){
 void neatestController::step(){
   _iteration++;
   if(_wm->isAlive()){
-      stepBehaviour(); // execure the neuro controller
-      broadcast();     // broadcast genome to neighbors
+      stepBehaviour(); // execute the neuro controller
+      if(matured())
+	  broadcast();     // broadcast genome to neighbors
   }
+  else{ // if not alive stop motor from any residual voltage
+      _wm->_desiredTranslationalValue = 0.0; 
+      _wm->_desiredRotationalVelocity = 0.0; 
+  }
+
   if(lifeTimeOver()){
       stepEvolution (); // select, mutate, replace
       
@@ -362,7 +372,7 @@ void neatestController::stepBehaviour(){
 void neatestController::broadcast() {
     /* Make a list of all neighbors within reach  */
     std::vector<neatestController *> neighbors;
-    for (int i = 0; i < _wm->_cameraSensorsNb; i++)	{
+    for (int i = 0; i < _wm->_cameraSensorsNb; i++) {
 	int targetIndex = _wm->getObjectIdFromCameraSensor (i);
 	
 	/* sensor ray bumped into a robot : communication is possible */
@@ -444,14 +454,15 @@ void neatestController::stepEvolution() {
 		  neatestSharedData::gEvaluationTime));
     
 	switch(neatestSharedData::gControllerType) {
-	case 0: /* neat*/
+	case 0: /* neat */
 	    _genome = _genome->mutate(_sigma, getId(), newId);
 	    break;
-	case 1: /* FFNN*/
+	case 1: /* FFNN */
 	    _genome = _genome->mutate_weights(_sigma, getId(), newId);
 	    break;
 	default:
-	    std::cerr << "Error unknown mutation for this controller" << std::endl;
+	    std::cerr << "Error unknown mutation for this controller" 
+		      << std::endl;
 	    exit (-1);
 	}
     
