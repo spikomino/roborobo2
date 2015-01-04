@@ -104,7 +104,7 @@ TopEDOController::initRobot ()
                   << std::endl;
     }
     //TOUNCOMMENT : this has been commented to use irace to tune the parameters
-    //save_genome();
+    save_genome();
 }
 
 
@@ -132,12 +132,14 @@ TopEDOController::step ()
 
     stepBehaviour ();
     
+    _wm->setRobotLED_colorValues((int)(_wm->_agentAbsoluteOrientation/360.0 * 255), (int)(_wm->_agentAbsoluteOrientation/360.0 * 255),(int)(_wm->_agentAbsoluteOrientation/360.0 * 255) );
+
     if (lifeTimeOver())
     {
         printAll();
         stepEvolution ();
         //TOUNCOMMENT : this has been commented to use irace to tune the parameters
-        //save_genome();
+        save_genome();
         reset();
     }
 }

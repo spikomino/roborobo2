@@ -26,7 +26,7 @@ TopEDOWorldObserver::TopEDOWorldObserver( World* world ) : WorldObserver( world 
     gProperties.checkAndGetPropertyValue("mutate_toggle_enable_prob",&mutate_toggle_enable_prob,true);
     gProperties.checkAndGetPropertyValue("mutate_gene_reenable_prob",&mutate_gene_reenable_prob,true);
     gProperties.checkAndGetPropertyValue("mutate_add_node_prob",&mutate_add_node_prob,true);
-    gProperties.checkAndGetPropertyValue("mutate_add_link_prob",&mutate_add_link_prob,true);    
+    gProperties.checkAndGetPropertyValue("mutate_add_link_prob",&mutate_add_link_prob,true);
     gProperties.checkAndGetPropertyValue("mate_only_prob",&mate_only_prob,true);
     gProperties.checkAndGetPropertyValue("recur_only_prob",&recur_only_prob,true);
     gProperties.checkAndGetPropertyValue("newstructure_tries",&newstructure_tries,true);

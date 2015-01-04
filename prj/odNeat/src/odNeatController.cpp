@@ -1,0 +1,984 @@
+/**
+ * @author Inaki Fernandez Perez <inaki.fernandez@loria.fr>
+ *
+ */
+
+#include "odNeat/include/odNeatController.h"
+#include "odNeat/include/odNeatWorldObserver.h"
+
+#include "World/World.h"
+#include "Utilities/Misc.h"
+#include <math.h>
+#include <stdio.h>
+#include <string>
+
+#include <odneat/genome.h>
+#include <odneat/network.h>
+
+using namespace Neural;
+using namespace ODNEAT;
+
+odNeatController::odNeatController (RobotWorldModel * wm)
+{
+
+    _wm = wm;
+
+    nn = NULL;
+
+    _sigma = odNeatSharedData::gSigmaRef;
+
+    initRobot ();
+
+    _iteration = 0;
+    _birthdate = 0;
+    _fitness = 0.0;
+
+}
+
+odNeatController::~odNeatController ()
+{
+    if(nn != NULL)
+        delete nn;
+    nn = NULL;
+}
+
+void
+odNeatController::reset ()
+{
+    _fitness = 0.0;
+    _birthdate = gWorld->getIterations ();
+    _energy = odNeatSharedData::gDefaultInitialEnergy;
+    emptyBasket();
+    emptyGenomeList();
+    //Fitness initialized to 0, so species will be "hindered"
+    //Pay attention to initial species (see constructor above)
+    _genome ->species = -1;
+    add_to_species(message(_genome,_fitness,_sigma,_birthdate));
+}
+
+void
+odNeatController::initRobot ()
+{
+    _nbInputs = 1;		// Bias constant input (1.0)
+
+    if ((gExtendedSensoryInputs) && (odNeatSharedData::gFitness == 0))
+    {
+        _nbInputs += (1) * _wm->_cameraSensorsNb;	// Switch
+    }
+
+    _nbInputs += _wm->_cameraSensorsNb;	// proximity sensors
+
+    _nbOutputs = 2;
+
+    // Inputs, outputs, 0 hidden neurons, fully connected.
+    //Start with Simple Perceptron
+    //All agents are given the same initial topology.
+    //Thus, those genes are not identified by a common historical marker
+    _genome = new Genome (_wm->getId(),_nbInputs, _nbOutputs);
+    _genome->mom_id = -1;
+    _genome->dad_id = -1;
+    _genome->genome_id = _wm->getId ();
+
+    _genome->mutate_link_weights (1.0);
+    createNN ();
+
+    if (gVerbose)
+        std::cout << std::flush;
+
+    setNewGenomeStatus (true);
+
+    emptyGenomeList();
+    emptyBasket();
+
+
+    if(gVerbose){
+        std::cout << "[initRobot] "
+                  << "id="  << _wm->getId() << " "
+                  << "in="  << _nbInputs    << " "
+                  << "out=" << _nbOutputs
+                  << std::endl;
+    }
+
+
+
+    _energy = odNeatSharedData::gDefaultInitialEnergy;
+
+    //TOUNCOMMENT : this has been commented to use irace to tune the parameters
+    save_genome();
+}
+
+
+void
+odNeatController::createNN ()
+{
+    if (nn != NULL)
+        delete nn;
+
+    nn = _genome->genesis ();
+
+}
+
+unsigned int
+odNeatController::computeRequiredNumberOfWeights ()
+{
+    unsigned int res = nn->linkcount ();
+    return res;
+}
+
+void
+odNeatController::step ()
+{
+    _iteration++;
+    //If Inter-robot reproduction event
+    if(doBroadcast())
+    {
+        // broadcasting genome : robot broadcasts its genome
+        //to all neighbors (contact-based wrt proximity sensors)
+        broadcastGenome();
+    }
+
+    stepBehaviour ();
+    
+    if ((_energy <=odNeatSharedData::gEnergyThreshold)
+            && !(in_maturation_period()))
+    {
+        printAll();
+        stepEvolution ();
+        //TOUNCOMMENT : this has been commented to use irace to tune the parameters
+        save_genome();
+        reset();
+    }
+}
+
+
+
+// ################ ######################## ################
+// ################ BEHAVIOUR METHOD(S)      ################
+// ################ ######################## ################
+
+void
+odNeatController::stepBehaviour ()
+{
+    act();
+    updateFitness ();
+    _energy = update_energy_level();
+}
+
+void odNeatController::act()
+{
+    // ---- Build inputs ----
+
+    std::vector < double >inputs(_nbInputs);
+    int inputToUse = 0;
+
+
+    // distance sensors
+    for (int i = 0; i < _wm->_cameraSensorsNb; i++)
+    {
+        inputs[inputToUse] =
+                _wm->getDistanceValueFromCameraSensor (i) /
+                _wm->getCameraSensorMaximumDistanceValue (i);
+        inputToUse++;
+
+        if (gExtendedSensoryInputs && (odNeatSharedData::gFitness == 0))
+        {
+            int objectId = _wm->getObjectIdFromCameraSensor (i);
+
+            // input: physical object? which type?
+            if (PhysicalObject::isInstanceOf (objectId))
+            {
+                //Switch is type 3
+                if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
+                     ->getType ()) == 3)
+                {
+                    inputs[inputToUse] = 	_wm->getDistanceValueFromCameraSensor (i) /
+                            _wm->getCameraSensorMaximumDistanceValue (i);//Match
+                }
+                else
+                    inputs[inputToUse] = 1.0;
+                inputToUse++;
+            }
+            else //Not physical object
+            {
+                inputs[inputToUse] = 1.0;
+                inputToUse++;
+            }
+
+        }
+    }
+
+    /* get the most activated obstacle sensor for floreano fitness*/
+    _md =10.0;
+    for(int i = 0; i < _wm->_cameraSensorsNb; i++)
+        if(_md > inputs[i] &&
+                gExtendedSensoryInputs)//TOFIX (if the activation does not correspond to an item) && inputs[i+_wm->_cameraSensorsNb] < 1.0)
+            _md = inputs[i];
+
+    //Bias
+    inputs[inputToUse++] = 1.0;
+
+    // ---- compute and read out ----
+    nn->load_sensors (&(inputs[0]));
+
+    if (!(nn->activate ()))
+    {
+        std::cerr << "[ERROR] Activation of ANN not correct: genome " << _genome->genome_id << std::endl;
+        save_genome();
+        exit (-1);
+    }
+    // Read the output
+    std::vector<double> outputs;
+    std::vector<NNode*>::iterator out_iter;
+    for (out_iter  = nn->outputs.begin();
+         out_iter != nn->outputs.end();
+         out_iter++)
+        outputs.push_back((*out_iter)->activation);
+
+    /* store translational and rotational velocities for floreano fitness */
+    _transV = 2 * (outputs[0] - 0.5);
+    _rotV = 2 * (outputs[1] - 0.5);
+
+    //Set the outputs to the right effectors, and rescale the intervals
+    //Translational velocity in [-1,+1]. Robots can move backwards. Neat uses sigmoid [0,+1]
+    _wm->_desiredTranslationalValue = 2 * (outputs[0] - 0.5);
+    //Rotational velocity in [-1,+1]. Neat uses sigmoid [0,+1]
+    _wm->_desiredRotationalVelocity = 2 * (outputs[1] - 0.5);
+
+    // normalize to motor interval values
+    _wm->_desiredTranslationalValue =
+            _wm->_desiredTranslationalValue * gMaxTranslationalSpeed;
+    _wm->_desiredRotationalVelocity =
+            _wm->_desiredRotationalVelocity * gMaxRotationalSpeed;
+
+}
+
+void
+odNeatController::updateFitness ()
+{
+    switch(odNeatSharedData::gFitness)
+    {
+    case 0:
+        updateFitnessForaging();
+        break;
+    case 1:
+        updateFitnessNavigation();
+        break;
+
+    default:
+        std::cerr << "[ERROR] Unknown fitness function selected. Check gFitness parameter in properties file." << std::endl;
+        exit(-1);
+    }
+}
+
+// update fitness for navigation
+void odNeatController::updateFitnessNavigation(){
+    //[Floreano2000] locomotion fitness function
+    //abs(Translational speed) * (1 - abs(Rotational Speed)) * minimal(distance to obstacle)
+    _fitness += (fabs(_transV)) *
+            (1.0 -sqrt(fabs(_rotV))) * _md;
+}
+// update fitness for foraging
+void odNeatController::updateFitnessForaging(){
+    _fitness = (double) _items / (double) get_lifetime();
+}
+
+void
+odNeatController::broadcastGenome ()
+{
+    std::vector<odNeatController *> neighbors;
+
+    // only if agent is active (ie. not just revived) and deltaE>0.
+    for (int i = 0; i < _wm->_cameraSensorsNb; i++)
+    {
+        int targetIndex = _wm->getObjectIdFromCameraSensor (i);
+
+        // sensor ray bumped into a robot : communication is possible
+        if (targetIndex >= gRobotIndexStartOffset)
+        {
+            // convert image registering index into robot id.
+            targetIndex = targetIndex - gRobotIndexStartOffset;
+
+            odNeatController *targetRobotController =
+                    dynamic_cast <
+                    odNeatController *
+                    >(gWorld->getRobot (targetIndex)->getController ());
+
+            if (!targetRobotController)
+            {
+                std::
+                        cerr << "Error from robot " << _wm->getId () <<
+                                " : the observer of robot " << targetIndex <<
+                                " is not compatible" << std::endl;
+                exit (-1);
+            }
+
+            /* add to the list  */
+            neighbors.push_back(targetRobotController);
+        }
+    }
+
+    /* if found neighbors, broadcast my genome */
+    if(neighbors.size() > 0) {
+        //message msg (_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber);
+        message msg (_genome, _fitness, _sigma, _birthdate);
+
+        /* remove duplicates */
+        std::sort(neighbors.begin(), neighbors.end());
+        auto last = std::unique(neighbors.begin(), neighbors.end());
+        neighbors.erase(last, neighbors.end());
+
+        /* send */
+        for (const auto& c : neighbors)
+            c->storeMessage (msg);
+
+        /* some screen output */
+        if (gVerbose){
+            /* std::cout << "@"  << _iteration << " R" << _wm->getId() << " -> " ;
+            for (const auto& c : neighbors)
+                std::cout << c->_wm->getId() << " ";
+            std::cout << std::endl;*/
+        }
+        /* delete neighbors list */
+        neighbors.clear();
+    }
+}
+void odNeatController::storeMessage(message msg){
+    //Received species info is no longer valid
+    std::get<0>(msg) -> species = -1;
+    if(tabu_list_approves(std::get<0>(msg)) && population_accepts(msg))
+    {
+
+        add_to_population(msg);
+        adjust_population_size();
+        adjust_species_fitness();
+    }
+
+    /*
+    //Update genetic clocks for nodes and links
+    //This minimizes the number of arbitrary sorting orders in genome alignment
+    //due to concurrent mutations in different agents
+    _nodeId = max(_nodeId,std::get<4>(msg));
+    _innovNumber = max(_innovNumber,std::get<5>(msg));*/
+
+}
+
+void odNeatController::emptyGenomeList(){
+    population.clear();
+    species.clear();
+}
+void odNeatController::pickItem(){
+    _items++;
+    _energy += odNeatSharedData::gEnergItemValue;
+}
+void odNeatController::emptyBasket(){
+    _items = 0;
+}
+// ################ ######################## ################
+// ################ EVOLUTION ENGINE METHODS ################
+// ################ ######################## ################
+
+void
+odNeatController::stepEvolution ()
+{
+
+    logGenome();
+    add_to_population(message(_genome, _fitness, _sigma, _birthdate));
+    add_to_tabu_list(_genome);
+    Genome* offspring =  generate_offspring();
+    update_population(offspring);
+    _genome =  offspring;
+    createNN();
+}
+
+
+void odNeatController::logGenome()
+{
+
+    //GENERATION ID-ROBOT FITNESS SIZE(localPop) IDGENOME IDMOM
+    odNeatSharedData::gEvoLog <<
+                                 dynamic_cast <odNeatWorldObserver *>
+                                 (gWorld->getWorldObserver ())->getGenerationCount() +1
+                              << " " << _wm->getId () << " " <<
+                                 _fitness << " " << population.size() << " " << _genome->genome_id << std::endl;
+
+
+
+    std::string filename;
+
+    filename = odNeatSharedData::gGenomeLogFolder;
+    filename += std::to_string(_genome -> genome_id);
+
+    //_genome -> print_to_filename(const_cast<char*>(filename.c_str()));
+}
+
+
+int
+odNeatController::selectBest ()
+{
+    std::map < int, message >::iterator it = population.begin();
+
+    double bestFit = std::get<1>(it->second);
+    int idx = it->first;
+
+    for (; it != population.end (); it++)
+    {
+        if (std::get<1>(it->second) > bestFit)
+        {
+            bestFit = std::get<1>(it->second);
+            idx = it->first;
+        }
+
+    }
+    return idx;
+}
+int
+odNeatController::selectRankBased()
+{       
+    std::map < int, message>::iterator it = population.begin();
+
+    std::vector<std::pair<int,float>> rankedFitness;
+    //sum of indexes from (1:n) = n(n+1)/2
+    int totalIndex = (population.size()) *( population.size()+1) / 2;
+    //Vector for Rank for each individual
+    for (it->first; it != population.end (); it++)
+    {
+        rankedFitness.push_back(std::make_pair(it->first,std::get<1>(it->second)));
+    }
+
+    int random = (rand() % totalIndex) + 1; //Uniform between 1 and n * (n+1) / 2
+
+    //Fitness ascending order
+    std::sort(rankedFitness.begin(), rankedFitness.end(), compareFitness);
+
+    for(unsigned int i = 0; i < rankedFitness.size(); i++)
+    {
+        random -= i + 1;
+        if(random <= 0)
+            return rankedFitness[i].first;
+    }
+    return -1;
+}
+int
+odNeatController::selectBinaryTournament()
+{
+    int result = -1;
+
+    std::vector<int> v;
+
+    //Vector for storing the keys (robot ID)
+    for(std::map<int,message>::iterator it = population.begin(); it != population.end(); ++it) {
+        v.push_back(it->first);
+    }
+
+    if(population.size() > 1)
+    {
+        int ind1 =  rand () % population.size ();
+        ind1 = v[ind1];
+        int ind2 =  rand () % population.size ();
+        ind2 = v[ind2];
+
+        while(ind1 == ind2)
+        {
+            ind2 =  rand () % population.size ();
+            ind2 = v[ind2];
+        }
+
+        if(std::get<1>(population[ind1]) >= std::get<1>(population[ind2]))
+            result = ind1;
+        else
+            result = ind2;
+    }
+    else
+        result = population.begin()->first;
+
+    if(result == -1)
+    {
+        std::cerr << "[ERROR] No individual selected by binary tournament." << std::endl << std::flush;
+        exit(-1);
+    }
+
+    if(population.find(result) == population.end())
+    {
+        std::cerr << "[ERROR] Unexisting individual selected by binary tournament." << std::endl << std::flush;
+        exit(-1);
+    }
+
+    return result;
+}
+int
+odNeatController::selectRandom()
+{       
+    int randomIndex = rand()%population.size();
+    std::map<int, message >::iterator it = population.begin();
+    while (randomIndex !=0 )
+    {
+        it ++;
+        randomIndex --;
+    }
+
+    return it->first;
+}
+
+bool odNeatController::compareFitness(std::pair<int,float> i,std::pair<int,float> j)
+{
+    return (i.second < j.second);
+}
+
+void odNeatController::printIO( std::pair< std::vector<double>, std::vector<double> > io)
+{
+    std::vector<double> in = io.first;
+    std::vector<double> out = io.second;
+
+    std::cout << "------------------------------" << std::endl;
+
+    std::cout << "Input vector" << std::endl;
+    printVector(in);
+
+    std::cout << std::endl;
+
+    std::cout << "Output vector" << std::endl;
+    printVector(out);
+
+    std::cout << std::endl;
+    std::cout << "------------------------------" << std::endl;
+}
+
+void odNeatController::printVector(std::vector<double> v)
+{
+    for(unsigned int i = 0; i < v.size(); i++)
+    {
+        std::cout << "[" << i << "] =" << v[i] << " | ";
+    }
+}
+void odNeatController::printFitnessList()
+{
+    std::cout << "------------------------------" << std::endl;
+    std::map<int,message>::iterator it = population.begin();
+    std::cout << "Fitness List" << std::endl;
+    for(;it != population.end(); it++)
+    {
+        std::cout << "R[" << it->first << "] " << std::get<1>(it->second) << std::endl;
+    }
+    std::cout << "------------------------------" << std::endl;
+}
+// Save a genome (file name = robot_id-genome_id.gen)
+void odNeatController::save_genome(){
+    char fname[128];
+    snprintf(fname, 127, "logs/genomes/%04d-%010d.gen",
+             _wm->getId(), _genome->genome_id);
+    std::ofstream oFile(fname);
+    _genome->print_to_file(oFile);
+    oFile.close();
+}
+
+
+void odNeatController::print_genome(Genome* g){
+    std::cout << "[Genome: id=" << _wm->getId()
+              << " idtrace="    << g->genome_id
+              << " mom="        << g->mom_id
+              << " dad="        << g->dad_id << " ]";
+}
+
+void odNeatController::printRobot(){
+    std::cout << "[Robot: id=" + to_string(_wm->getId())
+              << " iteration=" + to_string(_iteration)
+              << " birthdate=" + to_string(_birthdate)
+              << " fitness="   + to_string(_fitness)
+              << " energy="    + to_string(_energy)
+              << " items="     + to_string(_items)
+              << " sigma="     + to_string(_sigma)
+             /* << " nodeId="     + to_string(_nodeId)
+              << " geneId="     + to_string(_innovNumber)*/
+              << " ]";
+}
+
+void odNeatController::printAll(){
+    printRobot();
+    print_genome(_genome);
+    std::cout << "\n";
+}
+bool odNeatController::lifeTimeOver(){
+    return get_lifetime()
+            >= odNeatSharedData::gEvaluationTime - 1;
+}
+
+int odNeatController::get_lifetime(){
+    return dynamic_cast <odNeatWorldObserver*>
+            (gWorld->getWorldObserver())->getLifeIterationCount();
+}
+bool odNeatController::doBroadcast(){
+    bool result = false;
+
+    double adjustedFitness = std::get<1>(species[_genome -> species]);
+    double totalAdjFitness = 0.0;
+    std::map<int,std::pair<std::set<Genome*>,double>>::iterator it = species.begin();
+    for(; it != species.end(); it++)
+    {
+        totalAdjFitness += std::get<1>(it->second);
+    }
+
+    if(!(totalAdjFitness == 0.0))
+        if(randFloat() < (adjustedFitness / totalAdjFitness))
+            result = true;
+    return result;
+}
+bool odNeatController::in_maturation_period(){
+
+    bool result = false;
+    if(gWorld->getIterations () <=
+            _birthdate + odNeatSharedData::gMaturationPeriod)
+        result = true;
+
+    return result;
+
+}
+bool odNeatController::tabu_list_approves(Genome* g)
+{
+    bool result = true;
+    std::set<std::pair<Genome*,int>>::iterator it = tabu.begin();
+    for(;it != tabu.end();it++)
+    {
+        if(std::get<0>(*it)->dissimilarity(g) < odNeatSharedData::gTabuThreshold)
+        {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool odNeatController::population_accepts(message msg)
+{
+    bool result = false;
+
+    if(population.size() < odNeatSharedData::gMaxPopSize)
+    {
+        result = true;
+    }
+    else
+    {
+        std::map<int,message>::iterator it = population.begin();
+        for(;it != population.end();it++)
+        {
+            //if there exists a genome with a lower fitness than the received
+            if(std::get<1>(it->second) < std::get<1>(msg))
+            {
+                result = true;
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
+void odNeatController::add_to_tabu_list(Genome* g)
+{
+    tabu.insert(std::make_pair(g, odNeatSharedData::gTabuTimeout));
+}
+void odNeatController::add_to_population(message msg)
+{
+    int receivedId = std::get<0>(msg)->genome_id;
+    //If the received genome already exists
+    if(population.find(receivedId) != population.end())
+    {
+        std::get<1>(population[receivedId]) = (std::get<1>(population[receivedId]) + std::get<1>(msg))/2; //TOCHECK: is this the way to average?
+    }
+    else //new genome
+    {
+        //If there is still room available then add (to population and corresponding species)
+        if(population.size() < odNeatSharedData::gMaxPopSize)
+        {
+            if(population.find(receivedId) == population.end())
+            {
+                population[receivedId] = msg;
+                add_to_species(msg);
+            }
+        }
+        else
+        {
+            //For searching the worse genome (the one to be replaced)
+            std::map<int,message>::iterator it = population.begin();
+            int worseGenomeId = -1;
+            //Initialize to received genome's fitness (the replacement )
+            double worseFitness = std::get<1>(msg);
+            //Search for the worse genome
+            for(;it != population.end();it++)
+            {
+                //if there exists a genome with a lower fitness
+                if(std::get<1>(it->second) < worseFitness)
+                {
+                    worseFitness = std::get<1>(it->second);
+                    worseGenomeId = std::get<0>(it->second)->genome_id;
+                }
+            }
+            if(worseFitness < std::get<1>(msg))
+            {
+                //Erase from species
+                //TOCHECK: erasing here destroys the object?
+                std::get<0>(species[std::get<0>(population[worseGenomeId])->species]).erase(std::get<0>(population[worseGenomeId]));
+
+                population.erase(worseGenomeId);
+
+                population[receivedId] = msg;
+                add_to_species(msg);
+            }
+            else
+            {
+                //Not to add the active genome to be dropped, because it's not competitive enough
+                //Delete from species. It does not belong to population
+                //TOCHECK: erasing here destroys the object?  Either way, it does not belong to the population, the reference may be lost
+                std::get<0>(species[std::get<0>(population[worseGenomeId])->species]).erase(std::get<0>(population[worseGenomeId]));
+            }
+        }
+
+
+    }
+
+}
+void odNeatController::add_to_species(message msg)
+{
+    if(std::get<0>(msg) -> species == -1)
+    {
+        int speciesId = computeSpeciesId(std::get<0>(msg));
+
+        if(species.find(speciesId) != species.end()) //If the species already exists
+        {
+            std::get<0>(msg)->species = speciesId;
+            std::get<0>(species[speciesId]).insert(std::get<0>(msg)); //Species fitness is adjusted just later
+        }
+        else
+        {
+            std::set<Genome*> newSpecies;
+            std::get<0>(msg)->species = speciesId;
+            newSpecies.insert(std::get<0>(msg));
+            std::get<0>(species[speciesId]) = newSpecies;
+            std::get<1>(species[speciesId]) = std::get<1>(msg);//New species' fitness equals the new genome's fitness
+        }
+    }
+    else if((species.find(std::get<0>(msg) -> species) == species.end()) ||
+            (std::get<0>(species.find(std::get<0>(msg) -> species)-> second).find(std::get<0>(msg))
+             == std::get<0>(species.find(std::get<0>(msg) -> species)-> second).end()))
+    {
+        //Error, unexisting species!
+        std::cerr << "[ERROR] Unexisting species recorded on genome" << std::endl;
+        exit(-1);
+    }
+}
+
+int odNeatController::computeSpeciesId(Genome* g)
+{
+    std::map<int,std::pair<std::set<Genome*>,double>>::iterator it = species.begin();
+    std::set<Genome*>::iterator itSp;
+    int randIndiv;
+    int result = -1; //species' ID
+
+    //A genome's species corresponds to the first species
+    //in which a randomly sampled individual has a
+    //compatibility measure lower than the threshold
+    for(; it != species.end(); it++)
+    {
+        itSp = std::get<0>(it->second).begin();
+        //Get random individual in species
+        randIndiv = randInt(1, std::get<0>(it->second).size());
+        std::advance(itSp,randIndiv);
+
+        if(g->dissimilarity(*itSp) < odNeatSharedData::gCompatThreshold)
+        {
+            result = it -> first;
+            break;
+        }
+    }
+    //No species found
+    //New species ID
+    if(result == -1)
+    {
+        if(species.size() > 0)
+            result = species.rbegin()->first+1;
+        else
+            result = 1;
+    }
+    return result;
+}
+
+void odNeatController::adjust_population_size()
+{
+    //TODO
+    //Not needed, already done in add_to_population()
+}
+void odNeatController::adjust_species_fitness()
+{
+    std::map<int,std::pair<std::set<Genome*>,double>>::iterator it = species.begin();
+    std::set<Genome*>::iterator itSp;
+    double adjFit = 0.0;
+
+    for(; it != species.end(); it++)
+    {
+        //iterate over the individuals of current species
+        itSp = std::get<0>(it->second).begin();
+        for(; itSp != std::get<0>(it->second).end(); itSp++)
+        {
+            //Cumulate each individual's adjusted fitness
+            adjFit += std::get<1>(population[(*itSp)->genome_id])/std::get<0>(it->second).size();
+        }
+        //The species fitness equals the average adjusted fitness of
+        //the individuals belonging to it
+        std::get<1>(it->second) = adjFit / std::get<0>(it->second).size();
+    }
+
+
+}
+Genome* odNeatController::generate_offspring()
+{
+    Genome* result = NULL;
+
+    int spId = selectSpecies();
+    Genome* g1 = selectParent(spId);
+    Genome* g2 = selectParent(spId);
+
+    int newId = _wm->getId () + 10000 * (1 + (gWorld->getIterations () /
+                                              odNeatSharedData::gEvaluationTime));
+
+
+
+    //Mate
+    if(randFloat() < mateOnlyProb)
+    {
+        result = g1 -> mate_multipoint(g2,newId, std::get<1>(population[g1->genome_id]),std::get<1>(population[g2->genome_id]));
+
+    }
+    else
+        result = g1;
+    if(randFloat() < mutateOnlyProb)//Mutate
+    {
+        result = result-> mutate (_sigma, newId);
+    }
+    return result;
+}
+int odNeatController::selectSpecies()
+{
+    int result = -1;
+    double totalAdjFitness = 0.0;
+    std::map<int,std::pair<std::set<Genome*>,double>>::iterator it = species.begin();
+
+    for(; it != species.end(); it++)
+    {
+        totalAdjFitness += std::get<1>(it->second);
+    }
+    double random = randFloat() * totalAdjFitness;
+    it = species.begin();
+    while (random > 0.0)
+    {
+        random -= std::get<1>(it->second);
+        it++;
+    }
+    if(random <=0.0)
+    {
+        it--;
+        result = it->first;
+    }
+    else
+    {
+        std::cerr << "[ERROR] Bad species selection(?)" << std::endl;
+        exit(-1);
+    }
+    if(result == -1)
+    {
+        std::cerr << "[ERROR] Bad species selection(-1)" << std::endl;
+        exit(-1);
+    }
+
+    return result;
+}
+
+Genome* odNeatController::selectParent(int spId)
+{
+    //Intraspecies binary tournament
+    Genome* result = NULL;
+    std::set<Genome*> sp = std::get<0>(species[spId]);
+    std::set<Genome*>::iterator randomIt1, randomIt2;
+
+    if(sp.size() > 1)
+    {
+        int ind1 =  rand () % sp.size ();
+        int ind2 =  rand () % sp.size ();
+
+        while(ind1 == ind2)
+        {
+            ind2 =  rand () % sp.size ();
+        }
+
+        randomIt1 = sp.begin();
+        std::advance(randomIt1,ind1);
+
+        randomIt2 = sp.begin();
+        std::advance(randomIt2,ind2);
+
+        if(std::get<1>(population[(*randomIt1)->genome_id]) >= std::get<1>(population[(*randomIt2)->genome_id]))
+        {
+            result = (*randomIt1);
+        }
+        else
+        {
+            result = (*randomIt2);
+        }
+    }
+    else
+        result =(*sp.begin());
+
+    return result;
+}
+
+void odNeatController::update_population(Genome* offspring)
+{
+    //Nothing to do (?)
+}
+double odNeatController::update_energy_level()
+{
+    double result = 0.0;
+
+    switch(odNeatSharedData::gFitness)
+    {
+    case 0:
+        result = updateEnergyForaging();
+        break;
+    case 1:
+        result = updateEnergyNavigation();
+        break;
+
+    default:
+        std::cerr << "[ERROR] Unknown fitness function selected. Check gFitness parameter in properties file." << std::endl;
+        exit(-1);
+    }
+    return result;
+}
+double odNeatController::updateEnergyForaging()
+{
+    double result = _energy;
+
+    double vR,vL;//Speed Tranformed into left and right wheels activation
+
+    vR = _transV - (_rotV / 2);
+    vL = _rotV + vR;
+    //Consumption
+    if(vL * vR < 0.0)
+        result += -1;
+    else
+        result += (_transV/1.0) * sqrt(vL * vR);
+
+    return result;
+}
+double odNeatController::updateEnergyNavigation()
+{
+    double result = 0.0;
+    double vR,vL;//Speed Tranformed into left and right wheels activation
+
+    vR = _transV - (_rotV / 2);
+    vL = _rotV + vR;
+
+    result = (fabs(vR) + fabs(vL))/2 * (1 - sqrt(fabs(vR - vL))) * (_md);
+    result = 2 * (result - 0.5);
+
+    return result + _energy;
+}

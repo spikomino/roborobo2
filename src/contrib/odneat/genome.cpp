@@ -1,6 +1,6 @@
-#include "pure_neat/genome.h"
-#include "pure_neat/network.h"
-#include "pure_neat/gene.h"
+#include "odneat/genome.h"
+#include "odneat/network.h"
+#include "odneat/gene.h"
 
 #include <iostream>
 #include <cmath>
@@ -8,8 +8,11 @@
 #include <fstream>
 #include <cstring>
 #include <map>
+#include <time.h>
+#include <limits>
 
-using namespace PURENEAT;
+
+using namespace ODNEAT;
 
 Genome::Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g) 
 {
@@ -18,6 +21,7 @@ Genome::Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g)
     genes=g;
     mom_id = -1;
     dad_id = -1;
+    species = -1;
 }
 Genome& Genome::operator=(const Genome& genome)
 {
@@ -52,6 +56,7 @@ Genome& Genome::operator=(const Genome& genome)
     }
     mom_id = genome.mom_id;
     dad_id = genome.dad_id;
+    species = -1;
     return *this;
 }
 
@@ -88,6 +93,7 @@ Genome::Genome(const Genome& genome)
     }
     mom_id = genome.mom_id;
     dad_id = genome.dad_id;
+    species = -1;
 }
 
 Genome::Genome(int id, std::ifstream &iFile) 
@@ -102,7 +108,7 @@ Genome::Genome(int id, std::ifstream &iFile)
     genome_id=id;
 
     iFile.getline(curline, sizeof(curline));
-    int wordcount = getUnitCount(curline, delimiters);
+    int wordcount = getUnitCounts(curline, delimiters);
     int curwordnum = 0;
 
     //Loop until file is finished, parsing each line
@@ -111,7 +117,7 @@ Genome::Genome(int id, std::ifstream &iFile)
         if (curwordnum > wordcount || wordcount == 0)
         {
             iFile.getline(curline, sizeof(curline));
-            wordcount = getUnitCount(curline, delimiters);
+            wordcount = getUnitCounts(curline, delimiters);
             curwordnum = 0;
         }
 
@@ -169,10 +175,10 @@ Genome::Genome(int id, std::ifstream &iFile)
         }
 
     }
-
+    species = -1;
 }
 
-Genome::Genome(int id,int num_in,int num_out, int idR) {
+Genome::Genome(int id,int num_in,int num_out) {
 
     //Temporary lists of nodes
     std::vector<NNode*> inputs;
@@ -187,8 +193,7 @@ Genome::Genome(int id,int num_in,int num_out, int idR) {
     NNode *newnode;
     Gene *newgene;
 
-    int count;
-    int ncount;
+    int ncount, count;
 
     genome_id=id;
 
@@ -197,9 +202,10 @@ Genome::Genome(int id,int num_in,int num_out, int idR) {
     //Build the input nodes. Last one is bias
     for(ncount=1;ncount<=num_in;ncount++)
     {
+        //Set common initial time
         innov innovClock;
-        innovClock.idR = idR;
-        innovClock.gc = ncount;
+        innovClock.timestamp.tv_sec = 0;
+        innovClock.timestamp.tv_nsec = ncount;
 
         if (ncount<num_in)
             newnode=new NNode(SENSOR,innovClock,INPUT);
@@ -215,8 +221,8 @@ Genome::Genome(int id,int num_in,int num_out, int idR) {
     for(ncount=num_in+1;ncount<=num_in+num_out;ncount++)
     {
         innov innovClock;
-        innovClock.idR = idR;
-        innovClock.gc = ncount;
+        innovClock.timestamp.tv_sec = 0;
+        innovClock.timestamp.tv_nsec = ncount;
 
         newnode=new NNode(NEURON,innovClock,OUTPUT);
         //Add the node to the list of nodes
@@ -227,26 +233,30 @@ Genome::Genome(int id,int num_in,int num_out, int idR) {
     //Create the links
     //Just connect inputs straight to outputs
 
-    count=1;
+    count = 0;
     //Loop over the outputs
     for(curnode1=outputs.begin();curnode1!=outputs.end();++curnode1)
     {
         //Loop over the inputs
         for(curnode2=inputs.begin();curnode2!=inputs.end();++curnode2)
         {
+            count++;
+            innov innovClock;
+            innovClock.timestamp.tv_sec = 0;
+            innovClock.timestamp.tv_nsec = count;
+
             //Connect each input to each output with a weight 0.0
-            newgene=new Gene(0, (*curnode2), (*curnode1),false,count, idR);
+            newgene=new Gene(0, (*curnode2), (*curnode1),false,innovClock);
 
             //Add the gene to the genome
             genes.push_back(newgene);
-
-            count++;
 
         }
 
     }
     mom_id = -1;
     dad_id = -1;
+    species = -1;
 }
 
 Genome::~Genome() 
@@ -345,7 +355,7 @@ bool Genome::verify()
     NNode *inode;
     NNode *onode;
 
-    int last_id, last_idR;
+    innov last_innov;
 
     //Check each gene's nodes
     for(curgene=genes.begin();curgene!=genes.end();++curgene)
@@ -375,18 +385,14 @@ bool Genome::verify()
     }
 
     //Check for NNodes being out of order
-    last_id=0;
-    last_idR = 0;
+    last_innov.timestamp={0,0};
     for(curnode=nodes.begin();curnode!=nodes.end();++curnode)
     {
-        if ((*curnode)->node_id.gc <last_id)
+        if ((*curnode)->node_id < last_innov)
             return false;
-        else if((*curnode)->node_id.gc == last_id)
-            if((*curnode)->node_id.idR <= last_idR)
-                return false;
-
-        last_id=(*curnode)->node_id.gc;
-        last_idR=(*curnode)->node_id.idR;
+        if((*curnode)->node_id == last_innov)
+            return false;
+        last_innov=(*curnode)->node_id;
     }
 
 
@@ -489,7 +495,7 @@ Genome *Genome::duplicate()
 
 }
 
-Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, int &innovNum)
+Genome *Genome::mutate(float sigma, int idNewGenome)
 {
     std::map<int, Genome*>::iterator curorg;
 
@@ -507,20 +513,19 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, i
     }
 
     //Choose the mutation depending on probabilities
-    if (randfloat () < mutate_add_node_prob)
+    if (randFloat () < mutateAddNodeProb)
     {
-        //Innovation numbers as pairs <idRobot, genecounter>
-        if(!(new_genome->mutate_add_node(idRobot,nodeId,innovNum,newstructure_tries)))
+        //Innovation numbers as timespec's (high res. timestamps)
+        if(!(new_genome->mutate_add_node(newStructureTries)))
         {
-            //No node was added, no connection found to split. Maybe try again?            
+            //No node was added, no connection found to split. Maybe try again?
         }
     }
     else
     {
-        if (randfloat () < mutate_add_link_prob)
+        if (randFloat () < mutateAddLinkProb)
         {
-                       if (!(new_genome->mutate_add_link(idRobot, innovNum,
-                                              newstructure_tries)))
+            if (!(new_genome->mutate_add_link(newStructureTries)))
             {
                 //No link was added. Maybe all links all already present
             }
@@ -532,15 +537,15 @@ Genome *Genome::mutate(float sigma, int idRobot ,int idNewGenome, int &nodeId, i
         else
         {
             //If we didn't do a structural mutation, we do the other kinds
-            if (randfloat () < mutate_link_weights_prob)
+            if (randFloat () < mutateLinkWeightsProb)
             {
                 new_genome->mutate_link_weights (sigma);
             }
-            if (randfloat () < mutate_toggle_enable_prob)
+            if (randFloat () < mutateToggleEnableProb)
             {
                 new_genome->mutate_toggle_enable (1);
             }
-            if (randfloat () < mutate_gene_reenable_prob)
+            if (randFloat () < mutateGeneReenableProb)
             {
                 new_genome->mutate_gene_reenable ();
             }
@@ -556,11 +561,11 @@ void Genome::mutate_link_weights(double power)
     std::vector<Gene*>::iterator curgene;
 
     //Loop on all genes
-    //TODO - cap the weights to a value, even normalize weights [-1,+1]
+    //TODO - cap the weights to a value
     for(curgene=genes.begin();curgene!=genes.end();curgene++)
     {
         if((*curgene) -> enable)
-            ((*curgene)-> lnk) -> weight += power * gaussrand();
+            ((*curgene)-> lnk) -> weight += power * gaussRand();
     } //end for loop
 }
 
@@ -575,7 +580,7 @@ void Genome::mutate_toggle_enable(int times)
     for (count=1;count<=times;count++) {
 
         //Choose a random genenum
-        genenum=randint(0,genes.size()-1);
+        genenum=randInt(0,genes.size()-1);
 
         //find the gene
         thegene=genes.begin();
@@ -618,7 +623,7 @@ void Genome::mutate_gene_reenable() {
 
 }
 
-bool Genome::mutate_add_node(int idR,int &curnode_id,int &curinnov, int tries)
+bool Genome::mutate_add_node(int tries)
 {
     std::vector<Gene*>::iterator thegene;  //random gene containing the original link
     int genenum;  //The random gene number
@@ -647,7 +652,7 @@ bool Genome::mutate_add_node(int idR,int &curnode_id,int &curinnov, int tries)
         //This old totally random selection is bad- splitting
         //inside something recently splitted adds little power
         //to the system (should use a gaussian if doing it this way)
-        genenum=randint(0,genes.size()-1);
+        genenum=randInt(0,genes.size()-1);
 
         //find the gene
         thegene=genes.begin();
@@ -679,25 +684,24 @@ bool Genome::mutate_add_node(int idR,int &curnode_id,int &curinnov, int tries)
     out_node=thelink->out_node;
 
     innov innovClock;
-    innovClock.idR = idR;
-    innovClock.gc = curnode_id++;
+    clock_gettime(CLOCK_REALTIME,&innovClock.timestamp);
+
     //Create the new NNode
     newnode=new NNode(NEURON,innovClock,HIDDEN);
 
     //Create the new Genes
     if (thelink->is_recurrent)
     {
-        newgene1=new Gene(1.0,in_node,newnode,true,curinnov,idR);
-
-        newgene2=new Gene(oldweight,newnode,out_node,false,curinnov + 1,idR);
-        curinnov+=2;
+        clock_gettime(CLOCK_REALTIME,&innovClock.timestamp);
+        newgene1=new Gene(1.0,in_node,newnode,true,innovClock);
+        clock_gettime(CLOCK_REALTIME,&innovClock.timestamp);
+        newgene2=new Gene(oldweight,newnode,out_node,false,innovClock);
     }
     else {
-        newgene1=new Gene(1.0,in_node,newnode,false,curinnov,idR);
-
-        newgene2=new Gene(oldweight,newnode,out_node,false,curinnov + 1,idR);
-
-        curinnov+=2;
+        clock_gettime(CLOCK_REALTIME,&innovClock.timestamp);
+        newgene1=new Gene(1.0,in_node,newnode,false,innovClock);
+        clock_gettime(CLOCK_REALTIME,&innovClock.timestamp);
+        newgene2=new Gene(oldweight,newnode,out_node,false,innovClock);
     }
 
     //Now add the new NNode and new Genes to the Genome
@@ -713,7 +717,7 @@ bool Genome::mutate_add_node(int idR,int &curnode_id,int &curinnov, int tries)
 
 } 
 
-bool Genome::mutate_add_link(int idR, int &curinnov,int tries)
+bool Genome::mutate_add_link(int tries)
 {
     int nodenum1,nodenum2;  //Random node numbers
     std::vector<NNode*>::iterator thenode1,thenode2;  //Random node iterators
@@ -746,7 +750,7 @@ bool Genome::mutate_add_link(int idR, int &curinnov,int tries)
     trycount=0;
 
     //Decide whether to make this recurrent
-    if (randfloat() < recur_only_prob)
+    if (randFloat() < recurOnlyProb)
         do_recur=true;
     else do_recur=false;
 
@@ -767,7 +771,7 @@ bool Genome::mutate_add_link(int idR, int &curinnov,int tries)
         while(trycount<tries)
         {
             //Some of the time try to make a recur loop
-            if (randfloat()>0.5)
+            if (randFloat()>0.5)
             {
                 loop_recur=true;
             }
@@ -776,14 +780,14 @@ bool Genome::mutate_add_link(int idR, int &curinnov,int tries)
 
             if (loop_recur)
             {
-                nodenum1=randint(first_nonsensor,nodes.size()-1);
+                nodenum1=randInt(first_nonsensor,nodes.size()-1);
                 nodenum2=nodenum1;
             }
             else
             {
                 //Choose random nodenums
-                nodenum1=randint(0,nodes.size()-1);
-                nodenum2=randint(first_nonsensor,nodes.size()-1);
+                nodenum1=randInt(0,nodes.size()-1);
+                nodenum2=randInt(first_nonsensor,nodes.size()-1);
             }
 
             //Find the first node
@@ -839,8 +843,8 @@ bool Genome::mutate_add_link(int idR, int &curinnov,int tries)
         while(trycount<tries)
         {
             //Choose random nodenums
-            nodenum1=randint(0,nodes.size()-1);
-            nodenum2=randint(first_nonsensor,nodes.size()-1);
+            nodenum1=randInt(0,nodes.size()-1);
+            nodenum2=randInt(first_nonsensor,nodes.size()-1);
 
             //Find the first node
             thenode1=nodes.begin();
@@ -906,11 +910,12 @@ bool Genome::mutate_add_link(int idR, int &curinnov,int tries)
                 return false;
 
             //Choose the new weight
-            newweight=randposneg()*randfloat()*1.0;
+            newweight=randPosNeg()*randFloat()*1.0;
 
+            innov innovClock;
+            clock_gettime(CLOCK_REALTIME,&innovClock.timestamp);
             //Create the new gene
-            newgene=new Gene(newweight,nodep1,nodep2,recurflag,curinnov,idR);
-            curinnov=curinnov+1.0;
+            newgene=new Gene(newweight,nodep1,nodep2,recurflag,innovClock);
 
             done=true;
         }
@@ -949,8 +954,7 @@ void Genome::node_insert(std::vector<NNode*> &nlist,NNode *n)
 
     curnode=nlist.begin();
     while ( (curnode!=nlist.end()) &&
-            ( (((*curnode)->node_id.gc) < id.gc) ||
-           ((((*curnode)->node_id.gc) == id.gc) && ((*curnode)->node_id.idR) < id.idR) ))
+            (((*curnode)->node_id) < id))
         ++curnode;
 
     nlist.insert(curnode,n);
@@ -1059,7 +1063,7 @@ Genome *Genome::mate_multipoint(Genome *g,int genomeid,double fitness1,double fi
 
             if (p1innov==p2innov)
             {
-                if (randfloat()<0.5)
+                if (randFloat()<0.5)
                 {
                     chosengene=*p1gene;
                 }
@@ -1072,7 +1076,7 @@ Genome *Genome::mate_multipoint(Genome *g,int genomeid,double fitness1,double fi
                 //will likely be disabled
                 if ((((*p1gene)->enable)==false)||
                         (((*p2gene)->enable)==false))
-                    if (randfloat()<0.75) disable=true;
+                    if (randFloat()<0.75) disable=true;
 
                 ++p1gene;
                 ++p2gene;
@@ -1229,6 +1233,75 @@ int Genome::extrons()
     
     return total;
 }
+double Genome::dissimilarity(Genome *g)
+{
+    double result = 0.0;
+    double exc = 0.0 , disj = 0.0, weight = 0.0;
+
+    std::vector<Gene*>::iterator it1 = genes.begin();
+    std::vector<Gene*>::iterator it2 = g->genes.begin();
+
+    int maxLength;
+    if(genes.size() < g->genes.size())
+        maxLength = g->genes.size();
+    else
+        maxLength = genes.size();
+
+    bool done = (it1 == genes.end()) && (it2 == g -> genes.end());
+
+    while(!done)
+    {
+
+        if( (it2 == genes.end()) && !(it1 == genes.end()))
+        {
+            //There are still genes of the first genome
+            exc += 1.0;
+            it1++;
+        }
+        else if( (it1 == genes.end()) && !(it2 == genes.end()))
+        {
+            //There are still genes of the second genome
+            exc += 1.0;
+            it2++;
+        }
+        else //There are still genes of both genomes
+        {
+            Gene* g1 = *it1;
+            Gene* g2 = *it2;
+
+            if((g1 -> innovation_num) == (g2 -> innovation_num))
+            {
+                if(g1 -> enable && g2 ->enable)
+                {
+                    weight += fabs( (g1->lnk)->weight - (g2->lnk)->weight );
+                }
+                it1++;
+                it2++;
+            }
+            else if((g1 -> innovation_num) < (g2 -> innovation_num))
+            {
+                disj += 1.0;
+                it1++;
+            }
+            else if((g1 -> innovation_num) > (g2 -> innovation_num))
+            {
+                disj += 1.0;
+                it2++;
+            }
+            else
+            {
+                std::cerr << "[ERROR] Innovation numbers (timestamps) not comparable (?)" << std::endl;
+                exit(-1);
+            }
+
+        }
+
+        done = (it1 == genes.end()) && (it2 == g -> genes.end());
+    }
+
+    result = (coefE * exc/maxLength) + (coefD * disj/maxLength) + (coefW * weight);
+    return result;
+}
 
 void print_Genome_tofile(Genome *g,const char *filename) 
 {
@@ -1243,7 +1316,7 @@ void print_Genome_tofile(Genome *g,const char *filename)
 }
 
 //Random Functions 
-int randposneg()
+int randPosNeg()
 {
     if (rand()%2)
         return 1;
@@ -1251,16 +1324,16 @@ int randposneg()
         return -1;
 }
 
-int randint(int x,int y)
+int randInt(int x,int y)
 {
     return rand()%(y-x+1)+x;
 }
 
-double randfloat()
+double randFloat()
 {
     return rand() / (double) RAND_MAX;
 }
-double gaussrand()
+double gaussRand()
 {
     static int iset=0;
     static double gset;
@@ -1270,8 +1343,8 @@ double gaussrand()
     {
         do
         {
-            v1=2.0*(randfloat())-1.0;
-            v2=2.0*(randfloat())-1.0;
+            v1=2.0*(randFloat())-1.0;
+            v2=2.0*(randFloat())-1.0;
             rsq=v1*v1+v2*v2;
         } while (rsq>=1.0 || rsq==0.0);
         fac=sqrt(-2.0*log(rsq)/rsq);
@@ -1286,13 +1359,13 @@ double gaussrand()
     }
 }
 
-double fsigmoid(double activesum,double slope)
+double fSigmoid(double activesum,double slope)
 {
     //NON-SHIFTED STEEPENED
     return (1/(1+(exp(-(slope*activesum)))));
 }
 
-int getUnitCount(const char *string, const char *set)
+int getUnitCounts(const char *string, const char *set)
 {
     int count = 0;
     short last = 0;
@@ -1316,7 +1389,7 @@ int getUnitCount(const char *string, const char *set)
 } 
 
 
-bool load_neat_params(const char *filename, bool output)
+bool load_odneat_params(const char *filename, bool output)
 {
     std::ifstream paramFile(filename);
 
@@ -1330,56 +1403,60 @@ bool load_neat_params(const char *filename, bool output)
         printf("NEAT READING IN %s", filename);
 
     paramFile>>curword;
-    paramFile>>mutate_only_prob;
+    paramFile>>mutateOnlyProb;
 
     paramFile>>curword;
-    paramFile>>mutate_link_weights_prob;
+    paramFile>>mutateLinkWeightsProb;
 
     paramFile>>curword;
-    paramFile>>mutate_toggle_enable_prob;
+    paramFile>>mutateToggleEnableProb;
 
     paramFile>>curword;
-    paramFile>>mutate_gene_reenable_prob;
+    paramFile>>mutateGeneReenableProb;
 
     paramFile>>curword;
-    paramFile>>mutate_add_node_prob;
+    paramFile>>mutateAddNodeProb;
 
     paramFile>>curword;
-    paramFile>>mutate_add_link_prob;
+    paramFile>>mutateAddLinkProb;
 
     paramFile>>curword;
-    paramFile>>mate_only_prob;
+    paramFile>>mateOnlyProb;
 
     paramFile>>curword;
-    paramFile>>recur_only_prob;
+    paramFile>>recurOnlyProb;
 
     paramFile>>curword;
-    paramFile>>newstructure_tries;
+    paramFile>>newStructureTries;
 
 
     if(output)
     {
-        printf("mutate_only_prob=%f\n",mutate_only_prob);
-        printf("mutate_link_weights_prob=%f\n",mutate_link_weights_prob);
-        printf("mutate_toggle_enable_prob=%f\n",mutate_toggle_enable_prob);
-        printf("mutate_gene_reenable_prob=%f\n",mutate_gene_reenable_prob);
-        printf("mutate_add_node_prob=%f\n",mutate_add_node_prob);
-        printf("mutate_add_link_prob=%f\n",mutate_add_link_prob);        
-        printf("mate_only_prob=%f\n",mate_only_prob);
-        printf("recur_only_prob=%f\n",recur_only_prob);
-        printf("newstructure_tries=%d\n",newstructure_tries);
+        printf("mutate_only_prob=%f\n",mutateOnlyProb);
+        printf("mutate_link_weights_prob=%f\n",mutateLinkWeightsProb);
+        printf("mutate_toggle_enable_prob=%f\n",mutateToggleEnableProb);
+        printf("mutate_gene_reenable_prob=%f\n",mutateGeneReenableProb);
+        printf("mutate_add_node_prob=%f\n",mutateAddNodeProb);
+        printf("mutate_add_link_prob=%f\n",mutateAddLinkProb);
+        printf("mate_only_prob=%f\n",mateOnlyProb);
+        printf("recur_only_prob=%f\n",recurOnlyProb);
+        printf("newstructure_tries=%d\n",newStructureTries);
     }
     paramFile.close();
     return true;
 }
 
+double     mutateOnlyProb = 0; // Prob. of a non-mating reproduction
+double     mutateLinkWeightsProb = 0;
+double     mutateToggleEnableProb = 0;
+double     mutateGeneReenableProb = 0;
+double     mutateAddNodeProb = 0;
+double     mutateAddLinkProb = 0;
+double     mateOnlyProb = 0; // Prob. of mating without mutation
+double     recurOnlyProb = 0;  // Probability of forcing selection of ONLY links that are naturally recurrent
+int        newStructureTries = 0;  // Number of tries mutateAddLink will attempt to find an open link
 
-double     mutate_only_prob = 0; // Prob. of a non-mating reproduction 
-double     mutate_link_weights_prob = 0;
-double     mutate_toggle_enable_prob = 0;
-double     mutate_gene_reenable_prob = 0;
-double     mutate_add_node_prob = 0;
-double     mutate_add_link_prob = 0;
-double     mate_only_prob = 0; // Prob. of mating without mutation 
-double     recur_only_prob = 0;  // Probability of forcing selection of ONLY links that are naturally recurrent 
-int        newstructure_tries = 0;  // Number of tries mutate_add_link will attempt to find an open link
+double     coefE = 1.0;
+double     coefD = 1.0;
+double     coefW = 1.0;
+

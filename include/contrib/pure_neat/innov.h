@@ -1,5 +1,7 @@
 #ifndef INNOV_H
 #define INNOV_H
+namespace PURENEAT
+{
 //Struct for innovation numbers of topological innovations (nodes and links)
 //in a distributed setup. It stores a pair of integers
 //(idR: id of the robot creating the innovation, gc: gene counter in that robot)
@@ -32,5 +34,5 @@ struct innov
       return (idR > innov2.idR);
     }
 };
-
+}//namespace PURENEAT
 #endif // INNOV_H
