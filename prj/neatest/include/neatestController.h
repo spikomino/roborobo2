@@ -35,8 +35,8 @@ private:
     
     int            _items_collected; // items collected 
     int            _items_forraged;  // items brought back to the nest
-    int            _items_max; // basket capacity 
-    
+    int            _items_max;       // basket capacity 
+    double         _locomotion;      // accumulates the locomotion fitness
 
     double                  _sigma;
     GenomeAdapted*          _genome;

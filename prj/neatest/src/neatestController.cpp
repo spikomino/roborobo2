@@ -46,7 +46,8 @@ neatestController::neatestController(RobotWorldModel * wm){
 
   _items_collected   = 0;
   _items_forraged    = 0;
-  
+  _locomotion        = 0.0;
+
   _items_max         = 5;
 
   _neurocontroller = NULL;
@@ -123,7 +124,7 @@ void neatestController::reset(){
     _fitness = 0.0;
     _items_collected   = 0;
     _items_forraged    = 0;
-  
+    _locomotion        = 0.0;
     emptyBasket();
     emptyGenomeList();
 }
@@ -144,7 +145,7 @@ void neatestController::step(){
       stepEvolution (); // select, mutate, replace
       
       if (gVerbose){
-	  save_genome();
+	  //save_genome();
 	  printAll();
       }
       reset();          // reset fitness and neurocontroller
@@ -307,9 +308,10 @@ void neatestController::stepBehaviour(){
     switch(neatestSharedData::gFitnessFunction) {
 
     case 0: /* locomotion */
-	_fitness += (fabs(lv) + fabs(rv)) * 
+	_locomotion += (fabs(lv) + fabs(rv)) * 
 	    (1.0 - sqrt(fabs(lv - rv))) * 
 	    (1.0 - md) ;
+	_fitness = (double) _locomotion / (double) get_lifetime();
 	break;
 
     case 1: /* Collection */

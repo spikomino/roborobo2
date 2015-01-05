@@ -9,7 +9,7 @@ home = os.environ["HOME"]
 config_dir    = 'config'
 log_dir       = 'logs'
 template_file = 'template.properties'
-nb_exec       = 28
+nb_exec       = 32
 global_script = 'run-all'
 sr_extraction_script = 'genome_phylo_stats.py'
 sr_extraction_list = 'sr_list'
@@ -18,10 +18,10 @@ var_parameter = 'gSelectionPressure'
 var_values = [ '0.00', '0.25', '0.50', '0.75', '1.00' ]
 
 parameters={
-    'gInitialNumberOfRobots': 600,
-    'gNbOfPhysicalObjects': 300,
-    'gSigmaRef': 0.3,
-    'gFitnessFunction': 1,  # 0: locomotion, 1: collection, 2: forraging 
+    'gInitialNumberOfRobots': 150,
+    'gNbOfPhysicalObjects': 0,
+    'gSigmaRef': 0.5,
+    'gFitnessFunction': 0,  # 0: locomotion, 1: collection, 2: forraging 
     'gControllerType': 1,   # 0 = NEAT, 1 = FFNN
     'gEvaluationTime': 200,
     'gMaxIt'         : 20000, 
