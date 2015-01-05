@@ -144,7 +144,7 @@ void neatestController::step(){
       stepEvolution (); // select, mutate, replace
       
       if (gVerbose){
-	  //save_genome();
+	  save_genome();
 	  printAll();
       }
       reset();          // reset fitness and neurocontroller
@@ -439,7 +439,7 @@ void neatestController::emptyGenomeList(){
 void neatestController::stepEvolution() {
     /* store our genome in the list */
     message msg (_genome, _fitness, _sigma, _birthdate);
-    //storeMessage(_wm->getId(), msg);
+    storeMessage(_wm->getId(), msg);
 
     if (_glist.size()>0){
 	_wm->setAlive(true);

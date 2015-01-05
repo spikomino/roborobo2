@@ -6,3 +6,4 @@ rm -f logs/robotsId*.bmp
 rm -f logs/*.eps
 rm -f logs/log.txt
 rm -f logs/extract*.dat*
+rm -f logs/*.gen

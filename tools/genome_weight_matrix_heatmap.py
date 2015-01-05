@@ -34,7 +34,6 @@ if __name__ == '__main__':
     defaults_opts['path']      = 'test'
     (options, args) = read_options(defaults_opts)
 
-
     # read the directory (list the genome files)
     fl = []
     for f in os.listdir(options.path):
@@ -45,7 +44,6 @@ if __name__ == '__main__':
     M=[]
     for f in fl :
         M.append(process_weight_matrix(f))
-
         
     # compute the pairewise distance 
 
@@ -53,8 +51,8 @@ if __name__ == '__main__':
     for x in xrange(len(M)):
         for y in xrange(x,len(M)):
             Z[x][y] = weight_matrix_dist(M[x], M[y])
+   
     fig = pylab.figure() 
-    
     ax = pylab.axes([0.025,0.025,0.95,0.95])
     pylab.imshow(Z,interpolation='nearest', cmap='spectral', origin='lower')
     pylab.colorbar(shrink=.92)

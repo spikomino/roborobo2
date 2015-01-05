@@ -36,10 +36,10 @@ if __name__ == '__main__':
     defaults_opts['outfile']   = None 
     (options, args) = read_options(defaults_opts)
 
-    # Create the graph object of the genome
+    # Create weight matrix 
     m = process_weight_matrix(options.infile)
     
-    # save to file 
+    # print the matrix 
     if options.outfile == None :
         print m
         
