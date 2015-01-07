@@ -5,6 +5,7 @@
 import os, re, sys, pylab, progressbar 
 from os import listdir
 from os.path import isfile, join
+from scipy.stats import *
 
 # find datalog in a directory coresponfing to one experiment
 # in  : a directory path
@@ -91,6 +92,12 @@ def acc_above_target(data, trg_gen):
         g +=1
     return result
 
+def stat_test(x,y, ks=True):
+    if ks:
+        return ks_2samp(x,y)
+    else :
+        return  mannwhitneyu(x,y)
+
 # process multiple datalogs
 def process_experiment(path):
     datalogs = list_datalogs(path)
@@ -166,6 +173,13 @@ def draw_data(exp, runs=False, tex=False):
     ax2.set_title('Average accumulated swarm fitness')
     ax2.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
     ax2.set_xticklabels=l
+
+
+    # stat test 
+    for i in xrange(len(stats)) :
+        for j in xrange(i+1,len(stats)) :
+            print stat_test(stats[i], stats[j])
+            
 
     # Fix budget swarm fitness
     ax3 = pylab.subplot2grid((2,3), (0, 2))
