@@ -60,11 +60,13 @@ class odNeatSharedData {
 
   static double gDefaultInitialEnergy;
   static double gEnergyThreshold;
+  static double gMaxEnergy;
 
   static int gMaturationPeriod;
   static unsigned int gMaxPopSize;
   static double gCompatThreshold;
 
+  static int gFitnessFreq;
   static int gTabuTimeout;
   static double gTabuThreshold;
 

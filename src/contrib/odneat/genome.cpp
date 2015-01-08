@@ -260,7 +260,7 @@ Genome::Genome(int id,int num_in,int num_out) {
 }
 
 Genome::~Genome() 
-{
+{    
     std::vector<NNode*>::iterator curnode;
     std::vector<Gene*>::iterator curgene;
 
@@ -269,8 +269,6 @@ Genome::~Genome()
     
     for(curgene=genes.begin();curgene!=genes.end();++curgene)
         delete (*curgene);
-
-
 }
 
 Network *Genome::genesis()
@@ -490,6 +488,7 @@ Genome *Genome::duplicate()
 
     newgenome->mom_id = this->mom_id;
     newgenome->dad_id = this->dad_id;
+    newgenome->species = -1;
 
     return newgenome;
 
@@ -560,13 +559,25 @@ void Genome::mutate_link_weights(double power)
 {
     std::vector<Gene*>::iterator curgene;
 
-    //Loop on all genes
-    //TODO - cap the weights to a value
+    //Loop on all genes    
     for(curgene=genes.begin();curgene!=genes.end();curgene++)
     {
         if((*curgene) -> enable)
+        {
             ((*curgene)-> lnk) -> weight += power * gaussRand();
+            ((*curgene)-> lnk) -> weight = capWeights(((*curgene)-> lnk) -> weight);
+        }
     } //end for loop
+}
+
+double Genome::capWeights(double w)
+{
+    double result = w;
+    if(result < -rangeW)
+        result = -rangeW;
+    if(result > +rangeW)
+        result = +rangeW;
+    return result;
 }
 
 void Genome::mutate_toggle_enable(int times) 
@@ -1252,13 +1263,13 @@ double Genome::dissimilarity(Genome *g)
     while(!done)
     {
 
-        if( (it2 == genes.end()) && !(it1 == genes.end()))
+        if( (it2 == g -> genes.end()) && !(it1 == genes.end()))
         {
             //There are still genes of the first genome
             exc += 1.0;
             it1++;
         }
-        else if( (it1 == genes.end()) && !(it2 == genes.end()))
+        else if( (it1 == genes.end()) && !(it2 == g -> genes.end()))
         {
             //There are still genes of the second genome
             exc += 1.0;
@@ -1458,5 +1469,7 @@ int        newStructureTries = 0;  // Number of tries mutateAddLink will attempt
 
 double     coefE = 1.0;
 double     coefD = 1.0;
-double     coefW = 1.0;
+double     coefW = 0.4;
+
+double     rangeW = 10.0;
 

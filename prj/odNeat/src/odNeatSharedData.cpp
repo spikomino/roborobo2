@@ -42,13 +42,15 @@ int odNeatSharedData::gControllerType = -1; // cf. header for description
 
 double odNeatSharedData::gDefaultInitialEnergy = 100;
 double odNeatSharedData::gEnergyThreshold = 0;
+double odNeatSharedData::gMaxEnergy = 2*odNeatSharedData::gDefaultInitialEnergy;
 
 int odNeatSharedData::gMaturationPeriod = 50;
 unsigned int odNeatSharedData::gMaxPopSize = 20;
-double odNeatSharedData::gCompatThreshold = 3.0;
+double odNeatSharedData::gCompatThreshold = 10.0;
 
+int odNeatSharedData::gFitnessFreq = 10;
 int odNeatSharedData::gTabuTimeout = 15;
-double odNeatSharedData::gTabuThreshold = 3.0;
+double odNeatSharedData::gTabuThreshold = 1.0;
 
 
 double odNeatSharedData::gEnergItemValue = 1.0;

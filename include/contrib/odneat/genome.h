@@ -41,6 +41,8 @@ namespace ODNEAT
 
     int species;
 
+    int nbFitnessUpdates;//average on how many energy measures
+
     std::vector<NNode*> nodes; //List of NNodes for the Network
     std::vector<Gene*> genes; //List of innovation-tracking genes
 
@@ -88,6 +90,8 @@ namespace ODNEAT
     // Add Gaussian noise to all linkweights with variance power ^ 2
     void mutate_link_weights(double power);
     
+    double capWeights(double w);
+
     // toggle genes on or off 
     void mutate_toggle_enable(int times);
     
@@ -148,6 +152,8 @@ namespace ODNEAT
     extern double     coefE;
     extern double     coefD;
     extern double     coefW;
+
+    extern double     rangeW;
     
   }
 } // namespace ODNEAT

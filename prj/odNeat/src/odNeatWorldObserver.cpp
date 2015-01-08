@@ -35,8 +35,28 @@ odNeatWorldObserver::odNeatWorldObserver( World* world ) : WorldObserver( world 
     gProperties.checkAndGetPropertyValue("gFitness",&odNeatSharedData::gFitness,true);
     gProperties.checkAndGetPropertyValue("gSigmaRef",&odNeatSharedData::gSigmaRef,true);
 
+    //odNeat parameters
+    gProperties.checkAndGetPropertyValue("gDefaultInitialEnergy",&odNeatSharedData::gDefaultInitialEnergy,true);
+    gProperties.checkAndGetPropertyValue("gEnergyThreshold",&odNeatSharedData::gEnergyThreshold,true);
+    gProperties.checkAndGetPropertyValue("gMaturationPeriod",&odNeatSharedData::gMaturationPeriod,true);
+    int aux;
+    gProperties.checkAndGetPropertyValue("gMaxPopSize",&aux,true);
+    if(aux > 0 )
+        odNeatSharedData::gMaxPopSize = aux;//abs(aux);
+    else
+    {
+        std::cerr << "[ERROR] Wrong gMaxPopSize" << std::endl;
+        exit(-1);
+    }
+    gProperties.checkAndGetPropertyValue("gCompatThreshold",&odNeatSharedData::gCompatThreshold,true);
+    gProperties.checkAndGetPropertyValue("gTabuTimeout",&odNeatSharedData::gTabuTimeout,true);
+    gProperties.checkAndGetPropertyValue("gTabuThreshold",&odNeatSharedData::gTabuThreshold,true);
+    gProperties.checkAndGetPropertyValue("gEnergItemValue",&odNeatSharedData::gEnergItemValue,true);
+    gProperties.checkAndGetPropertyValue("gFitnessFreq",&odNeatSharedData::gFitnessFreq,true);
 
-    odNeatSharedData::gEvoLog.open(odNeatSharedData::gEvolutionLogFile, std::ofstream::out | std::ofstream::app);
+
+    odNeatSharedData::gEvoLog.open(odNeatSharedData::gEvolutionLogFile);//, std::ofstream::out | std::ofstream::app);
+
     if(!odNeatSharedData::gEvoLog)
     {
         std::cerr << "[ERROR] Could not open log file " << odNeatSharedData::gEvolutionLogFile << std::endl;
@@ -108,7 +128,8 @@ void odNeatWorldObserver::updateMonitoring()
         
         if ( gVerbose )
         {
-            std::cout << "[gen:" << (gWorld->getIterations()/odNeatSharedData::gEvaluationTime) << ";pop:" << activeCount << "]\n";
+            //odNeat not generational
+            //std::cout << "[gen:" << (gWorld->getIterations()/odNeatSharedData::gEvaluationTime) << ";pop:" << activeCount << "]\n";
         }
         
         // Logging
@@ -121,7 +142,13 @@ void odNeatWorldObserver::updateMonitoring()
     {
         //It may be possible to force fitness log on all robots
         //before closing (for all robots printAll())
+        for ( int i = 0 ; i != gNumberOfRobots ; i++ )
+        {
+            (dynamic_cast<odNeatController*>(gWorld->getRobot(i)->getController()))->printAll();
+            (dynamic_cast<odNeatController*>(gWorld->getRobot(i)->getController()))->save_genome();
+            (dynamic_cast<odNeatController*>(gWorld->getRobot(i)->getController()))->logGenome();
 
+        }
         odNeatSharedData::gEvoLog.close();
     }
 }

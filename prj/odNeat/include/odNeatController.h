@@ -39,7 +39,8 @@ private:
     //Map of all <idspecies,species> with their respective fitness values
     std::map<int,std::pair<std::set<Genome*>,double>> species;
 
-    std::set<std::pair<Genome*, int>> tabu; //Set of dropped genomes, with the timeout when they are not to be accepted
+    std::vector< std::pair<Genome*, int> > tabu; //Set of dropped genomes, with the timeout when they are not to be accepted
+    int _fitnessUpdateCounter; //Fitness is measured every gFitnessFreq steps    
 
     bool in_maturation_period();
 
@@ -50,16 +51,23 @@ private:
 
     void add_to_tabu_list(Genome* g);
     bool tabu_list_approves(Genome* g);
+    int tabu_contains(Genome*  g);
+
 
     bool population_accepts(message msg);
     void add_to_population(message msg);
+    void add_unconditional_to_population(message msg);
+    int findInPopulation(Genome* g);
+    int findInSpecies(Genome* g);
+    void cleanPopAndSpecies();
     void add_to_species(message msg);
     int computeSpeciesId(Genome* g);
+    void recomputeAllSpecies();
 
     void adjust_population_size();
 
     void adjust_species_fitness();
-
+    void adjust_active_species_fitness(int species);
     Genome* generate_offspring();
     int selectSpecies();
     Genome* selectParent(int spId);
@@ -88,7 +96,7 @@ private:
     void stepEvolution ();
     int get_lifetime();
     bool lifeTimeOver();
-    void logGenome();
+
     void loadNewGenome ();
     void emptyGenomeList();
 
@@ -100,17 +108,7 @@ private:
     static bool compareFitness(std::pair<int,float> i,std::pair<int,float> j);
 
 
-    /* misc */
 
-    void printRobot      ();
-    void print_genome     (Genome* g);
-    void save_genome     ();
-    void printAll        ();
-
-    void printIO(std::pair<std::vector<double>,std::vector<double>> io);
-    void printVector(std::vector<double> v);
-    void printFitnessList();
-    
     bool getNewGenomeStatus ()
     {
         return _isNewGenome;
@@ -146,6 +144,17 @@ public:
 
     odNeatController (RobotWorldModel * wm);
     ~odNeatController ();
+
+    /* misc */
+    void logGenome();
+    void printRobot      ();
+    void print_genome     (Genome* g);
+    void save_genome     ();
+    void printAll        ();
+
+    void printIO(std::pair<std::vector<double>,std::vector<double>> io);
+    void printVector(std::vector<double> v);
+    void printFitnessList();
 
     void reset ();
     void step ();
