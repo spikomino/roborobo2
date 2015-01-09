@@ -74,11 +74,16 @@ if __name__ == '__main__':
     
   
     # create the phylogenetic tree
-    G = create_phylo_tree(options.infile)
+    #G = create_phylo_tree(options.infile)
+    #R = compute_survival_rate(G)
+  
+
+    # second faster method to compute the survival rate 
+    R = compute_survival_rate_by_genome_id(options.infile)
+    k = R.keys() 
+    k.sort()
     
-    R = compute_survival_rate(G)
-    
-    for r in R :
-        print r
-        
-        
+
+    for r in k :
+        print R[r]
+  

@@ -126,7 +126,7 @@ void neatestController::reset(){
     _items_forraged    = 0;
     _locomotion        = 0.0;
     emptyBasket();
-    //emptyGenomeList();
+    emptyGenomeList();
 }
 
 void neatestController::step(){

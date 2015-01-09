@@ -179,6 +179,11 @@ def graph_from_graph(G, fname):
 # phylogenetic related functions
 ################################################################################
 
+
+
+
+
+
 # extract the genome form a line and put it in the right list
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
@@ -262,6 +267,57 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
         nx.write_dot(G, dotfile)
     
     return G
+
+# modified survival rate computation based on genome id at each generation
+# in  : a log file.
+# out : the number of different genomes at each generation 
+def compute_survival_rate_by_genome_id(fname):
+
+    G = {} # dictionary whose keys are iteration number at each generation 
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and data[0] == '[Robot:' :
+            # read the iteration number 
+            itr = int(data[2].split('=')[1]) 
+            G[itr] = []
+    fh.close()   
+
+    # compute the number of genomes 
+    num_genomes=0
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and data[0] == '[initRobot]' :
+            num_genomes=num_genomes+1
+    fh.close()   
+
+
+    def read_robot_line(d):
+        if d[10] != '][Genome:' :
+            return (None, None)
+        gid = int(d[11].split('=')[1]) 
+        itr = int(d[2].split('=')[1]) 
+        return (gid, itr)
+
+    # fill the lists 
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data != [] and  data[0] == '[Robot:' :
+            (id,it) = read_robot_line(data)
+            if id != None :
+                G[it].append(id)
+    fh.close()   
+
+    R = {}
+    for g in G.keys() :
+        R[g] = len(list(set(G[g]))) / float(num_genomes)
+
+
+    return R
+
+
 
 # Compute survival rate
 # in  : a phylo genetic graph
