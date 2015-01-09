@@ -10,6 +10,7 @@
 #include "Config/TestMedeaConfigurationLoader.h"
 #include "Config/SimpleConfigurationLoader.h"
 #include "Config/odNeatConfigurationLoader.h"
+#include "Config/odNeatGCConfigurationLoader.h"
 //###DO-NOT-DELETE-THIS-LINE###TAG:INCLUDE###//
 
 
@@ -81,6 +82,12 @@ ConfigurationLoader* ConfigurationLoader::make_ConfigurationLoader (std::string 
 	else if (configurationLoaderObjectName == "odNeatConfigurationLoader" )
 	{
 		return new odNeatConfigurationLoader();
+	}
+#endif
+#if defined PRJ_ODNEATGC || !defined MODULAR
+	else if (configurationLoaderObjectName == "odNeatGCConfigurationLoader" )
+	{
+		return new odNeatGCConfigurationLoader();
 	}
 #endif
     //###DO-NOT-DELETE-THIS-LINE###TAG:SWITCH###//
