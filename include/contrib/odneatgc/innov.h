@@ -12,8 +12,8 @@ namespace ODNEATGC
 //update the receiver gc and thus avoiding gene counter collisions as much as possible
 struct innov
 {
-  int idR = -1;
-  int gc = -1;
+  int idR;
+  int gc;
   bool operator ==(const innov& innov2)
     {
         return ((idR == innov2.idR) && (gc == innov2.gc));
