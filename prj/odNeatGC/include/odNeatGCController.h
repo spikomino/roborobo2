@@ -43,7 +43,7 @@ private:
 
     bool in_maturation_period();
 
-    double _energy;
+
     double update_energy_level();
     double updateEnergyNavigation();
     double updateEnergyForaging();
@@ -119,11 +119,8 @@ private:
 
     // evolutionary engine
 
-    Genome *_genome;
-
     std::vector<double> _previousOut;
 
-    float _fitness;
     int _items;
     float _sigma;
     /* Floreano's navigation fitness related attributes */
@@ -143,6 +140,10 @@ public:
 
     odNeatGCController (RobotWorldModel * wm);
     ~odNeatGCController ();
+
+    double _energy;
+    Genome *_genome;
+    float _fitness;
 
     /* misc */
     void logGenome();

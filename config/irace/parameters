@@ -35,5 +35,5 @@ mutate_add_link_prob 	       "-l " 	r   (0.0, 1.0)		| mutate_only_prob > 0.0
 mate_only_prob 		       "-x " 	r   (0.0, 1.0)		| mutate_only_prob < 1.0
 recur_only_prob  	       "-r " 	r   (0.0, 1.0)		| mutate_add_link_prob > 0.0
 sigma			       "-s "	r   (0.0, 3.0)		| mutate_link_weights_prob > 0.0
-gMaturationPeriod 	       "-q"	i   (10,60)
+gMaturationPeriod 	       "-q"	i   (5,50)
 gMaxPopSize		       "-p"	i   (5,50)

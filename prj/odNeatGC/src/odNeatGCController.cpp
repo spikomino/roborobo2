@@ -52,6 +52,7 @@ odNeatGCController::reset()
 
     _birthdate = gWorld->getIterations ();
     _energy = odNeatGCSharedData::gDefaultInitialEnergy;
+    _fitness = _energy;
     emptyBasket();
 
     //Fitness initialized to 0, so species will be "hindered"
@@ -420,7 +421,7 @@ void
 odNeatGCController::stepEvolution ()
 {
 
-    logGenome();
+    //logGenome();
 
     add_to_population(message(_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber));
     add_to_tabu_list(_genome);
@@ -604,7 +605,7 @@ void odNeatGCController::printFitnessList()
 // Save a genome (file name = robot_id-genome_id.gen)
 void odNeatGCController::save_genome(){
     char fname[128];
-    snprintf(fname, 127, "logs/genomes/%04d-%010d.gen",
+    snprintf(fname, 127, (odNeatGCSharedData::gGenomeLogFolder+"%04d-%010d.gen").c_str(),
              _wm->getId(), _genome->genome_id);
     std::ofstream oFile(fname);
     _genome->print_to_file(oFile);
@@ -1056,7 +1057,7 @@ void odNeatGCController::recomputeAllSpecies()
     species.clear();
 
     std::map < int, message>::iterator it = population.begin();
-    int i = 0;
+    unsigned int i = 0;
     for(;it != population.end() ; it++)
     {
         //Invalidate previous species
@@ -1064,7 +1065,7 @@ void odNeatGCController::recomputeAllSpecies()
         add_to_species(it->second);
         i++;
     }
-    if(i > 20)
+    if(i > odNeatGCSharedData::gMaxPopSize)
     {
         std::cerr << "[ERROR] Excess in population : " << i << "/" << odNeatGCSharedData::gMaxPopSize  << std::endl;
         exit(-1);

@@ -1,8 +1,9 @@
 #!/bin/bash
 
 EXE=./roborobo
-TEMPLATE=config/templateOdneatIrace.properties
+TEMPLATE=config/templateGcIrace.properties
 FIXED_PARAMS="-l"
+
 
 OPTIND=1         # Reset in case getopts has been used previously in the shell.
 
@@ -57,6 +58,7 @@ done
 #Create parameter file from template
 PARAMFNAME="${i}.${cand}.param"
 
+
 cp ${TEMPLATE} ${PARAMFNAME}
 
 #Read current instance (random seed)
@@ -85,11 +87,32 @@ echo "gSigmaRef = $s " >> $PARAMFNAME
 echo "gMaturationPeriod = $q " >> $PARAMFNAME
 echo "gMaxPopSize = $p " >> $PARAMFNAME
 
-if [ ! -f logs/out.log ]; then
-   touch logs/out.log
+
+
+####
+#Log experiments in different files so
+#several parallel runs can be launched
+
+
+folder="logs/$cand"
+
+if [ ! -f $folder ]; then
+   mkdir $folder
+   mkdir $folder/genomes
 fi
 
-$EXE $FIXED_PARAMS $PARAMFNAME >> logs/out.log 2> /dev/null
+log="$folder/$cand.out.log"
+
+if [ ! -f $log ]; then
+   touch $log
+fi
+
+echo "gGenomeLogFolder = $folder/genomes/ " >> $PARAMFNAME
+echo "gEvolutionLogFile = $folder/gcodneat.log " >> $PARAMFNAME
+
+
+$EXE $FIXED_PARAMS $PARAMFNAME >> $log  2> /dev/null
+
 
 timeBack=0.08
 
@@ -97,13 +120,30 @@ timeBack=0.08
 #Read "cost/quality" measure of the run (to be minimized)
 #Testing with average accumulated swarm fitness (for last 8% of evo)
 #Since this measure is to be minimized, we take 1/(avgAccumSwarmFit)
-cost=`R --slave --args logs/evolution.log $timeBack < tools/accumMeanEnd.r` #recover it with val=`... `
+#TOFIX
+cost=`R --slave --args $folder/gcodneat.log $timeBack < tools/accumMeanEnd.r` #recover it with val=`... `
 
-rm logs/out.log
-rm logs/evolution.log
+
+timestamp=`date +"%s"`
+
+outGFolder="config/irace/results/$timestamp"
+
+if [ ! -d "$outGFolder" ]; then
+  mkdir $outGFolder
+else
+ mkdir backup
+ mv -R $outFolder backup
+ mkdir $outFolder
+fi
+
+zip -r "logs/$cand.zip" "logs/$cand" 
+rm -rf "logs/$cand"
+
+#Erase data if too heavy
+rm "logs/$cand.zip"
+#mv "logs/$cand.zip" $outGFolder
 
 #Acc. swarm fitness is a performance measure to be maximized
 #Since irace expects a cost measure to be minimized, -1 times the value is returned
-#TOCHECK it could be 1/value
 echo  -$cost
 
