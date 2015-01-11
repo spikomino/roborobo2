@@ -163,6 +163,7 @@ void odNeatGCWorldObserver::updateMonitoring()
            // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->save_genome();
            // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->logGenome();
 
+        odNeatGCController* c = (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()));
 
             odNeatGCSharedData::gEvoLog << gWorld->getIterations()
                                        << " " << c->getWorldModel()->getId()
