@@ -43,13 +43,14 @@ if __name__ == '__main__':
     
     M=[]
     for f in fl :
-        M.append(process_weight_matrix(f))
+        M.append(process_weight_matrix(options.path+'/'+f))
         
     # compute the pairewise distance 
+    size = 20 #len(M)
 
-    Z =  [[0 for x in xrange(len(M))] for x in xrange(len(M))]
-    for x in xrange(len(M)):
-        for y in xrange(x,len(M)):
+    Z =  [[0 for x in xrange(size)] for x in xrange(size)]
+    for x in xrange(size):
+        for y in xrange(x,size):
             Z[x][y] = weight_matrix_dist(M[x], M[y])
    
     fig = pylab.figure() 

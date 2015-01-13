@@ -149,102 +149,30 @@ def process_experiment(path):
 
 # draw a figure
 
-
-
-
-def draw_data(exp, runs=False, tex=False): 
-    font = {'family' : 'serif', 'size'   : 6}
-    if tex :
-        matplotlib.rc('text', usetex=True)
-    matplotlib.rc('font', **font)
-    bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
-    colors = bmap.mpl_colors
+def plot_one_curve(data, color, axis, label, quartiles=False):
+    med, perc_25, perc_75 = perc(data)
+    if quartiles :
+        axis.fill_between(np.arange(0, len(med)), perc_25, perc_75,
+                          alpha=0.25, linewidth=0, color=colors)
+    axis.plot(med, lw=2, label=label, color=color)
     
-    fig = figure(num=None, figsize=(10, 5), dpi=100)
-    clf()
+      
+    axis.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+    axis.spines['top'].set_visible(False)
+    axis.spines['right'].set_visible(False)
+    axis.spines['left'].set_visible(False)
+    axis.get_xaxis().tick_bottom()
+    axis.get_yaxis().tick_left()
+    axis.tick_params(axis='x', direction='out')
+    axis.tick_params(axis='y', length=0)
+    for spine in axis.spines.values():
+        spine.set_position(('outward', 5))
+    axis.set_axisbelow(True)
 
-    # median Fitness
-    ax1 = subplot2grid((2,3), (0,0))
-    c=0
-    for e in exp:
-        (n, data, stats, survival) = e
-        med, perc_25, perc_75 = perc(data)
-        
-        if runs :
-            ax1.fill_between(np.arange(0, len(med)), perc_25, perc_75,
-                              alpha=0.25, linewidth=0, color=colors[c])
-           
-        ax1.plot(med, lw=2, label=re.sub('[_/]', '', n), color=colors[c] )
-        c=c+1
-
-    ax1.set_title('Median swarm fitness over time (%d runs)'%(len(data)))
-    ax1.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
-    ax1.legend(loc='lower right')
-    ax1.set_xlabel('Generations')
-    ax1.set_ylabel('Fitness')   
+def plot_boxplot(stats, colors, axis, labels, sig=False):
     
-    ax1.spines['top'].set_visible(False)
-    ax1.spines['right'].set_visible(False)
-    ax1.spines['left'].set_visible(False)
-    ax1.get_xaxis().tick_bottom()
-    ax1.get_yaxis().tick_left()
-    ax1.tick_params(axis='x', direction='out')
-    ax1.tick_params(axis='y', length=0)
-    # offset the spines
-    for spine in ax1.spines.values():
-        spine.set_position(('outward', 5))
-    # put the grid behind
-    ax1.set_axisbelow(True)
+    bp = axis.boxplot(stats)
 
-
-
-    # Median Lineage survival rate
-    ax11 = subplot2grid((2,3), (1,0))
-    c=0
-    for e in exp:
-        (n, data, stats, survival) = e
-        med, perc_25, perc_75 = perc(survival)
-        if runs :
-            ax11.fill_between(np.arange(0, len(med)), perc_25, perc_75,
-                              alpha=0.5, linewidth=0, color=colors[c])
-        ax11.plot(med, lw=2, label=re.sub('[_/]', '', n), color=colors[c]) 
-        c=c+1
-
-    ax11.set_title('Median number of genetic lines over time (%d runs)'%(len(data)))
-    ax11.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
-    ax11.legend(loc='upper right')
-    ax11.set_xlabel('Generations')
-    ax11.set_ylabel('Rate of survival')  
-
-    ax11.spines['top'].set_visible(False)
-    ax11.spines['right'].set_visible(False)
-    ax11.spines['left'].set_visible(False)
-    ax11.get_xaxis().tick_bottom()
-    ax11.get_yaxis().tick_left()
-    ax11.tick_params(axis='x', direction='out')
-    ax11.tick_params(axis='y', length=0)
-    # offset the spines
-    for spine in ax11.spines.values():
-        spine.set_position(('outward', 5))
-    # put the grid behind
-    ax11.set_axisbelow(True)
-
-
-
-
-    # average accumulated swarm fitness
-    ax2 = subplot2grid((2,3), (0,1))
-    stats=[]
-    l=[]
-    for e in exp:
-        (n, d, s, r) = e 
-        stats.append(s['aasf']) 
-        l.append(re.sub('[_/]', '', n))
-        print n, l
-
-
-
-    bp = ax2.boxplot(stats)
     for i in range(0, len(bp['boxes'])):
         bp['boxes'][i].set_color(colors[i])
         # we have two whiskers!
@@ -276,38 +204,91 @@ def draw_data(exp, runs=False, tex=False):
             boxY.append(box.get_ydata()[j])
             boxCoords = zip(boxX,boxY)
             boxPolygon = Polygon(boxCoords, facecolor = colors[i], linewidth=0)
-            ax2.add_patch(boxPolygon)
+            axis.add_patch(boxPolygon)
 
 
-    ax2.set_title('Average accumulated swarm fitness')
-    ax2.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
-    ax2.set_xticklabels=l
-    ax2.spines['top'].set_visible(False)
-    ax2.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
-    ax2.get_xaxis().tick_bottom()
-    ax2.get_yaxis().tick_left()
-    ax2.tick_params(axis='x', direction='out')
-    ax2.tick_params(axis='y', length=0)
     
+    axis.set_xticklabels(labels)
+    axis.spines['top'].set_visible(False)
+    axis.spines['right'].set_visible(False)
+    axis.spines['left'].set_visible(False)
+    axis.get_xaxis().tick_bottom()
+    axis.get_yaxis().tick_left()
+    axis.tick_params(axis='x', direction='out')
+    axis.tick_params(axis='y', length=0)
+    axis.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+    axis.set_axisbelow(True)
 
 
     # stat test 
-    for i in xrange(len(stats)) :
-        for j in xrange(i+1,len(stats)) :
-            y_max = max(concatenate((stats[i], stats[j])))
-            y_min = min(concatenate((stats[i], stats[j])))
-            z,p = stat_test(stats[i], stats[j])
+    if sig :
+        for i in xrange(len(stats)) :
+            for j in xrange(i+1,len(stats)) :
+                y_max = max(concatenate((stats[i], stats[j])))
+                y_min = min(concatenate((stats[i], stats[j])))
+                z,p = stat_test(stats[i], stats[j])
 
-            ax2.annotate("", xy=(i+1, y_max), xycoords='data',
-                         xytext=(j+1, y_max), textcoords='data',
-                         arrowprops=dict(arrowstyle="-", ec='#aaaaaa',
-                                         connectionstyle="bar,fraction=0.1"))
-            ax2.text((j-i)/2.0 + j, y_max + abs(y_max - y_min)*0.1, stars(p*2.0),
-                     horizontalalignment='center',
-                     verticalalignment='center')
-          
-            
+                axis.annotate("", xy=(i+1, y_max), xycoords='data',
+                             xytext=(j+1, y_max), textcoords='data',
+                             arrowprops=dict(arrowstyle="-", ec='#aaaaaa',
+                                             connectionstyle="bar,fraction=0.1"))
+                axis.text((j-i)/2.0 + j, y_max + abs(y_max - y_min)*0.1, stars(p*2.0),
+                         horizontalalignment='center',
+                         verticalalignment='center')
+                
+         
+
+
+
+
+def draw_data(exp, runs=False, tex=False): 
+    font = {'family' : 'serif', 'size'   : 6}
+    if tex :
+        matplotlib.rc('text', usetex=True)
+    matplotlib.rc('font', **font)
+    bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
+    colors = bmap.mpl_colors
+   
+
+    figure(num=None, figsize=(10, 5), dpi=100)
+    clf()
+
+    # median Fitness
+    ax1 = subplot2grid((2,3), (0,0))
+    c=0
+    for e in exp:
+        (n, data, stats, survival) = e
+        plot_one_curve(data, colors[c], ax1,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    ax1.set_title('Median swarm fitness over time (%d runs)'%(len(data)))
+    ax1.legend(loc='lower right')
+    ax1.set_xlabel('Generations')
+    ax1.set_ylabel('Fitness')   
+
+    # Median Lineage survival rate
+    ax11 = subplot2grid((2,3), (1,0))
+    c=0
+    for e in exp:
+        (n, data, stats, survival) = e
+        plot_one_curve(survival, colors[c], ax11,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    ax11.set_title('Genetic lines over time (%d runs)'%(len(data)))
+    ax11.legend(loc='upper right')
+    ax11.set_xlabel('Generations')
+    ax11.set_ylabel('Rate of survival')  
+
+
+    # average accumulated swarm fitness
+    ax2 = subplot2grid((2,3), (0,1))
+    stats=[]
+    l=[]
+    for e in exp:
+        (n, d, s, r) = e 
+        stats.append(s['aasf']) 
+        l.append(re.sub('[_/]', '', n))
+        
+        plot_boxplot(stats, colors, ax2, l, sig=False)
+        ax2.set_title('Average accumulated swarm fitness')
 
     # Fix budget swarm fitness
     ax3 = subplot2grid((2,3), (0, 2))
@@ -317,9 +298,9 @@ def draw_data(exp, runs=False, tex=False):
         (n, d, s, r) = e
         stats.append(s['fbsf']) 
         l.append(re.sub('[_/]', '', n))
-    ax3.boxplot(stats)
+    plot_boxplot(stats, colors, ax3, l, sig=False)
     ax3.set_title('Fixed budget swarm fitness')
-    ax3.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    
 
     # Time to reach target 
     ax4 = subplot2grid((2,3), (1, 1))
@@ -329,7 +310,7 @@ def draw_data(exp, runs=False, tex=False):
         (n, d, s, r) = e
         stats.append(s['trt']) 
         l.append(re.sub('[_/]', '', n))
-    ax4.boxplot(stats)
+    plot_boxplot(stats, colors, ax4, l, sig=False)
     ax4.set_title('Time to reach target')
 
     # accumulated fitness above target
@@ -340,9 +321,9 @@ def draw_data(exp, runs=False, tex=False):
         (n, d, s, r) = e
         stats.append(s['aat']) 
         l.append(re.sub('[_/]', '', n))
-    ax5.boxplot(stats)
+    plot_boxplot(stats, colors, ax5, l, sig=False)
     ax5.set_title('Accumulated fitness above target')
-    ax5.ticklabel_format(style='sci', scilimits=(0,0), axis='y')
+    
 
     draw()
     show()
