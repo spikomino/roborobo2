@@ -139,38 +139,42 @@ void odNeatGCWorldObserver::updateMonitoring()
     }
 
     if(gWorld->getIterations() >= 1)
-    //Log "iteration idRobot idGenome energy fitness" every iteration
-    for ( int i = 0 ; i != gNumberOfRobots ; i++ )
-    {
-        odNeatGCController* c = (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()));
+    {//Log "iteration idRobot idGenome energy fitness" every N iterations
+        int n = 100;
+        if((gWorld->getIterations() % n) == 0)
+        {
+            for ( int i = 0 ; i != gNumberOfRobots ; i++ )
+            {
+                odNeatGCController* c = (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()));
 
-        odNeatGCSharedData::gEvoLog << gWorld->getIterations()
-                                   << " " << c->getWorldModel()->getId()
-                                   << " " << c->_genome->genome_id
-                                   <<   " " << c->_energy
-                                   << " " << c->_fitness
-                                << std::endl;
+                odNeatGCSharedData::gEvoLog << gWorld->getIterations()
+                                            << " " << c->getWorldModel()->getId()
+                                            << " " << c->_genome->genome_id
+                                            <<   " " << c->_energy
+                                              << " " << c->_fitness
+                                              << std::endl;
+            }
 
+        }
     }
-
     if ( gWorld->getIterations() == gMaxIt-1 )
     {
         //It may be possible to force fitness log on all robots
         //before closing (for all robots printAll())
         for ( int i = 0 ; i != gNumberOfRobots ; i++ )
         {
-           // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->printAll();
-           // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->save_genome();
-           // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->logGenome();
+            // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->printAll();
+            // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->save_genome();
+            // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->logGenome();
 
-        odNeatGCController* c = (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()));
+            odNeatGCController* c = (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()));
 
             odNeatGCSharedData::gEvoLog << gWorld->getIterations()
-                                       << " " << c->getWorldModel()->getId()
-                                       << " " << c->_genome->genome_id
-                                       <<   " " << c->_energy
-                                       << " " << c->_fitness
-                                    << std::endl;
+                                        << " " << c->getWorldModel()->getId()
+                                        << " " << c->_genome->genome_id
+                                        <<   " " << c->_energy
+                                          << " " << c->_fitness
+                                          << std::endl;
         }
         odNeatGCSharedData::gEvoLog.close();
     }
