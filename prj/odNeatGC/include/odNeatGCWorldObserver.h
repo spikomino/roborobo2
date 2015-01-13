@@ -16,9 +16,8 @@
 #include "Observers/WorldObserver.h"
 #include "WorldModels/RobotWorldModel.h"
 #include "odNeatGC/include/odNeatGCSharedData.h"
+#include <set>
 
-
-//class World;
 
 class odNeatGCWorldObserver : public WorldObserver
 {
@@ -29,11 +28,13 @@ class odNeatGCWorldObserver : public WorldObserver
 	protected:
 		int _generationCount;
 		int _lifeIterationCount;
+        int _countGeneClockCollisions;
 
 	public:
 		odNeatGCWorldObserver(World *world);
 		~odNeatGCWorldObserver();
-
+        std::set<int> usedGeneCounters;
+        void incrementCollisions();
 		void reset();
 		void step();
 

@@ -74,7 +74,9 @@ odNeatGCWorldObserver::odNeatGCWorldObserver( World* world ) : WorldObserver( wo
     
     _lifeIterationCount = -1;
     _generationCount = -1;
-    
+
+    _countGeneClockCollisions = 0;
+
 }
 
 odNeatGCWorldObserver::~odNeatGCWorldObserver()
@@ -138,6 +140,17 @@ void odNeatGCWorldObserver::updateMonitoring()
         gLogManager->flush();
     }
 
+    if(gWorld->getIterations() == 0)
+    {
+        //For counting concurrent gene counters
+        //Initialize WorldObserver::usedGeneCounters (set<int>)
+        int lastInnov = dynamic_cast<odNeatGCController*>(gWorld->getRobot(0)->getController()) -> _innovNumber;
+        for(int i = 0; i < lastInnov ; i++)
+        {
+            usedGeneCounters.insert(i);
+        }
+    }
+
     if(gWorld->getIterations() >= 1)
     {//Log "iteration idRobot idGenome energy fitness" every N iterations
         int n = 100;
@@ -156,7 +169,31 @@ void odNeatGCWorldObserver::updateMonitoring()
             }
 
         }
+
+        //Measure concurrent events
+        odNeatGCController* c;
+        int geneCounter = -1;
+        for ( int i = 0 ; i != gNumberOfRobots ; i++ )
+        {
+            c =dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController());
+            std::vector<int>::iterator it = c->_newGenes.begin();
+            for(; it !=c->_newGenes.end(); it++)
+            {
+                geneCounter = *it;
+                if(usedGeneCounters.find(geneCounter) != usedGeneCounters.end())
+                {//If it exists already, increment gene counter collision (concurrent event) counter
+                    incrementCollisions();
+                }
+                else
+                {
+                    //Insert it otherwise
+                    usedGeneCounters.insert(geneCounter + i);
+                }
+            }
+            c->_newGenes.clear();
+        }
     }
+
     if ( gWorld->getIterations() == gMaxIt-1 )
     {
         //It may be possible to force fitness log on all robots
@@ -177,6 +214,11 @@ void odNeatGCWorldObserver::updateMonitoring()
                                           << std::endl;
         }
         odNeatGCSharedData::gEvoLog.close();
+        //Out number of concurrent gene counters
+        std::cout << "Concurrent events= " << _countGeneClockCollisions << std::endl;
     }
 }
-
+void odNeatGCWorldObserver::incrementCollisions()
+{
+    _countGeneClockCollisions++;
+}

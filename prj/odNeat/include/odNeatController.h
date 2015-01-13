@@ -22,7 +22,6 @@
 using namespace ODNEAT;
 using namespace std;
 
-//typedef tuple<Genome*, double, double, int,int,int> message; //Genome, fitness, sigma, birthdate, node id, link gene counter
 typedef tuple<Genome*, double, double, int> message; //Genome, fitness, sigma, birthdate
 
 class odNeatController:public Controller
@@ -44,7 +43,6 @@ private:
 
     bool in_maturation_period();
 
-    double _energy;
     double update_energy_level();
     double updateEnergyNavigation();
     double updateEnergyForaging();
@@ -120,11 +118,8 @@ private:
 
     // evolutionary engine
 
-    Genome *_genome;
-
     std::vector<double> _previousOut;
 
-    float _fitness;
     int _items;
     float _sigma;
     /* Floreano's navigation fitness related attributes */
@@ -144,6 +139,10 @@ public:
 
     odNeatController (RobotWorldModel * wm);
     ~odNeatController ();
+
+    double _energy;
+    Genome *_genome;
+    float _fitness;
 
     /* misc */
     void logGenome();

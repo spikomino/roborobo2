@@ -53,6 +53,7 @@ odNeatController::reset()
 
     _birthdate = gWorld->getIterations ();
     _energy = odNeatSharedData::gDefaultInitialEnergy;
+    _fitness = _energy;
     emptyBasket();
 
     //Fitness initialized to 0, so species will be "hindered"
@@ -60,7 +61,7 @@ odNeatController::reset()
     _genome ->species = -1;
     add_unconditional_to_population(message(_genome,_energy,_sigma,_birthdate));
     adjust_species_fitness();
-    recomputeAllSpecies(); //TOCHECK
+    recomputeAllSpecies();
 }
 
 void
@@ -346,8 +347,7 @@ odNeatController::broadcastGenome ()
     }
 
     /* if found neighbors, broadcast my genome */
-    if(neighbors.size() > 0) {
-        //message msg (_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber);
+    if(neighbors.size() > 0) {        
 
         /* remove duplicates */
         std::sort(neighbors.begin(), neighbors.end());
@@ -389,13 +389,6 @@ void odNeatController::storeMessage(message msg){
         adjust_species_fitness();
     }
 
-    /*
-    //Update genetic clocks for nodes and links
-    //This minimizes the number of arbitrary sorting orders in genome alignment
-    //due to concurrent mutations in different agents
-    _nodeId = max(_nodeId,std::get<4>(msg));
-    _innovNumber = max(_innovNumber,std::get<5>(msg));*/
-
 }
 
 void odNeatController::emptyGenomeList(){
@@ -417,7 +410,7 @@ void
 odNeatController::stepEvolution ()
 {
 
-    logGenome();
+    //logGenome();
 
     add_to_population(message(_genome, _fitness, _sigma, _birthdate));
     add_to_tabu_list(_genome);
@@ -601,7 +594,7 @@ void odNeatController::printFitnessList()
 // Save a genome (file name = robot_id-genome_id.gen)
 void odNeatController::save_genome(){
     char fname[128];
-    snprintf(fname, 127, "logs/genomes/%04d-%010d.gen",
+    snprintf(fname, 127, (odNeatSharedData::gGenomeLogFolder+"%04d-%010d.gen").c_str(),
              _wm->getId(), _genome->genome_id);
     std::ofstream oFile(fname);
     _genome->print_to_file(oFile);
@@ -627,9 +620,6 @@ void odNeatController::printRobot(){
               << " nbSpecies=" + to_string(species.size())
               << " nbIndiv="     + to_string(population.size())
               << " sizeTabu="     + to_string(tabu.size())
-                 /* << " nodeId="     + to_string(_nodeId)
-                                                                                                                                                                          *
-                                                                                                                                                                          << " geneId="     + to_string(_innovNumber)*/
               << " ]";
 }
 
@@ -1054,7 +1044,7 @@ void odNeatController::recomputeAllSpecies()
     species.clear();
 
     std::map < int, message>::iterator it = population.begin();
-    int i = 0;
+    unsigned int i = 0;
     for(;it != population.end() ; it++)
     {
         //Invalidate previous species
@@ -1062,7 +1052,7 @@ void odNeatController::recomputeAllSpecies()
         add_to_species(it->second);
         i++;
     }
-    if(i > 20)
+    if(i > odNeatSharedData::gMaxPopSize)
     {
         std::cerr << "[ERROR] Excess in population : " << i << "/" << odNeatSharedData::gMaxPopSize  << std::endl;
         exit(-1);
@@ -1129,7 +1119,7 @@ Genome* odNeatController::generate_offspring()
 
 
     //Mate
-    if((randFloat() < mateOnlyProb) && (g1 != g2)) //TOTEST COMPARISON g1 g2
+    if((randFloat() < mateOnlyProb) && (g1 != g2))
     {
         result = g1 -> mate_multipoint(g2,newId, std::get<1>(population[g1->genome_id]),std::get<1>(population[g2->genome_id]));
 
@@ -1137,11 +1127,22 @@ Genome* odNeatController::generate_offspring()
     else
     {
         result = g1 -> duplicate();
-        result->genome_id = newId;
+        result->genome_id = -1;
     }
     if(randFloat() < mutateOnlyProb)//Mutate
     {
         result = result-> mutate (_sigma, newId);
+    }
+    if((result->mom_id != -1) && (result->genome_id != -1) && (result->dad_id != -1))
+    {
+        //offspring comes from mate
+        //with the right id's
+    }
+    else
+    {
+        result->genome_id = newId;
+        result->mom_id = g1->genome_id;
+        result->dad_id = -1;
     }
     return result;
 }
@@ -1278,6 +1279,16 @@ void odNeatController::cleanPopAndSpecies()
     bool ok = true;
     std::map<int,std::pair<std::set<Genome*>,double>>::iterator itTestSp = species.begin();
     std::set<Genome*>::iterator itG;
+    std::map<int,message>::iterator itNull = population.begin();
+    //Erase Null genomes  (?)
+    for(;itNull!= population.end();itNull++)
+    {
+        if(std::get<0>((itNull->second)) == NULL)
+        {
+            //Iterator is not invalidated
+            population.erase(itNull->first);
+        }
+    }
     for(;itTestSp != species.end();itTestSp++)
     {
         if(std::get<0>(itTestSp->second).size() == 0 )

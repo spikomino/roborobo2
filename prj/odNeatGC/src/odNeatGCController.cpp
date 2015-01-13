@@ -159,8 +159,8 @@ odNeatGCController::step ()
         stepEvolution ();
 
         //TOUNCOMMENT : this has been commented to use irace to tune the parameters
-       // save_genome();
-        reset();        
+        // save_genome();
+        reset();
     }
 }
 
@@ -385,9 +385,9 @@ void odNeatGCController::storeMessage(message msg){
     std::get<0>(msg) -> nbFitnessUpdates++;
 
     if(tabu_list_approves(std::get<0>(msg)) && population_accepts(msg))
-    {    
+    {
         cleanPopAndSpecies();
-        add_to_population(msg);        
+        add_to_population(msg);
         adjust_population_size();
         adjust_species_fitness();
         cleanPopAndSpecies();
@@ -437,10 +437,10 @@ void odNeatGCController::logGenome()
 
     //GENERATION ID-ROBOT FITNESS SIZE(localPop) IDGENOME IDMOM
     odNeatGCSharedData::gEvoLog <<
-                                 dynamic_cast <odNeatGCWorldObserver *>
-                                 (gWorld->getWorldObserver ())->getGenerationCount() +1
-                              << " " << _wm->getId () << " " <<
-                                 _fitness << " " << population.size() << " " << _genome->genome_id << std::endl;
+                                   dynamic_cast <odNeatGCWorldObserver *>
+                                   (gWorld->getWorldObserver ())->getGenerationCount() +1
+                                << " " << _wm->getId () << " " <<
+                                   _fitness << " " << population.size() << " " << _genome->genome_id << std::endl;
 
 
 
@@ -750,8 +750,8 @@ void odNeatGCController::add_to_population(message msg)
 
         std::get<1>(population[receivedId]) =
                 std::get<1>(population[receivedId]) +
-                        ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
-                        /(std::get<0>(population[receivedId])->nbFitnessUpdates);
+                ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
+                /(std::get<0>(population[receivedId])->nbFitnessUpdates);
     }
     else //new genome
     {
@@ -1144,12 +1144,24 @@ Genome* odNeatGCController::generate_offspring()
     }
     if(randFloatGc() < mutateOnlyProbGc)//Mutate
     {
+        int oldInnov = _innovNumber;
+
         result = result-> mutate (_sigma,_wm->_id,newId,_nodeId,_innovNumber);
+
+        if(oldInnov != _innovNumber)
+        {
+            //add newly used gene counter(s) to this robot's list
+            //If mutation created a new node, two new gene counters are added
+            for(int i =oldInnov; i < _innovNumber ;i++ )
+            {
+                _newGenes.push_back(i);
+            }
+        }
 
     }
     if((result->mom_id != -1) && (result->genome_id != -1) && (result->dad_id != -1))
     {
-        //offspring comes from mate
+        //offspring comes from mating
         //with the right id's
     }
     else

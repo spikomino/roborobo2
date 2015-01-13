@@ -494,7 +494,7 @@ Genome *Genome::duplicate()
 
 }
 
-Genome *Genome::mutate(float sigma, int idR,int idNewGenome,int nodeId,int gc)
+Genome *Genome::mutate(float sigma, int idR,int idNewGenome,int &nodeId,int &gc)
 {    
     Genome *new_genome;	//For holding baby's genes
 

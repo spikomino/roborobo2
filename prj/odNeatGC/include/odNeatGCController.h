@@ -126,9 +126,6 @@ private:
     /* Floreano's navigation fitness related attributes */
     double _transV, _rotV, _md; /* tran rot velocities and min dist */
 
-    //NOTE: Gene counters: innovation number and number of nodes FOR THIS ROBOT
-    int _innovNumber;
-    int _nodeId;
 
     // ANN
     unsigned int _nbInputs;
@@ -144,6 +141,11 @@ public:
     double _energy;
     Genome *_genome;
     float _fitness;
+
+    std::vector<int> _newGenes;
+    //NOTE: Gene counters: innovation number and number of nodes FOR THIS ROBOT
+    int _innovNumber;
+    int _nodeId;
 
     /* misc */
     void logGenome();

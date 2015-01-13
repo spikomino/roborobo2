@@ -85,7 +85,7 @@ namespace ODNEATGC
     
     //Launch all mutations and returns the corresponding mutated genome
     //Check out properties file, section NEAT - paramerters for the probabilities
-    Genome *mutate(float sigma, int idR, int idNewGenome, int nodeId, int genecounter);
+    Genome *mutate(float sigma, int idR, int idNewGenome, int &nodeId, int &genecounter);
     
     // Add Gaussian noise to all linkweights with variance power ^ 2
     void mutate_link_weights(double power);
