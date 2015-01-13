@@ -19,17 +19,30 @@ if(!is.na(as.numeric(args[2])))
 	timeback <- as.numeric(args[2]);
 }
 
-lastIter <- max(data[1])
+lastIter <- max(data[1]) 
 
-backIters <- floor(lastIter * timeback)
 
-considered <- (lastIter-backIters+1):lastIter
+measurePeriod <- min(data[which(data[,1] !=  min(data[,1])),1]) - min(data[,1])
 
-meanFitness <- matrix(0.0,max(data[,1]),1)
 
-nbR <- length(which(data[,1] == 1, arr.ind=TRUE))
-for(i in (lastIter-backIters+1):lastIter)
-     meanFitness[i,1] <- mean(data[(i * 100 + 1) :(i * 100 + 100),5])
+nbR <- length(which(data[,1] == measurePeriod, arr.ind=TRUE))
+
+nbMeasures <- floor(lastIter/measurePeriod)
+
+backNbMeasures <- floor(nbMeasures * timeback)
+
+considered <- (nbMeasures-backNbMeasures+1):nbMeasures
+
+
+meanFitness <- matrix(0.0,nbMeasures,1)
+
+i <- 0
+while(i < nbMeasures)
+{
+	#or median?
+	meanFitness[i+1,1] <- mean(data[(i * nbR + 1) :(i * nbR + nbR),5])
+	i <- i +1
+}
 
 
 result <- mean(meanFitness[considered,1])
