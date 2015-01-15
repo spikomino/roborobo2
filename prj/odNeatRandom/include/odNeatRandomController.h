@@ -138,6 +138,7 @@ public:
     odNeatRandomController (RobotWorldModel * wm);
     ~odNeatRandomController ();
 
+    void gatherEnergy();
     double _energy;
     Genome *_genome;
     float _fitness;

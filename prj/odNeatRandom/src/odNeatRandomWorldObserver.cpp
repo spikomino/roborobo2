@@ -51,7 +51,7 @@ odNeatRandomWorldObserver::odNeatRandomWorldObserver( World* world ) : WorldObse
     gProperties.checkAndGetPropertyValue("gCompatThreshold",&odNeatRandomSharedData::gCompatThreshold,true);
     gProperties.checkAndGetPropertyValue("gTabuTimeout",&odNeatRandomSharedData::gTabuTimeout,true);
     gProperties.checkAndGetPropertyValue("gTabuThreshold",&odNeatRandomSharedData::gTabuThreshold,true);
-    gProperties.checkAndGetPropertyValue("gEnergItemValue",&odNeatRandomSharedData::gEnergItemValue,true);
+    gProperties.checkAndGetPropertyValue("gEnergItemValue",&odNeatRandomSharedData::gEnergyItemValue,true);
     gProperties.checkAndGetPropertyValue("gFitnessFreq",&odNeatRandomSharedData::gFitnessFreq,true);
 
 

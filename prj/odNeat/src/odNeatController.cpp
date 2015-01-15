@@ -76,6 +76,8 @@ odNeatController::initRobot ()
 
     _nbInputs += _wm->_cameraSensorsNb;	// proximity sensors
 
+    _nbInputs += 1; // energy
+
     _nbOutputs = 2;
 
     // Inputs, outputs, 0 hidden neurons, fully connected.
@@ -184,42 +186,66 @@ void odNeatController::act()
 
     std::vector < double >inputs(_nbInputs);
     int inputToUse = 0;
-
+    double obst=-1, item=-1;
 
     // distance sensors
     for (int i = 0; i < _wm->_cameraSensorsNb; i++)
     {
-        inputs[inputToUse] =
-                _wm->getDistanceValueFromCameraSensor (i) /
-                _wm->getCameraSensorMaximumDistanceValue (i);
-        inputToUse++;
-
-        if (gExtendedSensoryInputs && (odNeatSharedData::gFitness == 0))
+        int objectId = _wm->getObjectIdFromCameraSensor (i);
+        if (odNeatSharedData::gFitness == 1)
         {
-            int objectId = _wm->getObjectIdFromCameraSensor (i);
-
-            // input: physical object? which type?
-            if (PhysicalObject::isInstanceOf (objectId))
+            inputs[inputToUse] =
+                    _wm->getDistanceValueFromCameraSensor (i) /
+                    _wm->getCameraSensorMaximumDistanceValue (i);
+            inputToUse++;
+        }
+        else
+        {
+            if (gExtendedSensoryInputs && (odNeatSharedData::gFitness == 0))
             {
-                //Switch is type 3
-                if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
-                     ->getType ()) == 3)
+                obst = _wm->getDistanceValueFromCameraSensor (i) /
+                        _wm->getCameraSensorMaximumDistanceValue (i);
+
+                // input: physical object? which type?
+                if (PhysicalObject::isInstanceOf (objectId))
                 {
-                    inputs[inputToUse] = 	_wm->getDistanceValueFromCameraSensor (i) /
-                            _wm->getCameraSensorMaximumDistanceValue (i);//Match
+                    //Switch is type 3
+                    if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
+                         ->getType ()) == 3)
+                    {
+
+                        item = _wm->getDistanceValueFromCameraSensor (i) /
+                                _wm->getCameraSensorMaximumDistanceValue (i);//Match
+                    }
+                    else
+                        item = 1.0;
                 }
-                else
-                    inputs[inputToUse] = 1.0;
-                inputToUse++;
+                else //Not physical object
+                {
+                    item = 1.0;
+
+                }
+
             }
-            else //Not physical object
+            //If an item is detected, obstacle input is ignored (maximal distance, 1.0)
+            if(item < 1.0)
             {
                 inputs[inputToUse] = 1.0;
                 inputToUse++;
             }
+            else
+            {
+                inputs[inputToUse] = obst;
+                inputToUse++;
+            }
 
+            inputs[inputToUse] = item;
+            inputToUse++;
         }
     }
+
+    inputs[inputToUse++] = _energy / odNeatSharedData::gMaxEnergy;
+
 
     /* get the most activated obstacle sensor for floreano fitness*/
     _md =10.0;
@@ -387,6 +413,7 @@ void odNeatController::storeMessage(message msg){
         add_to_population(msg);
         adjust_population_size();
         adjust_species_fitness();
+        cleanPopAndSpecies();
     }
 
 }
@@ -397,11 +424,16 @@ void odNeatController::emptyGenomeList(){
 }
 void odNeatController::pickItem(){
     _items++;
-    _energy += odNeatSharedData::gEnergItemValue;
+    _energy += odNeatSharedData::gEnergyItemValue;
 }
 void odNeatController::emptyBasket(){
     _items = 0;
 }
+void odNeatController::gatherEnergy()
+{
+    _energy = std::max(0.0,std::min(odNeatSharedData::gEnergyItemValue + _energy,odNeatSharedData::gMaxEnergy)); ;
+}
+
 // ################ ######################## ################
 // ################ EVOLUTION ENGINE METHODS ################
 // ################ ######################## ################
@@ -1246,6 +1278,16 @@ double odNeatController::update_energy_level()
 double odNeatController::updateEnergyForaging()
 {
     double result = _energy;
+    //Fixed rate of energy consumption
+    //Energy gathering at energy point done in agent observer
+    result -= odNeatSharedData::gEnergyConsumption;
+
+    //cap energy (in [0,maxEnergy])
+    return std::max(0.0,std::min(result,odNeatSharedData::gMaxEnergy));
+}
+double odNeatController::updateEnergyNavigation()
+{
+    double result = 0.0;
 
     double vR,vL;//Speed Tranformed into left and right wheels activation
 
@@ -1256,20 +1298,6 @@ double odNeatController::updateEnergyForaging()
         result += -1;
     else
         result += (_transV/1.0) * sqrt(vL * vR);
-
-    //cap energy (in [0,maxEnergy])
-    return std::max(0.0,std::min(result,odNeatSharedData::gMaxEnergy));
-}
-double odNeatController::updateEnergyNavigation()
-{
-    double result = 0.0;
-    double vR,vL;//Speed Tranformed into left and right wheels activation
-
-    vR = _transV - (_rotV / 2);
-    vL = _rotV + vR;
-
-    result = (fabs(vR) + fabs(vL))/2 * (1 - sqrt(fabs(vR - vL))) * (_md);
-    result = 2 * (result - 0.5);
 
     //cap energy (in [0,maxEnergy])
     return std::max(0.0,std::min(result + _energy,odNeatSharedData::gMaxEnergy));

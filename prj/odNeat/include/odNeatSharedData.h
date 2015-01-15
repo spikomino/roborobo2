@@ -70,7 +70,8 @@ class odNeatSharedData {
   static int gTabuTimeout;
   static double gTabuThreshold;
 
-  static double gEnergItemValue;
+  static double gEnergyItemValue;
+  static double gEnergyConsumption;
   // -----  
   
 };

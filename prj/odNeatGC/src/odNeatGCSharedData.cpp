@@ -54,4 +54,4 @@ double odNeatGCSharedData::gTabuThreshold = 1.0;
 
 
 double odNeatGCSharedData::gEnergyItemValue = 30.0;
-double odNeatGCSharedData::gEnergyConsumption = 5.0;
+double odNeatGCSharedData::gEnergyConsumption = 1.0;

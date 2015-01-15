@@ -1,6 +1,5 @@
 /**
- * @author Nicolas Bredeche <nicolas.bredeche@upmc.fr>
- * NNlib: Leo Cazenille <leo.cazenille@upmc.fr>
+ * @author Inaki Fernandez
  */
 
 
@@ -53,4 +52,5 @@ int odNeatSharedData::gTabuTimeout = 15;
 double odNeatSharedData::gTabuThreshold = 1.0;
 
 
-double odNeatSharedData::gEnergItemValue = 1.0;
+double odNeatSharedData::gEnergyItemValue = 30.0;
+double odNeatSharedData::gEnergyConsumption = 1.0;
