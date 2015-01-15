@@ -11,6 +11,7 @@
 #include "Config/SimpleConfigurationLoader.h"
 #include "Config/odNeatConfigurationLoader.h"
 #include "Config/odNeatGCConfigurationLoader.h"
+#include "Config/odNeatRandomConfigurationLoader.h"
 //###DO-NOT-DELETE-THIS-LINE###TAG:INCLUDE###//
 
 
@@ -88,6 +89,12 @@ ConfigurationLoader* ConfigurationLoader::make_ConfigurationLoader (std::string 
 	else if (configurationLoaderObjectName == "odNeatGCConfigurationLoader" )
 	{
 		return new odNeatGCConfigurationLoader();
+	}
+#endif
+#if defined PRJ_ODNEATRANDOM || !defined MODULAR
+	else if (configurationLoaderObjectName == "odNeatRandomConfigurationLoader" )
+	{
+		return new odNeatRandomConfigurationLoader();
 	}
 #endif
     //###DO-NOT-DELETE-THIS-LINE###TAG:SWITCH###//

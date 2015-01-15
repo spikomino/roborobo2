@@ -4,33 +4,33 @@
  */
 
 
-#include "odNeatGC/include/odNeatGCAgentObserver.h"
+#include "odNeatRandom/include/odNeatRandomAgentObserver.h"
 #include "World/World.h"
 #include "Utilities/Misc.h"
 #include "RoboroboMain/roborobo.h"
-#include "odNeatGC/include/odNeatGCController.h"
+#include "odNeatRandom/include/odNeatRandomController.h"
 #include <cmath>
-#include "odNeatGC/include/odNeatGCWorldObserver.h"
+#include "odNeatRandom/include/odNeatRandomWorldObserver.h"
 #include <string>
 
 
-odNeatGCAgentObserver::odNeatGCAgentObserver( RobotWorldModel *wm )
+odNeatRandomAgentObserver::odNeatRandomAgentObserver( RobotWorldModel *wm )
 {
     _wm = (RobotWorldModel*)wm;
 
 }
 
-odNeatGCAgentObserver::~odNeatGCAgentObserver()
+odNeatRandomAgentObserver::~odNeatRandomAgentObserver()
 {
-    // nothing to do.
+	// nothing to do.
 }
 
-void odNeatGCAgentObserver::reset()
+void odNeatRandomAgentObserver::reset()
 {
-    // nothing to do.
+	// nothing to do.
 }
 
-void odNeatGCAgentObserver::step()
+void odNeatRandomAgentObserver::step()
 {
     // * update energy if needed
     if ( gEnergyLevel && _wm->isAlive() )
@@ -42,12 +42,12 @@ void odNeatGCAgentObserver::step()
     }
 
     // * send callback messages to objects touched or walked upon.
-    
+
     // through distance sensors
     for( int i = 0 ; i < _wm->_cameraSensorsNb; i++)
     {
         int targetIndex = _wm->getObjectIdFromCameraSensor(i);
-        
+
         if ( PhysicalObject::isInstanceOf(targetIndex) )   // sensor ray bumped into a physical object
         {
             targetIndex = targetIndex - gPhysicalObjectIndexStartOffset;
@@ -55,9 +55,9 @@ void odNeatGCAgentObserver::step()
             gPhysicalObjects[targetIndex]->isTouched(_wm->getId());
         }
     }
-    
+
     //Phototaxis: add energy to robot if it's at an energy point
-    if(odNeatGCSharedData::gFitness == 0)
+    if(odNeatRandomSharedData::gFitness == 0)
     {
         int targetIndex = _wm->getGroundSensorValue();
 
@@ -67,9 +67,9 @@ void odNeatGCAgentObserver::step()
             //std::cout << "[DEBUG] #" << _wm->getId() << " walked upon " << targetIndex << "\n";
             gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
             /* notify the robot that it picked an item  */
-            odNeatGCController *cont =
+            odNeatRandomController *cont =
                     dynamic_cast <
-                    odNeatGCController *
+                    odNeatRandomController *
                     >(gWorld->getRobot (_wm->getId())->getController ());
             cont->gatherEnergy();
         }
@@ -91,7 +91,5 @@ void odNeatGCAgentObserver::step()
             cont->pickItem();*/
         }
     }
-
-
 
 }

@@ -53,4 +53,5 @@ int odNeatGCSharedData::gTabuTimeout = 15;
 double odNeatGCSharedData::gTabuThreshold = 1.0;
 
 
-double odNeatGCSharedData::gEnergItemValue = 1.0;
+double odNeatGCSharedData::gEnergyItemValue = 30.0;
+double odNeatGCSharedData::gEnergyConsumption = 1.0;
