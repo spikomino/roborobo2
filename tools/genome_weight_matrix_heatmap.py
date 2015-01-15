@@ -46,13 +46,16 @@ if __name__ == '__main__':
         M.append(process_weight_matrix(options.path+'/'+f))
         
     # compute the pairewise distance 
-    size = 20 #len(M)
+    size = len(M)
 
     Z =  [[0 for x in xrange(size)] for x in xrange(size)]
     for x in xrange(size):
         for y in xrange(x,size):
             Z[x][y] = weight_matrix_dist(M[x], M[y])
    
+
+    
+
     fig = pylab.figure() 
     ax = pylab.axes([0.025,0.025,0.95,0.95])
     pylab.imshow(Z,interpolation='nearest', cmap='spectral', origin='lower')

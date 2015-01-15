@@ -56,7 +56,13 @@ def read_options(defaults):
                       default=defaults['pngfile']   ,  
                       help="the file to save the png file [default "
                       +str(defaults['pngfile'])+"]")
-    
+    parser.add_option("-g", "--path", 
+                      dest="path",
+                      type="string",
+                      default=defaults['path']   ,  
+                      help="the path to genome files [default "
+                      +str(defaults['path'])+"]")
+
     return parser.parse_args()
 
 
@@ -67,21 +73,20 @@ if __name__ == '__main__':
     # Read options & provide with defaults
     defaults_opts={}
     defaults_opts['win_out']   = False
-    defaults_opts['infile']    = 'evolution.log'
-    defaults_opts['dotfile']   = None
-    defaults_opts['pngfile']   = None
+    defaults_opts['infile']    = 'test/out.log'
+    defaults_opts['dotfile']   = 'test/out-pylo.dot'
+    defaults_opts['pngfile']   = 'test/out-pylo.png'
+    defaults_opts['path']      = 'test'
     (options, args) = read_options(defaults_opts)
     
   
     # create the phylogenetic tree
-    g = create_phylo_tree(options.infile)
+    g = create_phylo_tree(options.infile,
+                          dotfile=options.dotfile, 
+                          pngfile=options.pngfile,
+                          genpath=options.path)
     
-    # dot ? png ? window ?
-    if options.dotfile != None :
-        nx.write_dot(g, options.dotfile)
-        if options.pngfile != None :
-            dot2png(options.dotfile, options.pngfile)
-   
+     
     # If we draw things ... prepare    
     if options.win_out: 
         pylab.ion()

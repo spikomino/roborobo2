@@ -6,6 +6,24 @@ import networkx as nx
 import os, progressbar
 from subprocess import Popen, PIPE
 
+
+def rid_from_fname(fname):
+    return int(fname[:4])
+
+def gid_from_fname(fname):
+    return int((fname.split('-')[1])[:-4]) 
+    
+def gen_from_fname(fname):
+    id = rid_from_fname(fname)
+    tr = gid_from_fname(fname)
+    return (tr-id)/10000
+
+def fname_from_gen_and_rob(g,r):
+    return "{:0>4d}".format(r)+'-'+"{:0>10d}".format(g*10000+r)+'.gen'
+
+def gid_from_gen_and_rob(g,r):
+    return int("{:0>10d}".format(g*10000+r))
+
 # process trait of genes (not implemented)
 # in  : a graph object and the splited line from the genome file
 #       called exclusively by process_graph 
@@ -224,25 +242,41 @@ def process_file(fname):
     return G
 
 # trac the offspring of a gene and add them to the graph 
-def trac_genome(gl, id, G, col):
+def trac_genome(gl, id, G, col, genpath=None):
+
+    #extrac the robot number from id -> to read the gen file name
+    nbrobsize =len(str(len(gl.keys())))
+    id_robid = int(str(id)[-nbrobsize:])
+
     for i in gl :
         for g in gl[i] :
             (tr, m, d) = g
             if m == id :               
                 G.add_node(tr)
+                tr_robid = int(str(tr)[-nbrobsize:])
                 G.node[tr]['agent'] = i
                 G.node[tr]['id']    = tr
                 G.node[tr]['mom']   = m
                 G.node[tr]['dad']   = d
                 G.node[tr]['color'] = col[i%len(col)]
                 G.add_edge(id, tr)
-                trac_genome(gl, tr, G, col)
+                if genpath != None :
+                    id_fname = "{:0>4d}".format(id_robid)+'-'+\
+                        "{:0>10d}".format(id)+'.gen'
+                    tr_fname = "{:0>4d}".format(tr_robid)+'-'+\
+                        "{:0>10d}".format(tr)+'.gen'
+                    print id_fname, tr_fname
+                    w =weight_matrix_dist(
+                        process_weight_matrix(genpath+'/'+id_fname),
+                        process_weight_matrix(genpath+'/'+tr_fname))
+                    G.edge[id][tr]['label'] = "{0: 2.5f}".format(w)               
+                trac_genome(gl, tr, G, col, genpath)
 
 
-# Crete a phylogenetic tree 
+# Crete a phylogenetic tree from tracing mom ids
 # in  : log file in the correct format see above
 # out : the graphe og the phylo tree (root nodes are the initial genes)
-def create_phylo_tree(fname, save=False, dotfile='philo.dot'): 
+def create_phylo_tree(fname, dotfile=None, pngfile=None, genpath=None): 
     colors = ['chartreuse', 'chocolate', 'cadetblue', 'cornflowerblue', 'cyan',
               'darkorange', 'darkviolet', 'deeppink']
   
@@ -260,13 +294,93 @@ def create_phylo_tree(fname, save=False, dotfile='philo.dot'):
         G.node[n]['agent'] = n
         G.node[n]['id']    = n
         G.node[n]['color'] = colors[n%len(colors)]
-        trac_genome(gl, n, G, colors)
+        trac_genome(gl, n, G, colors, genpath)
     
     # write the file 
-    if save :
+    if dotfile != None :
         nx.write_dot(G, dotfile)
-    
+    if pngfile != None :
+        dot2png(dotfile, pngfile)
+
+
     return G
+
+
+# Crete a phylogenetic tree matrix similarity
+# in  : log file in the correct format see above
+# out : the graphe og the phylo tree (root nodes are the initial genes)
+def create_phylo_tree_dist(genpath, dotfile=None, pngfile=None): 
+    colors = ['chartreuse', 'chocolate', 'cadetblue', 'cornflowerblue', 'cyan',
+              'darkorange', 'darkviolet', 'deeppink']
+  
+    # create a graph
+    G=nx.DiGraph()        
+
+    # read the directory (list the genome files)
+    fl = []
+    for f in os.listdir(genpath):
+        if f.endswith('.gen'):
+            fl.append(f)
+    fl.sort()
+  
+    last = fl[-1]
+  
+    maxgen = gen_from_fname(last)
+    nbrob = rid_from_fname(last)
+
+    M =  [[0 for x in xrange(nbrob)] for x in xrange(maxgen-1)]
+   
+    for g in xrange(maxgen-1) :
+        for r1 in xrange(nbrob) :
+            r1f = fname_from_gen_and_rob(g,r1)
+            m1 = process_weight_matrix(genpath+'/'+r1f)
+            min = float("inf")
+            min_rob = -1
+            for r2 in xrange(nbrob): 
+                if r1 != r2 :
+                    r2f = fname_from_gen_and_rob(g+1,r2)
+                    m2 = process_weight_matrix(genpath+'/'+r2f)
+                    d = weight_matrix_dist(m1, m2)
+                    if d < min :
+                        min = d
+                        min_rob = r2
+            M[g][r1] = (min_rob, min, gid_from_gen_and_rob(g,min_rob))
+     
+    for r in xrange(nbrob) :       
+        G.add_node(r) # the root node (the initial gene)
+        G.node[r]['agent'] = r
+        G.node[r]['id']    = r
+        G.node[r]['color'] = colors[r%len(colors)]
+        
+    for g in xrange(maxgen-1) :    
+        for r in xrange(nbrob) :
+            (mr, m, mom) = M[g][r]
+            tr = gid_from_gen_and_rob(g+1,r)
+            G.add_node(tr)
+            G.node[tr]['color'] = colors[r%len(colors)]
+            G.add_edge(mom, tr)
+            G.edge[mom][tr]['label'] = "{0: 2.5f}".format(m)
+ 
+    
+    # write the file 
+    if dotfile != None :
+        nx.write_dot(G, dotfile)
+    if pngfile != None :
+        dot2png(dotfile, pngfile)
+
+
+    return G
+
+
+
+
+
+
+
+
+
+
+
 
 # modified survival rate computation based on genome id at each generation
 # in  : a log file.
