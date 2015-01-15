@@ -5,12 +5,12 @@
 
 
 
-#ifndef ODNEATGCSHAREDDATA_H
-#define ODNEATGCSHAREDDATA_H
+#ifndef ODNEATRANDOMSHAREDDATA_H
+#define ODNEATRANDOMSHAREDDATA_H
 #include <string>
 #include <fstream>
 
-class odNeatGCSharedData {
+class odNeatRandomSharedData {
 	
  public: 
   
@@ -70,9 +70,9 @@ class odNeatGCSharedData {
   static int gTabuTimeout;
   static double gTabuThreshold;
 
-  static double gEnergyItemValue;
+  static double gEnergItemValue;
   // -----  
-  static double gEnergyConsumption;
+  static int gMaxRandomInnov;
 };
 
 

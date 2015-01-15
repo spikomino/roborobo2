@@ -3,28 +3,28 @@
  *
  */
 
-#ifndef ODNEATGCCONTROLLER_H
-#define ODNEATGCCONTROLLER_H
+#ifndef ODNEATRANDOMCONTROLLER_H
+#define ODNEATRANDOMCONTROLLER_H
 
 #include "RoboroboMain/common.h"
 #include "RoboroboMain/roborobo.h"
 #include "Utilities/Graphics.h"
 #include "Controllers/Controller.h"
 #include "WorldModels/RobotWorldModel.h"
-#include "odNeatGC/include/odNeatGCAgentObserver.h"
+#include "odNeatRandom/include/odNeatRandomAgentObserver.h"
 #include <neuralnetworks/NeuralNetwork.h>
-#include <odneatgc/gene.h>
-#include <odneatgc/genome.h>
+#include <odneatrandom/gene.h>
+#include <odneatrandom/genome.h>
 #include <set>
 
 #include <iomanip>
 
-using namespace ODNEATGC;
+using namespace ODNEATGRANDOM;
 using namespace std;
 
-typedef tuple<Genome*, double, double, int,int,int> message; //Genome, fitness, sigma, birthdate, node id, link gene counter
+typedef tuple<Genome*, double, double, int> message; //Genome, fitness, sigma, birthdate
 
-class odNeatGCController:public Controller
+class odNeatRandomController:public Controller
 {
 private:
     int _iteration;
@@ -135,17 +135,15 @@ private:
 
 public:
 
-    odNeatGCController (RobotWorldModel * wm);
-    ~odNeatGCController ();
+    odNeatRandomController (RobotWorldModel * wm);
+    ~odNeatRandomController ();
 
     double _energy;
     Genome *_genome;
     float _fitness;
 
     std::vector<int> _newGenes;
-    //NOTE: Gene counters: innovation number and number of nodes FOR THIS ROBOT
-    int _innovNumber;
-    int _nodeId;
+
 
     /* misc */
     void logGenome();
@@ -161,7 +159,6 @@ public:
     void reset ();
     void step ();
     void pickItem();
-    void gatherEnergy();
     void emptyBasket();
     int getBirthdate ()
     {

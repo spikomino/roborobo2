@@ -3,8 +3,8 @@
  *
  */
 
-#include "odNeatGC/include/odNeatGCController.h"
-#include "odNeatGC/include/odNeatGCWorldObserver.h"
+#include "odNeatRandom/include/odNeatRandomController.h"
+#include "odNeatRandom/include/odNeatRandomWorldObserver.h"
 
 #include "World/World.h"
 #include "Utilities/Misc.h"
@@ -12,19 +12,19 @@
 #include <stdio.h>
 #include <string>
 
-#include <odneatgc/genome.h>
-#include <odneatgc/network.h>
+#include <odneatrandom/genome.h>
+#include <odneatrandom/network.h>
 
-using namespace ODNEATGC;
+using namespace ODNEATGRANDOM;
 
-odNeatGCController::odNeatGCController (RobotWorldModel * wm)
+odNeatRandomController::odNeatRandomController (RobotWorldModel * wm)
 {
 
     _wm = wm;
 
     nn = NULL;
 
-    _sigma = odNeatGCSharedData::gSigmaRef;
+    _sigma = odNeatRandomSharedData::gSigmaRef;
 
     initRobot ();
 
@@ -36,7 +36,7 @@ odNeatGCController::odNeatGCController (RobotWorldModel * wm)
 
 }
 
-odNeatGCController::~odNeatGCController ()
+odNeatRandomController::~odNeatRandomController ()
 {
     if(nn != NULL)
         delete nn;
@@ -44,38 +44,36 @@ odNeatGCController::~odNeatGCController ()
 }
 
 void
-odNeatGCController::reset()
+odNeatRandomController::reset()
 {
     _fitness = 0.0;
     _fitnessUpdateCounter = 0;
     _genome->nbFitnessUpdates = 0;
 
     _birthdate = gWorld->getIterations ();
-    _energy = odNeatGCSharedData::gDefaultInitialEnergy;
+    _energy = odNeatRandomSharedData::gDefaultInitialEnergy;
     _fitness = _energy;
     emptyBasket();
 
     //Fitness initialized to 0, so species will be "hindered"
     //Pay attention to initial species (see constructor above)
     _genome ->species = -1;
-    add_unconditional_to_population(message(_genome,_energy,_sigma,_birthdate,_nodeId,_innovNumber));
+    add_unconditional_to_population(message(_genome,_energy,_sigma,_birthdate));
     adjust_species_fitness();
     recomputeAllSpecies();
 }
 
 void
-odNeatGCController::initRobot ()
+odNeatRandomController::initRobot ()
 {
     _nbInputs = 1;		// Bias constant input (1.0)
 
-    if ((gExtendedSensoryInputs) && (odNeatGCSharedData::gFitness == 0))
+    if ((gExtendedSensoryInputs) && (odNeatRandomSharedData::gFitness == 0))
     {
         _nbInputs += (1) * _wm->_cameraSensorsNb;	// Switch
     }
 
     _nbInputs += _wm->_cameraSensorsNb;	// proximity sensors
-
-    _nbInputs += 1; // energy
 
     _nbOutputs = 2;
 
@@ -91,8 +89,6 @@ odNeatGCController::initRobot ()
 
     _genome->mutate_link_weights (1.0);
     createNN ();
-    _innovNumber = computeRequiredNumberOfWeights();
-    _nodeId = (1 + _nbInputs + _nbOutputs);
 
     if (gVerbose)
         std::cout << std::flush;
@@ -113,7 +109,7 @@ odNeatGCController::initRobot ()
 
 
 
-    _energy = odNeatGCSharedData::gDefaultInitialEnergy;
+    _energy = odNeatRandomSharedData::gDefaultInitialEnergy;
 
     //TOUNCOMMENT : this has been commented to use irace to tune the parameters
     //save_genome();
@@ -122,7 +118,7 @@ odNeatGCController::initRobot ()
 
 
 void
-odNeatGCController::createNN ()
+odNeatRandomController::createNN ()
 {
     if (nn != NULL)
         delete nn;
@@ -132,14 +128,14 @@ odNeatGCController::createNN ()
 }
 
 unsigned int
-odNeatGCController::computeRequiredNumberOfWeights ()
+odNeatRandomController::computeRequiredNumberOfWeights ()
 {
     unsigned int res = nn->linkcount ();
     return res;
 }
 
 void
-odNeatGCController::step ()
+odNeatRandomController::step ()
 {
     _iteration++;
 
@@ -153,7 +149,7 @@ odNeatGCController::step ()
 
     stepBehaviour ();
     
-    if ((_energy <=odNeatGCSharedData::gEnergyThreshold)
+    if ((_energy <=odNeatRandomSharedData::gEnergyThreshold)
             && !(in_maturation_period()))
     {
         printAll();
@@ -173,7 +169,7 @@ odNeatGCController::step ()
 // ################ ######################## ################
 
 void
-odNeatGCController::stepBehaviour ()
+odNeatRandomController::stepBehaviour ()
 {
     act();
     _energy = update_energy_level();
@@ -182,71 +178,48 @@ odNeatGCController::stepBehaviour ()
 
 }
 
-void odNeatGCController::act()
+void odNeatRandomController::act()
 {
     // ---- Build inputs ----
 
     std::vector < double >inputs(_nbInputs);
     int inputToUse = 0;
-    double obst=-1, item=-1;
+
 
     // distance sensors
     for (int i = 0; i < _wm->_cameraSensorsNb; i++)
     {
-        int objectId = _wm->getObjectIdFromCameraSensor (i);
-        if (odNeatGCSharedData::gFitness == 1)
+        inputs[inputToUse] =
+                _wm->getDistanceValueFromCameraSensor (i) /
+                _wm->getCameraSensorMaximumDistanceValue (i);
+        inputToUse++;
+
+        if (gExtendedSensoryInputs && (odNeatRandomSharedData::gFitness == 0))
         {
-            inputs[inputToUse] =
-                    _wm->getDistanceValueFromCameraSensor (i) /
-                    _wm->getCameraSensorMaximumDistanceValue (i);
-            inputToUse++;
-        }
-        else
-        {
-            if (gExtendedSensoryInputs && (odNeatGCSharedData::gFitness == 0))
+            int objectId = _wm->getObjectIdFromCameraSensor (i);
+
+            // input: physical object? which type?
+            if (PhysicalObject::isInstanceOf (objectId))
             {
-                obst = _wm->getDistanceValueFromCameraSensor (i) /
-                        _wm->getCameraSensorMaximumDistanceValue (i);
-
-                // input: physical object? which type?
-                if (PhysicalObject::isInstanceOf (objectId))
+                //Switch is type 3
+                if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
+                     ->getType ()) == 3)
                 {
-                    //Switch is type 3
-                    if ((gPhysicalObjects[objectId - gPhysicalObjectIndexStartOffset]
-                         ->getType ()) == 3)
-                    {
-
-                        item = _wm->getDistanceValueFromCameraSensor (i) /
-                                _wm->getCameraSensorMaximumDistanceValue (i);//Match
-                    }
-                    else
-                        item = 1.0;
+                    inputs[inputToUse] = 	_wm->getDistanceValueFromCameraSensor (i) /
+                            _wm->getCameraSensorMaximumDistanceValue (i);//Match
                 }
-                else //Not physical object
-                {
-                    item = 1.0;
-
-                }
-
+                else
+                    inputs[inputToUse] = 1.0;
+                inputToUse++;
             }
-            //If an item is detected, obstacle input is ignored (maximal distance, 1.0)
-            if(item < 1.0)
+            else //Not physical object
             {
                 inputs[inputToUse] = 1.0;
                 inputToUse++;
             }
-            else
-            {
-                inputs[inputToUse] = obst;
-                inputToUse++;
-            }
 
-            inputs[inputToUse] = item;
-            inputToUse++;
         }
     }
-
-    inputs[inputToUse++] = _energy / odNeatGCSharedData::gMaxEnergy;
 
     /* get the most activated obstacle sensor for floreano fitness*/
     _md =10.0;
@@ -294,9 +267,9 @@ void odNeatGCController::act()
 }
 
 void
-odNeatGCController::updateFitness ()
+odNeatRandomController::updateFitness ()
 {
-    switch(odNeatGCSharedData::gFitness)
+    switch(odNeatRandomSharedData::gFitness)
     {
     case 0:
         updateFitnessForaging();
@@ -313,9 +286,9 @@ odNeatGCController::updateFitness ()
 }
 
 // update fitness for navigation
-void odNeatGCController::updateFitnessNavigation(){
+void odNeatRandomController::updateFitnessNavigation(){
     _fitnessUpdateCounter++;
-    if(_fitnessUpdateCounter >= odNeatGCSharedData::gFitnessFreq)
+    if(_fitnessUpdateCounter >= odNeatRandomSharedData::gFitnessFreq)
     {
         _genome->nbFitnessUpdates++;
         _fitness = (_fitness) + ((_energy -  _fitness)/_genome->nbFitnessUpdates);
@@ -327,9 +300,9 @@ void odNeatGCController::updateFitnessNavigation(){
     //_fitness += (fabs(_transV)) * (1.0 -sqrt(fabs(_rotV))) * _md;
 }
 // update fitness for foraging
-void odNeatGCController::updateFitnessForaging(){
+void odNeatRandomController::updateFitnessForaging(){
     _fitnessUpdateCounter++;
-    if(_fitnessUpdateCounter >= odNeatGCSharedData::gFitnessFreq)
+    if(_fitnessUpdateCounter >= odNeatRandomSharedData::gFitnessFreq)
     {
         _genome->nbFitnessUpdates++;
         _fitness = (_fitness) + ((_energy -  _fitness)/_genome->nbFitnessUpdates);
@@ -339,9 +312,9 @@ void odNeatGCController::updateFitnessForaging(){
 }
 
 void
-odNeatGCController::broadcastGenome ()
+odNeatRandomController::broadcastGenome ()
 {
-    std::vector<odNeatGCController *> neighbors;
+    std::vector<odNeatRandomController *> neighbors;
 
     // only if agent is active (ie. not just revived) and deltaE>0.
     for (int i = 0; i < _wm->_cameraSensorsNb; i++)
@@ -354,9 +327,9 @@ odNeatGCController::broadcastGenome ()
             // convert image registering index into robot id.
             targetIndex = targetIndex - gRobotIndexStartOffset;
 
-            odNeatGCController *targetRobotController =
+            odNeatRandomController *targetRobotController =
                     dynamic_cast <
-                    odNeatGCController *
+                    odNeatRandomController *
                     >(gWorld->getRobot (targetIndex)->getController ());
 
             if (!targetRobotController)
@@ -374,8 +347,7 @@ odNeatGCController::broadcastGenome ()
     }
 
     /* if found neighbors, broadcast my genome */
-    if(neighbors.size() > 0) {
-        //message msg (_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber);
+    if(neighbors.size() > 0) {   
 
         /* remove duplicates */
         std::sort(neighbors.begin(), neighbors.end());
@@ -387,7 +359,7 @@ odNeatGCController::broadcastGenome ()
         {
             Genome* copy = _genome->duplicate();
             copy->nbFitnessUpdates= 0;
-            message msg (copy, _energy, _sigma, _birthdate,_nodeId,_innovNumber);
+            message msg (copy, _energy, _sigma, _birthdate);
             message send (msg);
 
             c->storeMessage (send);
@@ -404,7 +376,7 @@ odNeatGCController::broadcastGenome ()
         neighbors.clear();
     }
 }
-void odNeatGCController::storeMessage(message msg){
+void odNeatRandomController::storeMessage(message msg){
     //Received species info is no longer valid
     std::get<0>(msg) -> species = -1;
     std::get<0>(msg) -> nbFitnessUpdates++;
@@ -418,29 +390,17 @@ void odNeatGCController::storeMessage(message msg){
         cleanPopAndSpecies();
     }
 
-
-    //Update gene clocks for nodes and links
-    //This minimizes the number of arbitrary sorting orders in genome alignment
-    //due to concurrent mutations in different agents
-    _nodeId = max(_nodeId,std::get<4>(msg));
-    _innovNumber = max(_innovNumber,std::get<5>(msg));
-
 }
 
-void odNeatGCController::emptyGenomeList(){
+void odNeatRandomController::emptyGenomeList(){
     population.clear();
     species.clear();
 }
-void odNeatGCController::pickItem(){
+void odNeatRandomController::pickItem(){
     _items++;
-    _energy += odNeatGCSharedData::gEnergyItemValue;
+    _energy += odNeatRandomSharedData::gEnergItemValue;
 }
-void odNeatGCController::gatherEnergy()
-{
-    _energy = std::max(0.0,std::min(odNeatGCSharedData::gEnergyItemValue + _energy,odNeatGCSharedData::gMaxEnergy)); ;
-}
-
-void odNeatGCController::emptyBasket(){
+void odNeatRandomController::emptyBasket(){
     _items = 0;
 }
 // ################ ######################## ################
@@ -448,12 +408,12 @@ void odNeatGCController::emptyBasket(){
 // ################ ######################## ################
 
 void
-odNeatGCController::stepEvolution ()
+odNeatRandomController::stepEvolution ()
 {
 
     //logGenome();
 
-    add_to_population(message(_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber));
+    add_to_population(message(_genome, _fitness, _sigma, _birthdate));
     add_to_tabu_list(_genome);
     Genome* offspring =  generate_offspring();
     update_population(offspring);
@@ -462,12 +422,12 @@ odNeatGCController::stepEvolution ()
 }
 
 
-void odNeatGCController::logGenome()
+void odNeatRandomController::logGenome()
 {
 
     //GENERATION ID-ROBOT FITNESS SIZE(localPop) IDGENOME IDMOM
-    odNeatGCSharedData::gEvoLog <<
-                                   dynamic_cast <odNeatGCWorldObserver *>
+    odNeatRandomSharedData::gEvoLog <<
+                                   dynamic_cast <odNeatRandomWorldObserver *>
                                    (gWorld->getWorldObserver ())->getGenerationCount() +1
                                 << " " << _wm->getId () << " " <<
                                    _fitness << " " << population.size() << " " << _genome->genome_id << std::endl;
@@ -476,7 +436,7 @@ void odNeatGCController::logGenome()
 
     std::string filename;
 
-    filename = odNeatGCSharedData::gGenomeLogFolder;
+    filename = odNeatRandomSharedData::gGenomeLogFolder;
     filename += std::to_string(_genome -> genome_id);
 
     //_genome -> print_to_filename(const_cast<char*>(filename.c_str()));
@@ -484,7 +444,7 @@ void odNeatGCController::logGenome()
 
 
 int
-odNeatGCController::selectBest ()
+odNeatRandomController::selectBest ()
 {
     std::map < int, message >::iterator it = population.begin();
 
@@ -503,7 +463,7 @@ odNeatGCController::selectBest ()
     return idx;
 }
 int
-odNeatGCController::selectRankBased()
+odNeatRandomController::selectRankBased()
 {       
     std::map < int, message>::iterator it = population.begin();
 
@@ -530,7 +490,7 @@ odNeatGCController::selectRankBased()
     return -1;
 }
 int
-odNeatGCController::selectBinaryTournament()
+odNeatRandomController::selectBinaryTournament()
 {
     int result = -1;
 
@@ -577,7 +537,7 @@ odNeatGCController::selectBinaryTournament()
     return result;
 }
 int
-odNeatGCController::selectRandom()
+odNeatRandomController::selectRandom()
 {       
     int randomIndex = rand()%population.size();
     std::map<int, message >::iterator it = population.begin();
@@ -590,12 +550,12 @@ odNeatGCController::selectRandom()
     return it->first;
 }
 
-bool odNeatGCController::compareFitness(std::pair<int,float> i,std::pair<int,float> j)
+bool odNeatRandomController::compareFitness(std::pair<int,float> i,std::pair<int,float> j)
 {
     return (i.second < j.second);
 }
 
-void odNeatGCController::printIO( std::pair< std::vector<double>, std::vector<double> > io)
+void odNeatRandomController::printIO( std::pair< std::vector<double>, std::vector<double> > io)
 {
     std::vector<double> in = io.first;
     std::vector<double> out = io.second;
@@ -614,14 +574,14 @@ void odNeatGCController::printIO( std::pair< std::vector<double>, std::vector<do
     std::cout << "------------------------------" << std::endl;
 }
 
-void odNeatGCController::printVector(std::vector<double> v)
+void odNeatRandomController::printVector(std::vector<double> v)
 {
     for(unsigned int i = 0; i < v.size(); i++)
     {
         std::cout << "[" << i << "] =" << v[i] << " | ";
     }
 }
-void odNeatGCController::printFitnessList()
+void odNeatRandomController::printFitnessList()
 {
     std::cout << "------------------------------" << std::endl;
     std::map<int,message>::iterator it = population.begin();
@@ -633,9 +593,9 @@ void odNeatGCController::printFitnessList()
     std::cout << "------------------------------" << std::endl;
 }
 // Save a genome (file name = robot_id-genome_id.gen)
-void odNeatGCController::save_genome(){
+void odNeatRandomController::save_genome(){
     char fname[128];
-    snprintf(fname, 127, (odNeatGCSharedData::gGenomeLogFolder+"%04d-%010d.gen").c_str(),
+    snprintf(fname, 127, (odNeatRandomSharedData::gGenomeLogFolder+"%04d-%010d.gen").c_str(),
              _wm->getId(), _genome->genome_id);
     std::ofstream oFile(fname);
     _genome->print_to_file(oFile);
@@ -643,14 +603,14 @@ void odNeatGCController::save_genome(){
 }
 
 
-void odNeatGCController::print_genome(Genome* g){
+void odNeatRandomController::print_genome(Genome* g){
     std::cout << "[Genome: idRobot=" << _wm->getId()
               << " idgenome="    << g->genome_id
               << " mom="        << g->mom_id
               << " dad="        << g->dad_id << " ]";
 }
 
-void odNeatGCController::printRobot(){
+void odNeatRandomController::printRobot(){
     std::cout << "[Robot: id=" + to_string(_wm->getId())
               << " iteration=" + to_string(_iteration)
               << " birthdate=" + to_string(_birthdate)
@@ -661,26 +621,24 @@ void odNeatGCController::printRobot(){
               << " nbSpecies=" + to_string(species.size())
               << " nbIndiv="     + to_string(population.size())
               << " sizeTabu="     + to_string(tabu.size())
-              << " nodeId="     + to_string(_nodeId)
-              << " geneId="     + to_string(_innovNumber)
               << " ]";
 }
 
-void odNeatGCController::printAll(){
+void odNeatRandomController::printAll(){
     printRobot();
     print_genome(_genome);
     std::cout << "\n";
 }
-bool odNeatGCController::lifeTimeOver(){
+bool odNeatRandomController::lifeTimeOver(){
     return get_lifetime()
-            >= odNeatGCSharedData::gEvaluationTime - 1;
+            >= odNeatRandomSharedData::gEvaluationTime - 1;
 }
 
-int odNeatGCController::get_lifetime(){
-    return dynamic_cast <odNeatGCWorldObserver*>
+int odNeatRandomController::get_lifetime(){
+    return dynamic_cast <odNeatRandomWorldObserver*>
             (gWorld->getWorldObserver())->getLifeIterationCount();
 }
-bool odNeatGCController::doBroadcast(){
+bool odNeatRandomController::doBroadcast(){
     bool result = false;
 
     double adjustedFitness = std::get<1>(species[_genome -> species]);
@@ -692,31 +650,31 @@ bool odNeatGCController::doBroadcast(){
     }
 
     if(!(totalAdjFitness == 0.0))
-        if(randFloatGc() < (adjustedFitness / totalAdjFitness))
+        if(randFloatOdNRandom() < (adjustedFitness / totalAdjFitness))
             result = true;
     return result;
 }
-bool odNeatGCController::in_maturation_period(){
+bool odNeatRandomController::in_maturation_period(){
 
     bool result = false;
     if(gWorld->getIterations () <=
-            _birthdate + odNeatGCSharedData::gMaturationPeriod)
+            _birthdate + odNeatRandomSharedData::gMaturationPeriod)
         result = true;
 
     return result;
 
 }
-bool odNeatGCController::tabu_list_approves(Genome* g)
+bool odNeatRandomController::tabu_list_approves(Genome* g)
 {
     bool result = true;
     std::vector<std::pair<Genome*,int> >::iterator it = tabu.begin(), tabuEnd =  tabu.end();
 
     for(;it != tabuEnd;it++)
     {
-        if(std::get<0>(*it)->dissimilarity(g) < odNeatGCSharedData::gTabuThreshold)
+        if(std::get<0>(*it)->dissimilarity(g) < odNeatRandomSharedData::gTabuThreshold)
         {
             std::pair<Genome*, int> & pair  = (*it);
-            std::get<1>(pair) = odNeatGCSharedData::gTabuTimeout;
+            std::get<1>(pair) = odNeatRandomSharedData::gTabuTimeout;
 
             result = false;
         }
@@ -738,11 +696,11 @@ bool odNeatGCController::tabu_list_approves(Genome* g)
     return result;
 }
 
-bool odNeatGCController::population_accepts(message msg)
+bool odNeatRandomController::population_accepts(message msg)
 {
     bool result = false;
 
-    if(population.size() < odNeatGCSharedData::gMaxPopSize)
+    if(population.size() < odNeatRandomSharedData::gMaxPopSize)
     {
         result = true;
     }
@@ -763,12 +721,12 @@ bool odNeatGCController::population_accepts(message msg)
     return result;
 }
 
-void odNeatGCController::add_to_tabu_list(Genome* g)
+void odNeatRandomController::add_to_tabu_list(Genome* g)
 {
-    tabu.push_back(std::make_pair(g, odNeatGCSharedData::gTabuTimeout));
+    tabu.push_back(std::make_pair(g, odNeatRandomSharedData::gTabuTimeout));
 }
 
-void odNeatGCController::add_to_population(message msg)
+void odNeatRandomController::add_to_population(message msg)
 {
 
     int receivedId = std::get<0>(msg)->genome_id;
@@ -786,7 +744,7 @@ void odNeatGCController::add_to_population(message msg)
     else //new genome
     {
         //If there is still room available then add (to population and corresponding species)
-        if(population.size() < odNeatGCSharedData::gMaxPopSize)
+        if(population.size() < odNeatRandomSharedData::gMaxPopSize)
         {
             if(population.find(receivedId) == population.end())
             {
@@ -844,13 +802,13 @@ void odNeatGCController::add_to_population(message msg)
                     //delete worseGenome;
                     //If tabu list does not already contain the genome to be
                     //dropped from the population, then add the genome to it
-                    tabu.push_back(std::make_pair(worseGenome, odNeatGCSharedData::gTabuTimeout));
+                    tabu.push_back(std::make_pair(worseGenome, odNeatRandomSharedData::gTabuTimeout));
                 }
                 else
                 {
                     tabu.erase(tabu.begin() + tabu_contains(worseGenome));
                     //Reset time out counter of the worseGenome on the tabu list
-                    tabu.push_back(std::make_pair(worseGenome, odNeatGCSharedData::gTabuTimeout));
+                    tabu.push_back(std::make_pair(worseGenome, odNeatRandomSharedData::gTabuTimeout));
                 }
 
                 population[receivedId] = msg;
@@ -869,7 +827,7 @@ void odNeatGCController::add_to_population(message msg)
     }
 
 }
-void odNeatGCController::add_unconditional_to_population(message msg)
+void odNeatRandomController::add_unconditional_to_population(message msg)
 {
 
     int receivedId = std::get<0>(msg)->genome_id;
@@ -881,7 +839,7 @@ void odNeatGCController::add_unconditional_to_population(message msg)
     else //new genome
     {
         //If there is still room available then add (to population and corresponding species)
-        if(population.size() < odNeatGCSharedData::gMaxPopSize)
+        if(population.size() < odNeatRandomSharedData::gMaxPopSize)
         {
             if(population.find(receivedId) == population.end())
             {
@@ -938,13 +896,13 @@ void odNeatGCController::add_unconditional_to_population(message msg)
                 //delete worseGenome;
                 //If tabu list does not already contain the genome to be
                 //dropped from the population, then add the genome to it
-                tabu.push_back(std::make_pair(worseGenome, odNeatGCSharedData::gTabuTimeout));
+                tabu.push_back(std::make_pair(worseGenome, odNeatRandomSharedData::gTabuTimeout));
             }
             else
             {
                 tabu.erase(tabu.begin() + tabu_contains(worseGenome));
                 //Reset time out counter of the worseGenome on the tabu list
-                tabu.push_back(std::make_pair(worseGenome, odNeatGCSharedData::gTabuTimeout));
+                tabu.push_back(std::make_pair(worseGenome, odNeatRandomSharedData::gTabuTimeout));
             }
 
             population[receivedId] = msg;
@@ -957,7 +915,7 @@ void odNeatGCController::add_unconditional_to_population(message msg)
 
 }
 
-int odNeatGCController::tabu_contains(Genome* g)
+int odNeatRandomController::tabu_contains(Genome* g)
 {
     int result = -1;
     std::vector<std::pair<Genome*,int> >::iterator it = tabu.begin(), tabuEnd =  tabu.end();
@@ -968,7 +926,7 @@ int odNeatGCController::tabu_contains(Genome* g)
     }
     return result;
 }
-int odNeatGCController::findInPopulation(Genome* g)
+int odNeatRandomController::findInPopulation(Genome* g)
 {
     int result = -1;
     std::map<int,message>::iterator it = population.begin();
@@ -989,7 +947,7 @@ int odNeatGCController::findInPopulation(Genome* g)
     return result;
 }
 
-int odNeatGCController::findInSpecies(Genome* g)
+int odNeatRandomController::findInSpecies(Genome* g)
 {
     int result = -1;
 
@@ -1017,7 +975,7 @@ int odNeatGCController::findInSpecies(Genome* g)
     return result;
 }
 
-void odNeatGCController::add_to_species(message msg)
+void odNeatRandomController::add_to_species(message msg)
 {
     if(std::get<0>(msg) -> species == -1)
     {
@@ -1047,7 +1005,7 @@ void odNeatGCController::add_to_species(message msg)
     }
 }
 
-int odNeatGCController::computeSpeciesId(Genome* g)
+int odNeatRandomController::computeSpeciesId(Genome* g)
 {
     std::map<int,std::pair<std::set<Genome*>,double>>::iterator it = species.begin();
     std::set<Genome*>::iterator itSp;
@@ -1065,7 +1023,7 @@ int odNeatGCController::computeSpeciesId(Genome* g)
         //or not, and take first ( begin() ) as representative
         std::advance(itSp,randIndiv);
 
-        if(g->dissimilarity(*itSp) < odNeatGCSharedData::gCompatThreshold)
+        if(g->dissimilarity(*itSp) < odNeatRandomSharedData::gCompatThreshold)
         {
             result = it -> first;
             break;
@@ -1082,7 +1040,7 @@ int odNeatGCController::computeSpeciesId(Genome* g)
     }
     return result;
 }
-void odNeatGCController::recomputeAllSpecies()
+void odNeatRandomController::recomputeAllSpecies()
 {
     species.clear();
 
@@ -1095,18 +1053,18 @@ void odNeatGCController::recomputeAllSpecies()
         add_to_species(it->second);
         i++;
     }
-    if(i > odNeatGCSharedData::gMaxPopSize)
+    if(i > odNeatRandomSharedData::gMaxPopSize)
     {
-        std::cerr << "[ERROR] Excess in population : " << i << "/" << odNeatGCSharedData::gMaxPopSize  << std::endl;
+        std::cerr << "[ERROR] Excess in population : " << i << "/" << odNeatRandomSharedData::gMaxPopSize  << std::endl;
         exit(-1);
     }
 }
 
-void odNeatGCController::adjust_population_size()
+void odNeatRandomController::adjust_population_size()
 {    
     //Not needed, already done in add_to_population()
 }
-void odNeatGCController::adjust_species_fitness()
+void odNeatRandomController::adjust_species_fitness()
 {
     std::map<int,std::pair<std::set<Genome*>,double>>::iterator it = species.begin();
     std::set<Genome*>::iterator itSp;
@@ -1131,7 +1089,7 @@ void odNeatGCController::adjust_species_fitness()
 
 
 }
-void odNeatGCController::adjust_active_species_fitness(int spId)
+void odNeatRandomController::adjust_active_species_fitness(int spId)
 {
     std::set<Genome*>::iterator itSp;
     double adjFit = 0.0;
@@ -1148,7 +1106,7 @@ void odNeatGCController::adjust_active_species_fitness(int spId)
     std::get<1>(species[spId]) = adjFit / sizeSpecies;
 }
 
-Genome* odNeatGCController::generate_offspring()
+Genome* odNeatRandomController::generate_offspring()
 {
     Genome* result = NULL;
 
@@ -1157,12 +1115,12 @@ Genome* odNeatGCController::generate_offspring()
     Genome* g2 = selectParent(spId);
 
     int newId = _wm->getId () + 10000 * (1 + (gWorld->getIterations () /
-                                              odNeatGCSharedData::gEvaluationTime));
+                                              odNeatRandomSharedData::gEvaluationTime));
 
 
 
     //Mate
-    if((randFloatGc() < mateOnlyProbGc) && (g1 != g2))
+    if((randFloatOdNRandom() < mateOnlyProbOdNRandom) && (g1 != g2))
     {
         result = g1 -> mate_multipoint(g2,newId, std::get<1>(population[g1->genome_id]),std::get<1>(population[g2->genome_id]));
 
@@ -1172,13 +1130,22 @@ Genome* odNeatGCController::generate_offspring()
         result = g1 -> duplicate();
         result->genome_id = -1;
     }
-    if(randFloatGc() < mutateOnlyProbGc)//Mutate
+    if(randFloatOdNRandom() < mutateOnlyProbOdNRandom)//Mutate
     {
-        int oldInnov = _innovNumber;
 
-        result = result-> mutate (_sigma,_wm->_id,newId,_nodeId,_innovNumber);
 
-        if(oldInnov != _innovNumber)
+        int randomNodeId = randIntOdNRandom(0, odNeatRandomSharedData::gMaxRandomInnov) ;
+        int randomGeneId = randIntOdNRandom(0, odNeatRandomSharedData::gMaxRandomInnov) ;
+
+
+        //TOCHECK: maybe check that the current genome (in result) does not already use
+        //the random id's
+
+        result = result-> mutate (_sigma,newId,randomNodeId,randomGeneId);
+
+        //keep track of new connections, to measure the number of innovations
+        //having the same identifier (TOFIX)
+  /*      if(oldInnov != _innovNumber)
         {
             //add newly used gene counter(s) to this robot's list
             //If mutation created a new node, two new gene counters are added
@@ -1186,7 +1153,7 @@ Genome* odNeatGCController::generate_offspring()
             {
                 _newGenes.push_back(i);
             }
-        }
+        }*/
 
     }
     if((result->mom_id != -1) && (result->genome_id != -1) && (result->dad_id != -1))
@@ -1202,7 +1169,7 @@ Genome* odNeatGCController::generate_offspring()
     }
     return result;
 }
-int odNeatGCController::selectSpecies()
+int odNeatRandomController::selectSpecies()
 {
     int result = -1;
     double totalAdjFitness = 0.0;
@@ -1212,7 +1179,7 @@ int odNeatGCController::selectSpecies()
     {
         totalAdjFitness += std::get<1>(it->second);
     }
-    double random = randFloatGc() * totalAdjFitness;
+    double random = randFloatOdNRandom() * totalAdjFitness;
     it = species.begin();
     while (random > 0.0)
     {
@@ -1238,7 +1205,7 @@ int odNeatGCController::selectSpecies()
     return result;
 }
 
-Genome* odNeatGCController::selectParent(int spId)
+Genome* odNeatRandomController::selectParent(int spId)
 {
     //Intraspecies binary tournament
     Genome* result = NULL;
@@ -1276,15 +1243,15 @@ Genome* odNeatGCController::selectParent(int spId)
     return result;
 }
 
-void odNeatGCController::update_population(Genome* offspring)
+void odNeatRandomController::update_population(Genome* offspring)
 {
     //Nothing to do (?)
 }
-double odNeatGCController::update_energy_level()
+double odNeatRandomController::update_energy_level()
 {
     double result = 0.0;
 
-    switch(odNeatGCSharedData::gFitness)
+    switch(odNeatRandomSharedData::gFitness)
     {
     case 0:
         result = updateEnergyForaging();
@@ -1299,19 +1266,9 @@ double odNeatGCController::update_energy_level()
     }
     return result;
 }
-double odNeatGCController::updateEnergyForaging()
+double odNeatRandomController::updateEnergyForaging()
 {
     double result = _energy;
-    //Fixed rate of energy consumption
-    //Energy gathering at energy point done in agent observer
-    result -= odNeatGCSharedData::gEnergyConsumption;
-
-    //cap energy (in [0,maxEnergy])
-    return std::max(0.0,std::min(result,odNeatGCSharedData::gMaxEnergy));
-}
-double odNeatGCController::updateEnergyNavigation()
-{
-    double result = 0.0;
 
     double vR,vL;//Speed Tranformed into left and right wheels activation
 
@@ -1324,9 +1281,23 @@ double odNeatGCController::updateEnergyNavigation()
         result += (_transV/1.0) * sqrt(vL * vR);
 
     //cap energy (in [0,maxEnergy])
-    return std::max(0.0,std::min(result + _energy,odNeatGCSharedData::gMaxEnergy));
+    return std::max(0.0,std::min(result,odNeatRandomSharedData::gMaxEnergy));
 }
-void odNeatGCController::cleanPopAndSpecies()
+double odNeatRandomController::updateEnergyNavigation()
+{
+    double result = 0.0;
+    double vR,vL;//Speed Tranformed into left and right wheels activation
+
+    vR = _transV - (_rotV / 2);
+    vL = _rotV + vR;
+
+    result = (fabs(vR) + fabs(vL))/2 * (1 - sqrt(fabs(vR - vL))) * (_md);
+    result = 2 * (result - 0.5);
+
+    //cap energy (in [0,maxEnergy])
+    return std::max(0.0,std::min(result + _energy,odNeatRandomSharedData::gMaxEnergy));
+}
+void odNeatRandomController::cleanPopAndSpecies()
 {
     bool ok = true;
     std::map<int,std::pair<std::set<Genome*>,double>>::iterator itTestSp = species.begin();
