@@ -1,0 +1,149 @@
+#!/bin/bash
+
+EXE=./roborobo
+TEMPLATE=config/templateRdmForIrace.properties
+FIXED_PARAMS="-l"
+
+
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+# Initialize our own variables:
+m=0.0
+n=0.0
+w=0.0
+#t=0.0
+#e=0.0
+l=0.0
+x=0.0
+r=0.0
+s=0.0
+p=0
+q=0
+i=""
+cand=""
+#Read the given parameters
+#while getopts "i:m:w:t:e:n:l:x:r:g:s:c:" opt; do
+while getopts "i:m:w:n:l:x:r:g:s:c:q:p:" opt; do
+    case "$opt" in
+	m) m=$OPTARG
+	    ;;
+	w) w=$OPTARG
+	    ;;
+#	t) t=$OPTARG
+#	    ;;
+#	e) e=$OPTARG
+#	    ;;
+	n) n=$OPTARG
+	    ;;
+	l) l=$OPTARG
+	    ;;
+	q) q=$OPTARG
+	    ;;
+	p) p=$OPTARG
+	    ;;
+	x) x=$OPTARG
+	    ;;
+	r) r=$OPTARG
+	    ;;
+	s) s=$OPTARG
+	    ;;
+	i) i=$OPTARG
+	    ;;
+	c) cand=$OPTARG
+	    ;;
+    esac
+
+done
+
+#Create parameter file from template
+PARAMFNAME="${i}.${cand}.param"
+
+
+cp ${TEMPLATE} ${PARAMFNAME}
+
+#Read current instance (random seed)
+seed=`cat $i`
+
+#For debug
+#if [ ! -f debug.log ]; then
+#    touch debug.log
+#fi
+#echo "$i " >> debug.log
+
+#Fill the corresponding parameters
+echo -e "\n\n\n#Random Seed for this instance" >> $PARAMFNAME
+echo "gRandomSeed = $seed" >> $PARAMFNAME
+
+echo -e "\n\n\n#Parameters being tuned" >> $PARAMFNAME
+echo "mutate_only_prob = $m " >> $PARAMFNAME
+echo "mutate_link_weights_prob = $w " >> $PARAMFNAME
+#echo "mutate_toggle_enable_prob = $t " >> $PARAMFNAME
+#echo "mutate_gene_reenable_prob = $e " >> $PARAMFNAME
+echo "mutate_add_node_prob = $n " >> $PARAMFNAME
+echo "mutate_add_link_prob = $l " >> $PARAMFNAME
+echo "mate_only_prob = $x " >> $PARAMFNAME
+echo "recur_only_prob = $r "	 >> $PARAMFNAME
+echo "gSigmaRef = $s " >> $PARAMFNAME
+echo "gMaturationPeriod = $q " >> $PARAMFNAME
+echo "gMaxPopSize = $p " >> $PARAMFNAME
+
+
+
+####
+#Log experiments in different files so
+#several parallel runs can be launched
+
+
+folder="logs/$cand"
+
+if [ ! -f $folder ]; then
+   mkdir $folder
+   mkdir $folder/genomes
+fi
+
+log="$folder/$cand.out.log"
+
+if [ ! -f $log ]; then
+   touch $log
+fi
+
+echo "gGenomeLogFolder = $folder/genomes/ " >> $PARAMFNAME
+echo "gEvolutionLogFile = $folder/gcodneat.log " >> $PARAMFNAME
+
+
+$EXE $FIXED_PARAMS $PARAMFNAME >> $log  2> /dev/null
+
+
+timeBack=0.08
+
+
+#Read "cost/quality" measure of the run (to be minimized)
+#Testing with average accumulated swarm fitness (for last 8% of evo)
+#Since this measure is to be minimized, we take 1/(avgAccumSwarmFit)
+#TOFIX
+cost=`R --slave --args $folder/gcodneat.log $timeBack < tools/accumMeanEnd.r` #recover it with val=`... `
+
+
+timestamp=`date +"%s"`
+
+outGFolder="config/irace/results/$timestamp"
+
+if [ ! -d "$outGFolder" ]; then
+  mkdir $outGFolder
+else
+ mkdir backup
+ mv -R $outFolder backup
+ mkdir $outFolder
+fi
+
+zip -r "logs/$cand.zip" "logs/$cand" 
+rm -rf "logs/$cand"
+
+#Erase data if too heavy
+rm "logs/$cand.zip"
+#mv "logs/$cand.zip" $outGFolder
+
+#Acc. swarm fitness is a performance measure to be maximized
+#Since irace expects a cost measure to be minimized, -1 times the value is returned
+echo  -$cost
+
