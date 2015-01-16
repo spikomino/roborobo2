@@ -328,38 +328,45 @@ def create_phylo_tree_dist(genpath, dotfile=None, pngfile=None):
     maxgen = gen_from_fname(last)
     nbrob = rid_from_fname(last)
 
-    M =  [[0 for x in xrange(nbrob)] for x in xrange(maxgen-1)]
+    M =  [[0 for x in xrange(nbrob)] for x in xrange(maxgen)]
    
-    for g in xrange(maxgen-1) :
+    for g in xrange(maxgen) :
         for r1 in xrange(nbrob) :
             r1f = fname_from_gen_and_rob(g,r1)
             m1 = process_weight_matrix(genpath+'/'+r1f)
             min = float("inf")
             min_rob = -1
+            distances = []
             for r2 in xrange(nbrob): 
                 if r1 != r2 :
                     r2f = fname_from_gen_and_rob(g+1,r2)
                     m2 = process_weight_matrix(genpath+'/'+r2f)
                     d = weight_matrix_dist(m1, m2)
+                    distances.append(d)
                     if d < min :
                         min = d
                         min_rob = r2
-            M[g][r1] = (min_rob, min, gid_from_gen_and_rob(g,min_rob))
-     
+            M[g][r1] = (min_rob, min, gid_from_gen_and_rob(g+1,min_rob), 
+                        distances)
+
+    # create the graph  
     for r in xrange(nbrob) :       
         G.add_node(r) # the root node (the initial gene)
         G.node[r]['agent'] = r
         G.node[r]['id']    = r
         G.node[r]['color'] = colors[r%len(colors)]
         
-    for g in xrange(maxgen-1) :    
+    for g in xrange(maxgen) :    
         for r in xrange(nbrob) :
-            (mr, m, mom) = M[g][r]
-            tr = gid_from_gen_and_rob(g+1,r)
-            G.add_node(tr)
-            G.node[tr]['color'] = colors[r%len(colors)]
-            G.add_edge(mom, tr)
-            G.edge[mom][tr]['label'] = "{0: 2.5f}".format(m)
+            (mr, d, mr_id, D) = M[g][r]
+            print r, mr_id, d, mr, D
+            n1 = gid_from_gen_and_rob(g,r)
+            n2 = mr_id
+            
+            G.add_node(n1)
+            G.node[n1]['color'] = colors[r%len(colors)]
+            G.add_edge(n1, n2)
+            G.edge[n1][n2]['label'] = "{0: 2.5f}".format(d)
  
     
     # write the file 
