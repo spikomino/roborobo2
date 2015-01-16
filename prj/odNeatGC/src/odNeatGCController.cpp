@@ -1314,15 +1314,20 @@ double odNeatGCController::updateEnergyNavigation()
     double result = 0.0;
 
     double vR,vL;//Speed Tranformed into left and right wheels activation
-
-    vR = _transV - (_rotV / 2);
+    //vR and vL in [-1.5,+1.5]. Convert into [-1,+1]
+    vR = (_transV - (_rotV / 2));
     vL = _rotV + vR;
-    //Consumption
-    if(vL * vR < 0.0)
-        result += -1;
-    else
-        result += (_transV/1.0) * sqrt(vL * vR);
+    vR = vR/1.5;
+    vL = vL/1.5;
 
+    /*[vR,vL in [-1:+1] ]. Transform into [0:+1]*/
+
+    double V = fabs((vR/2) + 0.5) + fabs((vL/2)+0.5);
+    double deltav =  sqrt(fabs(vR -vL));
+    result =  2.0*(V *( 1 - deltav) * _md  ) -1.0;
+
+    //std::cout << "[VR] = " << vR << " - [VL] = " << vL << " - [dist]" << _md << std::endl;
+    //std::cout << "deltaE = " << result << std::endl;
     //cap energy (in [0,maxEnergy])
     return std::max(0.0,std::min(result + _energy,odNeatGCSharedData::gMaxEnergy));
 }
