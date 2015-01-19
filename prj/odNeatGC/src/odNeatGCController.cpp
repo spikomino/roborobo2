@@ -388,9 +388,8 @@ odNeatGCController::broadcastGenome ()
             Genome* copy = _genome->duplicate();
             copy->nbFitnessUpdates= 0;
             message msg (copy, _energy, _sigma, _birthdate,_nodeId,_innovNumber);
-            message send (msg);
 
-            c->storeMessage (send);
+            c->storeMessage (msg);
         }
 
         /* some screen output */
@@ -416,6 +415,11 @@ void odNeatGCController::storeMessage(message msg){
         adjust_population_size();
         adjust_species_fitness();
         cleanPopAndSpecies();
+    }
+    else
+    {
+        //Delete genome
+        delete std::get<0>(msg);
     }
 
 
@@ -667,9 +671,10 @@ void odNeatGCController::printRobot(){
 }
 
 void odNeatGCController::printAll(){
-    printRobot();
+    //TOUNCOMMENT
+    /*printRobot();
     print_genome(_genome);
-    std::cout << "\n";
+    std::cout << "\n";*/
 }
 bool odNeatGCController::lifeTimeOver(){
     return get_lifetime()
@@ -752,7 +757,8 @@ bool odNeatGCController::population_accepts(message msg)
         for(;it != population.end();it++)
         {
             //if there exists a genome with a lower fitness than the received
-            if(std::get<1>(it->second) < std::get<1>(msg))
+            //and it is not the active genome
+            if((std::get<1>(it->second) < std::get<1>(msg)) && (std::get<0>(it->second) != _genome))
             {
                 result = true;
                 break;
@@ -765,7 +771,11 @@ bool odNeatGCController::population_accepts(message msg)
 
 void odNeatGCController::add_to_tabu_list(Genome* g)
 {
-    tabu.push_back(std::make_pair(g, odNeatGCSharedData::gTabuTimeout));
+    int idx = tabu_contains(g);
+    if( idx == -1)
+        tabu.push_back(std::make_pair(g, odNeatGCSharedData::gTabuTimeout));
+    else
+        std::get<1>(tabu[idx]) = odNeatGCSharedData::gTabuTimeout;
 }
 
 void odNeatGCController::add_to_population(message msg)
@@ -782,17 +792,16 @@ void odNeatGCController::add_to_population(message msg)
                 std::get<1>(population[receivedId]) +
                 ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
                 /(std::get<0>(population[receivedId])->nbFitnessUpdates);
+        if(std::get<0>(msg)!=std::get<0>(population[receivedId]))
+            delete std::get<0>(msg);
     }
     else //new genome
     {
         //If there is still room available then add (to population and corresponding species)
         if(population.size() < odNeatGCSharedData::gMaxPopSize)
-        {
-            if(population.find(receivedId) == population.end())
-            {
+        {          
                 population[receivedId] = msg;
-                add_to_species(msg);
-            }
+                add_to_species(msg);          
         }
         else
         {
@@ -838,30 +847,43 @@ void odNeatGCController::add_to_population(message msg)
 
                 population.erase(worseGenomeId);
 
-
-                if(tabu_contains(worseGenome) == -1)
-                {
-                    //delete worseGenome;
-                    //If tabu list does not already contain the genome to be
-                    //dropped from the population, then add the genome to it
-                    tabu.push_back(std::make_pair(worseGenome, odNeatGCSharedData::gTabuTimeout));
-                }
-                else
-                {
-                    tabu.erase(tabu.begin() + tabu_contains(worseGenome));
-                    //Reset time out counter of the worseGenome on the tabu list
-                    tabu.push_back(std::make_pair(worseGenome, odNeatGCSharedData::gTabuTimeout));
-                }
+                add_to_tabu_list(worseGenome);
 
                 population[receivedId] = msg;
                 add_to_species(msg);
             }
             else
             {
+                //Active genome ended its evaluation
+                //And it is not competitive enough
+                //It is to be dropped from population
+                //and species
+                int id = std::get<0>(msg)->genome_id;
+                //Erase from species
+                int sp = std::get<0>(msg)->species;
+
+                //Verify if species effectively exists
+                if(species.find(sp) != species.end())
+                {
+                    std::get<0>(species[sp]).erase(std::get<0>(population[worseGenomeId]));
+
+                    //Erase species if empty
+
+                    if(std::get<0>(species.find(sp)->second).size() == 0)
+                        species.erase(sp);
+                }
+                else
+                {
+                    std::cerr << "[ERROR] Trying to erase individual from unexisting species: " <<  sp << " in robot: " << _wm->_id << std::endl;
+                    exit(-1);
+                }
+                population.erase(id);
+
+                /*
                 //Not to add the active genome to be dropped, because it's not competitive enough
                 //Delete from species. It does not belong to population
                 if(worseGenomeId != -1)
-                    std::get<0>(species[std::get<0>(population[worseGenomeId])->species]).erase(std::get<0>(population[worseGenomeId]));
+                    std::get<0>(species[std::get<0>(population[worseGenomeId])->species]).erase(std::get<0>(population[worseGenomeId]));*/
             }
         }
 

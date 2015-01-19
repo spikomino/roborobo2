@@ -716,6 +716,7 @@ bool odNeatController::tabu_list_approves(Genome* g)
             std::get<1>(*it) -= 1;
             if(std::get<1>(*it) <= 0)
             {
+                delete std::get<0>((*it));
                 it = tabu.erase(it);
                 tabuEnd =  tabu.end();
                 if( (it) == tabuEnd)
@@ -836,7 +837,7 @@ void odNeatController::add_to_population(message msg)
                     tabu.push_back(std::make_pair(worseGenome, odNeatSharedData::gTabuTimeout));
                 }
                 else
-                {
+                {                    
                     tabu.erase(tabu.begin() + tabu_contains(worseGenome));
                     //Reset time out counter of the worseGenome on the tabu list
                     tabu.push_back(std::make_pair(worseGenome, odNeatSharedData::gTabuTimeout));

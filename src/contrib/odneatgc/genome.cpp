@@ -21,6 +21,7 @@ Genome::Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g)
     mom_id = -1;
     dad_id = -1;
     species = -1;
+    phenotype =NULL;
 }
 Genome& Genome::operator=(const Genome& genome)
 {
@@ -56,6 +57,7 @@ Genome& Genome::operator=(const Genome& genome)
     mom_id = genome.mom_id;
     dad_id = genome.dad_id;
     species = -1;
+    phenotype =NULL;
     return *this;
 }
 
@@ -93,6 +95,7 @@ Genome::Genome(const Genome& genome)
     mom_id = genome.mom_id;
     dad_id = genome.dad_id;
     species = -1;
+    phenotype =NULL;
 }
 
 Genome::Genome(int id, std::ifstream &iFile) 
@@ -175,6 +178,7 @@ Genome::Genome(int id, std::ifstream &iFile)
 
     }
     species = -1;
+    phenotype =NULL;
 }
 
 Genome::Genome(int id,int num_in,int num_out) {
@@ -193,7 +197,7 @@ Genome::Genome(int id,int num_in,int num_out) {
     int ncount, count;
 
     genome_id=id;
-
+    phenotype = NULL;
     //Create the inputs and outputs
 
     //Build the input nodes. Last one is bias
@@ -254,6 +258,7 @@ Genome::Genome(int id,int num_in,int num_out) {
     mom_id = -1;
     dad_id = -1;
     species = -1;
+
 }
 
 Genome::~Genome() 
@@ -266,6 +271,8 @@ Genome::~Genome()
     
     for(curgene=genes.begin();curgene!=genes.end();++curgene)
         delete (*curgene);
+
+    delete (phenotype);
 }
 
 Network *Genome::genesis()
@@ -336,6 +343,9 @@ Network *Genome::genesis()
 
     //Attach genotype and phenotype together
     newnet->genotype=this;
+
+    if(phenotype != NULL)
+        delete phenotype;
     phenotype=newnet;
 
     return newnet;
@@ -489,6 +499,7 @@ Genome *Genome::duplicate()
     newgenome->mom_id = this->mom_id;
     newgenome->dad_id = this->dad_id;
     newgenome->species = -1;
+    newgenome->genesis();
 
     return newgenome;
 
