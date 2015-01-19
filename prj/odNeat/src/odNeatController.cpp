@@ -153,7 +153,7 @@ odNeatController::step ()
     
     if ((_energy <=odNeatSharedData::gEnergyThreshold)
             && !(in_maturation_period()))
-    {
+    {      
         printAll();
         cleanPopAndSpecies();
         stepEvolution ();
@@ -407,6 +407,11 @@ void odNeatController::storeMessage(message msg){
     std::get<0>(msg) -> species = -1;
     std::get<0>(msg) -> nbFitnessUpdates++;
 
+    /*if((_wm->_id == 0) && (_iteration >= 859) )
+    {
+        int toto  = -1;
+        std::cerr << "TOTO-" << toto << std::endl;
+    }*/
     if(tabu_list_approves(std::get<0>(msg)) && population_accepts(msg))
     {
         cleanPopAndSpecies();
@@ -716,7 +721,8 @@ bool odNeatController::tabu_list_approves(Genome* g)
             std::get<1>(*it) -= 1;
             if(std::get<1>(*it) <= 0)
             {
-                delete std::get<0>((*it));
+                if(findInPopulation(std::get<0>((*it))) == -1)
+                    delete std::get<0>((*it));
                 it = tabu.erase(it);
                 tabuEnd =  tabu.end();
                 if( (it) == tabuEnd)
@@ -961,17 +967,18 @@ int odNeatController::tabu_contains(Genome* g)
 int odNeatController::findInPopulation(Genome* g)
 {
     int result = -1;
+    int id = g->genome_id;
     std::map<int,message>::iterator it = population.begin();
 
     for(;it != population.end();it++)
     {
-        if((std::get<0>(it->second)->genome_id == g->genome_id) )
+        if((std::get<0>(it->second)->genome_id == id) )
         {
             if(result == -1)
-                result = it->first; //species Id
+                result = std::get<0>(it->second)->genome_id; //genome Id
             else
             {
-                std::cerr << "[ERROR] Duplicate genome in population" << std::endl;
+                std::cerr << "[ERROR] Duplicate genome in population: " << g->genome_id << std::endl;
                 exit(-1);
             }
         }
