@@ -30,6 +30,7 @@ namespace ODNEATGC
     
     // Copy Constructor
     Link(const Link& link);
+    ~Link();
     
   };
   

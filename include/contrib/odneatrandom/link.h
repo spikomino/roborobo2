@@ -30,6 +30,7 @@ namespace ODNEATGRANDOM
     
     // Copy Constructor
     Link(const Link& link);
+    ~Link();
     
   };
   
