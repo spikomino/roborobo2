@@ -30,6 +30,8 @@ namespace ODNEAT
     
     // Copy Constructor
     Link(const Link& link);
+    //Destructor
+    ~Link();
     
   };
   

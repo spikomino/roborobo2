@@ -21,6 +21,7 @@ Genome::Genome(int id, std::vector<NNode*> n, std::vector<Gene*> g)
     mom_id = -1;
     dad_id = -1;
     species = -1;
+    phenotype =NULL;
 }
 Genome& Genome::operator=(const Genome& genome)
 {
@@ -56,6 +57,7 @@ Genome& Genome::operator=(const Genome& genome)
     mom_id = genome.mom_id;
     dad_id = genome.dad_id;
     species = -1;
+    phenotype =NULL;
     return *this;
 }
 
@@ -93,6 +95,7 @@ Genome::Genome(const Genome& genome)
     mom_id = genome.mom_id;
     dad_id = genome.dad_id;
     species = -1;
+    phenotype =NULL;
 }
 
 Genome::Genome(int id, std::ifstream &iFile) 
@@ -175,6 +178,7 @@ Genome::Genome(int id, std::ifstream &iFile)
 
     }
     species = -1;
+    phenotype =NULL;
 }
 
 Genome::Genome(int id,int num_in,int num_out) {
@@ -193,13 +197,13 @@ Genome::Genome(int id,int num_in,int num_out) {
     int ncount, count;
 
     genome_id=id;
-
+    phenotype =NULL;
     //Create the inputs and outputs
 
     //Build the input nodes. Last one is bias
     for(ncount=1;ncount<=num_in;ncount++)
-    {        
-        innov innovClock;        
+    {
+        innov innovClock;
         innovClock.gc = ncount;
 
 
@@ -216,7 +220,7 @@ Genome::Genome(int id,int num_in,int num_out) {
     //Build the output nodes
     for(ncount=num_in+1;ncount<=num_in+num_out;ncount++)
     {
-        innov innovClock;        
+        innov innovClock;
         innovClock.gc = ncount;
 
         newnode=new NNode(NEURON,innovClock,OUTPUT);
@@ -236,7 +240,7 @@ Genome::Genome(int id,int num_in,int num_out) {
         for(curnode2=inputs.begin();curnode2!=inputs.end();++curnode2)
         {
             count++;
-            innov innovClock;            
+            innov innovClock;
             innovClock.gc = count;
 
             //Connect each input to each output with a weight 0.0
@@ -262,6 +266,7 @@ Genome::~Genome()
     
     for(curgene=genes.begin();curgene!=genes.end();++curgene)
         delete (*curgene);
+    //delete (phenotype);
 }
 
 Network *Genome::genesis()
@@ -332,6 +337,8 @@ Network *Genome::genesis()
 
     //Attach genotype and phenotype together
     newnet->genotype=this;
+    if(phenotype != NULL)
+        delete phenotype;
     phenotype=newnet;
 
     return newnet;
@@ -377,7 +384,7 @@ bool Genome::verify()
 
     }
 
-    //Check for NNodes being out of order    
+    //Check for NNodes being out of order
     last_innov.gc=last_id;
 
     for(curnode=nodes.begin();curnode!=nodes.end();++curnode)
@@ -485,7 +492,7 @@ Genome *Genome::duplicate()
     newgenome->mom_id = this->mom_id;
     newgenome->dad_id = this->dad_id;
     newgenome->species = -1;
-
+    newgenome->genesis();
     return newgenome;
 
 }
@@ -697,7 +704,7 @@ bool Genome::mutate_add_node(int tries,int &nodeId, int &gc)
     nodeId++;
     //Create the new Genes
     if (thelink->is_recurrent)
-    {        
+    {
         innovClock.gc = gc;
         newgene1=new Gene(1.0,in_node,newnode,true,innovClock);
 
@@ -705,7 +712,7 @@ bool Genome::mutate_add_node(int tries,int &nodeId, int &gc)
         newgene2=new Gene(oldweight,newnode,out_node,false,innovClock);
         gc = gc + 2;
     }
-    else {        
+    else {
         innovClock.gc = gc;
         newgene1=new Gene(1.0,in_node,newnode,false,innovClock);
 

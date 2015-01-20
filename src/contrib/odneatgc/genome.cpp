@@ -272,7 +272,7 @@ Genome::~Genome()
     for(curgene=genes.begin();curgene!=genes.end();++curgene)
         delete (*curgene);
 
-    delete (phenotype);
+    //delete (phenotype);
 }
 
 Network *Genome::genesis()

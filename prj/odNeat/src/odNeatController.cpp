@@ -153,7 +153,7 @@ odNeatController::step ()
     
     if ((_energy <=odNeatSharedData::gEnergyThreshold)
             && !(in_maturation_period()))
-    {      
+    {
         printAll();
         cleanPopAndSpecies();
         stepEvolution ();
@@ -250,10 +250,19 @@ void odNeatController::act()
     /* get the most activated obstacle sensor for floreano fitness*/
     _md =10.0;
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
-        if(_md > inputs[i] &&
-                gExtendedSensoryInputs)//TOFIX (if the activation does not correspond to an item) && inputs[i+_wm->_cameraSensorsNb] < 1.0)
-            _md = inputs[i];
-
+    {
+        if (odNeatSharedData::gFitness == 1)
+        {
+            if(_md > inputs[i])
+                _md = inputs[i];
+        }
+        else if (odNeatSharedData::gFitness == 1)
+        {
+            if(_md > inputs[2 * i] &&
+                    gExtendedSensoryInputs)
+                _md = inputs[2 * i];
+        }
+    }
     //Bias
     inputs[inputToUse++] = 1.0;
 
@@ -386,9 +395,8 @@ odNeatController::broadcastGenome ()
             Genome* copy = _genome->duplicate();
             copy->nbFitnessUpdates= 0;
             message msg (copy, _energy, _sigma, _birthdate);
-            message send (msg);
 
-            c->storeMessage (send);
+            c->storeMessage (msg);
         }
 
         /* some screen output */
@@ -407,11 +415,6 @@ void odNeatController::storeMessage(message msg){
     std::get<0>(msg) -> species = -1;
     std::get<0>(msg) -> nbFitnessUpdates++;
 
-    /*if((_wm->_id == 0) && (_iteration >= 859) )
-    {
-        int toto  = -1;
-        std::cerr << "TOTO-" << toto << std::endl;
-    }*/
     if(tabu_list_approves(std::get<0>(msg)) && population_accepts(msg))
     {
         cleanPopAndSpecies();
@@ -419,6 +422,11 @@ void odNeatController::storeMessage(message msg){
         adjust_population_size();
         adjust_species_fitness();
         cleanPopAndSpecies();
+    }
+    else
+    {
+        //Delete genome
+        delete std::get<0>(msg);
     }
 
 }
@@ -436,7 +444,7 @@ void odNeatController::emptyBasket(){
 }
 void odNeatController::gatherEnergy()
 {
-    _energy = std::max(0.0,std::min(odNeatSharedData::gEnergyItemValue + _energy,odNeatSharedData::gMaxEnergy)); ;
+    _energy = std::max(0.0,std::min(odNeatSharedData::gEnergyItemValue + _energy,odNeatSharedData::gMaxEnergy));
 }
 
 // ################ ######################## ################
@@ -748,7 +756,8 @@ bool odNeatController::population_accepts(message msg)
         for(;it != population.end();it++)
         {
             //if there exists a genome with a lower fitness than the received
-            if(std::get<1>(it->second) < std::get<1>(msg))
+            //and it is not the active genome
+            if((std::get<1>(it->second) < std::get<1>(msg)) && (std::get<0>(it->second) != _genome))
             {
                 result = true;
                 break;
@@ -761,7 +770,11 @@ bool odNeatController::population_accepts(message msg)
 
 void odNeatController::add_to_tabu_list(Genome* g)
 {
-    tabu.push_back(std::make_pair(g, odNeatSharedData::gTabuTimeout));
+    int idx = tabu_contains(g);
+    if( idx == -1)
+        tabu.push_back(std::make_pair(g, odNeatSharedData::gTabuTimeout));
+    else
+        std::get<1>(tabu[idx]) = odNeatSharedData::gTabuTimeout;
 }
 
 void odNeatController::add_to_population(message msg)
@@ -778,17 +791,17 @@ void odNeatController::add_to_population(message msg)
                 std::get<1>(population[receivedId]) +
                 ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
                 /(std::get<0>(population[receivedId])->nbFitnessUpdates);
+
+        if(std::get<0>(msg)!=std::get<0>(population[receivedId]))
+            delete std::get<0>(msg);
     }
     else //new genome
     {
         //If there is still room available then add (to population and corresponding species)
         if(population.size() < odNeatSharedData::gMaxPopSize)
         {
-            if(population.find(receivedId) == population.end())
-            {
-                population[receivedId] = msg;
-                add_to_species(msg);
-            }
+            population[receivedId] = msg;
+            add_to_species(msg);
         }
         else
         {
@@ -834,30 +847,43 @@ void odNeatController::add_to_population(message msg)
 
                 population.erase(worseGenomeId);
 
-
-                if(tabu_contains(worseGenome) == -1)
-                {
-                    //delete worseGenome;
-                    //If tabu list does not already contain the genome to be
-                    //dropped from the population, then add the genome to it
-                    tabu.push_back(std::make_pair(worseGenome, odNeatSharedData::gTabuTimeout));
-                }
-                else
-                {                    
-                    tabu.erase(tabu.begin() + tabu_contains(worseGenome));
-                    //Reset time out counter of the worseGenome on the tabu list
-                    tabu.push_back(std::make_pair(worseGenome, odNeatSharedData::gTabuTimeout));
-                }
+                add_to_tabu_list(worseGenome);
 
                 population[receivedId] = msg;
                 add_to_species(msg);
             }
             else
             {
+                //Active genome ended its evaluation
+                //And it is not competitive enough
+                //It is to be dropped from population
+                //and species
+                int id = std::get<0>(msg)->genome_id;
+                //Erase from species
+                int sp = std::get<0>(msg)->species;
+
+                //Verify if species effectively exists
+                if(species.find(sp) != species.end())
+                {
+                    std::get<0>(species[sp]).erase(std::get<0>(population[worseGenomeId]));
+
+                    //Erase species if empty
+
+                    if(std::get<0>(species.find(sp)->second).size() == 0)
+                        species.erase(sp);
+                }
+                else
+                {
+                    std::cerr << "[ERROR] Trying to erase individual from unexisting species: " <<  sp << " in robot: " << _wm->_id << std::endl;
+                    exit(-1);
+                }
+                population.erase(id);
+
+                /*
                 //Not to add the active genome to be dropped, because it's not competitive enough
                 //Delete from species. It does not belong to population
                 if(worseGenomeId != -1)
-                    std::get<0>(species[std::get<0>(population[worseGenomeId])->species]).erase(std::get<0>(population[worseGenomeId]));
+                    std::get<0>(species[std::get<0>(population[worseGenomeId])->species]).erase(std::get<0>(population[worseGenomeId]));*/
             }
         }
 
@@ -872,7 +898,10 @@ void odNeatController::add_unconditional_to_population(message msg)
     //If the received genome already exists
     if(population.find(receivedId) != population.end())
     {
-        std::get<1>(population[receivedId]) = (std::get<1>(population[receivedId]) + std::get<1>(msg))/2; //TOCHECK: is this the way to average?
+        std::get<1>(population[receivedId]) =
+                std::get<1>(population[receivedId]) +
+                ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
+                /(std::get<0>(population[receivedId])->nbFitnessUpdates);
     }
     else //new genome
     {
@@ -975,7 +1004,7 @@ int odNeatController::findInPopulation(Genome* g)
         if((std::get<0>(it->second)->genome_id == id) )
         {
             if(result == -1)
-                result = std::get<0>(it->second)->genome_id; //genome Id
+                result = it->first; //genome Id
             else
             {
                 std::cerr << "[ERROR] Duplicate genome in population: " << g->genome_id << std::endl;
@@ -1156,13 +1185,10 @@ Genome* odNeatController::generate_offspring()
     int newId = _wm->getId () + 10000 * (1 + (gWorld->getIterations () /
                                               odNeatSharedData::gEvaluationTime));
 
-
-
     //Mate
     if((randFloat() < mateOnlyProb) && (g1 != g2))
     {
         result = g1 -> mate_multipoint(g2,newId, std::get<1>(population[g1->genome_id]),std::get<1>(population[g2->genome_id]));
-
     }
     else
     {

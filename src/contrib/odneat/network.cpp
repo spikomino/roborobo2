@@ -53,8 +53,8 @@ Network::Network(const Network& network)
 Network::~Network() 
 {
   // Kill off all the nodes and links
-  destroy();  
-
+  destroy();
+   //Nodes and links already freed
 }
 
 // Puts the network back into an initial state
@@ -126,8 +126,8 @@ bool Network::activate()
         }
       
       // For each node, compute the sum of its incoming activation 
-      for(curnode=all_nodes.begin();curnode!=all_nodes.end();++curnode) 
-        {
+      for(curnode=all_nodes.begin();curnode!=all_nodes.end();curnode++)
+        {          
             //Ignore SENSORS
             if (((*curnode)->type)!=SENSOR)
               {

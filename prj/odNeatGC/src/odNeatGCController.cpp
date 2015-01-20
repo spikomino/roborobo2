@@ -250,10 +250,21 @@ void odNeatGCController::act()
 
     /* get the most activated obstacle sensor for floreano fitness*/
     _md =10.0;
+
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
-        if(_md > inputs[i] &&
-                gExtendedSensoryInputs)//TOFIX (if the activation does not correspond to an item) && inputs[i+_wm->_cameraSensorsNb] < 1.0)
-            _md = inputs[i];
+    {
+        if (odNeatGCSharedData::gFitness == 1)
+        {
+            if(_md > inputs[i])
+                _md = inputs[i];
+        }
+        else if (odNeatGCSharedData::gFitness == 1)
+        {
+            if(_md > inputs[2 * i] &&
+              gExtendedSensoryInputs)
+                _md = inputs[2 * i];
+        }
+    }
 
     //Bias
     inputs[inputToUse++] = 1.0;
@@ -375,7 +386,6 @@ odNeatGCController::broadcastGenome ()
 
     /* if found neighbors, broadcast my genome */
     if(neighbors.size() > 0) {
-        //message msg (_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber);
 
         /* remove duplicates */
         std::sort(neighbors.begin(), neighbors.end());
@@ -441,7 +451,7 @@ void odNeatGCController::pickItem(){
 }
 void odNeatGCController::gatherEnergy()
 {
-    _energy = std::max(0.0,std::min(odNeatGCSharedData::gEnergyItemValue + _energy,odNeatGCSharedData::gMaxEnergy)); ;
+    _energy = std::max(0.0,std::min(odNeatGCSharedData::gEnergyItemValue + _energy,odNeatGCSharedData::gMaxEnergy));
 }
 
 void odNeatGCController::emptyBasket(){
@@ -671,10 +681,9 @@ void odNeatGCController::printRobot(){
 }
 
 void odNeatGCController::printAll(){
-    //TOUNCOMMENT
-    /*printRobot();
+    printRobot();
     print_genome(_genome);
-    std::cout << "\n";*/
+    std::cout << "\n";
 }
 bool odNeatGCController::lifeTimeOver(){
     return get_lifetime()
@@ -732,6 +741,8 @@ bool odNeatGCController::tabu_list_approves(Genome* g)
             std::get<1>(*it) -= 1;
             if(std::get<1>(*it) <= 0)
             {
+                if(findInPopulation(std::get<0>((*it))) == -1)
+                    delete std::get<0>((*it));
                 it = tabu.erase(it);
                 tabuEnd =  tabu.end();
                 if( (it) == tabuEnd)
@@ -792,6 +803,7 @@ void odNeatGCController::add_to_population(message msg)
                 std::get<1>(population[receivedId]) +
                 ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
                 /(std::get<0>(population[receivedId])->nbFitnessUpdates);
+
         if(std::get<0>(msg)!=std::get<0>(population[receivedId]))
             delete std::get<0>(msg);
     }
@@ -799,9 +811,9 @@ void odNeatGCController::add_to_population(message msg)
     {
         //If there is still room available then add (to population and corresponding species)
         if(population.size() < odNeatGCSharedData::gMaxPopSize)
-        {          
-                population[receivedId] = msg;
-                add_to_species(msg);          
+        {
+            population[receivedId] = msg;
+            add_to_species(msg);
         }
         else
         {
@@ -898,7 +910,10 @@ void odNeatGCController::add_unconditional_to_population(message msg)
     //If the received genome already exists
     if(population.find(receivedId) != population.end())
     {
-        std::get<1>(population[receivedId]) = (std::get<1>(population[receivedId]) + std::get<1>(msg))/2; //TOCHECK: is this the way to average?
+        std::get<1>(population[receivedId]) =
+                         std::get<1>(population[receivedId]) +
+                         ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
+                         /(std::get<0>(population[receivedId])->nbFitnessUpdates);
     }
     else //new genome
     {
@@ -993,11 +1008,12 @@ int odNeatGCController::tabu_contains(Genome* g)
 int odNeatGCController::findInPopulation(Genome* g)
 {
     int result = -1;
+    int id = g->genome_id;
     std::map<int,message>::iterator it = population.begin();
 
     for(;it != population.end();it++)
     {
-        if((std::get<0>(it->second)->genome_id == g->genome_id) )
+        if((std::get<0>(it->second)->genome_id == id) )
         {
             if(result == -1)
                 result = it->first; //species Id

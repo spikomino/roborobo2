@@ -88,10 +88,10 @@ NNode::~NNode()
 {
   std::vector<Link*>::iterator curlink;
 	//Kill off all incoming links
-    for(curlink=incoming.begin();curlink!=incoming.end();++curlink)
+   for(curlink=incoming.begin();curlink!=incoming.end();++curlink)
     {
 		delete (*curlink);
-	}
+    }
 }
 
 //Returns the type of the node, NEURON or SENSOR

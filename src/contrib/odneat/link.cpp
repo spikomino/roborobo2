@@ -22,4 +22,9 @@ Link::Link(const Link& link)
 	out_node = link.out_node;
 	is_recurrent = link.is_recurrent;
 }
+Link::~Link()
+{
+    //Delete link
+
+}
 
