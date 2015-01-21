@@ -73,6 +73,8 @@ class odNeatGCSharedData {
   static double gEnergyItemValue;
   // -----  
   static double gEnergyConsumption;
+
+  static bool gUpdateGC;
 };
 
 

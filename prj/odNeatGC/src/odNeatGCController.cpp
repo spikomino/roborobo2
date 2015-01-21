@@ -432,12 +432,14 @@ void odNeatGCController::storeMessage(message msg){
         delete std::get<0>(msg);
     }
 
-
-    //Update gene clocks for nodes and links
-    //This minimizes the number of arbitrary sorting orders in genome alignment
-    //due to concurrent mutations in different agents
-    _nodeId = max(_nodeId,std::get<4>(msg));
-    _innovNumber = max(_innovNumber,std::get<5>(msg));
+    if(odNeatGCSharedData::gUpdateGC)
+    {
+        //Update gene clocks for nodes and links
+        //This minimizes the number of arbitrary sorting orders in genome alignment
+        //due to concurrent mutations in different agents
+        _nodeId = max(_nodeId,std::get<4>(msg));
+        _innovNumber = max(_innovNumber,std::get<5>(msg));
+    }
 
 }
 

@@ -1,0 +1,259 @@
+irace	version: 1.06.997
+********************************************************************************
+* irace: An implementation in R of Iterated Race                               *
+* Copyright (C) 2010-2014                                                      *
+* Manuel Lopez-Ibanez     <manuel.lopez-ibanez@ulb.ac.be>                      *
+* Jeremie Dubois-Lacoste  <jeremie.dubois-lacoste@ulb.ac.be>                   *
+*                                                                              *
+* This is free software, and you are welcome to redistribute it under certain  *
+* conditions.  See the GNU General Public License for details. There is NO     *
+* warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  *
+*                                                                              *
+* irace builds upon previous code from the race package                        *
+* Copyright (C) 2003 Mauro Birattari                                           *
+********************************************************************************
+# 2015-01-19 12:04:56 CET: Initialization
+# nbIterations: 5
+# minNbSurvival: 5
+# nbParameters: 9
+# seed: 2021449133.61738
+# confidence level: 0.95
+# remainingBudget: 1200
+# mu: 5
+
+# 2015-01-19 12:04:56 CET: Iteration 1 of 5
+# experimentsUsedSoFar: 0
+# timeUsedSoFar: 0
+# timeEstimate: 0
+# remainingBudget: 1200
+# currentBudget: 240
+# nbCandidates: 40
+                            Markers:                           
+                               x No test is performed.         
+                               - The test is performed and     
+                                 some candidates are discarded.
+                               = The test is performed but     
+                                 no candidate is discarded.    
+                                                               
+                                                               
++-+-----------+-----------+-----------+-----------+-----------+
+| |       Task|      Alive|       Best|  Mean best| Exp so far|
++-+-----------+-----------+-----------+-----------+-----------+
+|x|          1|         40|         30|     -76.01|         40|
+|x|          2|         40|         30|     -75.53|         80|
+|x|          3|         40|         37|     -74.78|        120|
+|=|          4|         40|          7|     -74.53|        160|
+|=|          5|         40|          7|     -74.38|        200|
+|=|          6|         40|         30|     -74.67|        240|
++-+-----------+-----------+-----------+-----------+-----------+
+
+Selected candidate:          30	mean value:     -74.67
+
+Description of the selected candidate:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+30            0.419                10          45                    0.723                0.421                0.882           0.93           0.485 2.784
+
+
+# Elite candidates:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+30            0.419                10          45                    0.723                0.421                0.882          0.930           0.485 2.784
+20            0.173                44          28                    0.507                0.457                0.613          0.797           0.513 0.440
+10            0.636                14           7                    0.116                0.762                0.312          0.652           0.506 2.527
+37            0.891                34          37                    0.104                0.777                0.091          0.471           0.153 2.857
+7             0.256                 9          18                    0.122                0.821                0.806          0.923           0.466 1.325
+# 2015-01-19 12:46:47 CET: Iteration 2 of 5
+# experimentsUsedSoFar: 240
+# timeUsedSoFar: 0
+# timeEstimate: 0
+# remainingBudget: 960
+# currentBudget: 240
+# nbCandidates: 34
+                            Markers:                           
+                               x No test is performed.         
+                               - The test is performed and     
+                                 some candidates are discarded.
+                               = The test is performed but     
+                                 no candidate is discarded.    
+                                                               
+                                                               
++-+-----------+-----------+-----------+-----------+-----------+
+| |       Task|      Alive|       Best|  Mean best| Exp so far|
++-+-----------+-----------+-----------+-----------+-----------+
+|x|          1|         34|         18|     -76.28|         34|
+|x|          2|         34|         18|     -75.61|         68|
+|x|          3|         34|          1|     -74.75|        102|
+|-|          4|         20|          1|     -74.79|        136|
+|=|          5|         20|          4|      -74.7|        156|
+|=|          6|         20|         18|     -74.79|        176|
+|=|          7|         20|          2|     -74.44|        196|
+|=|          8|         20|         18|     -74.61|        216|
+|=|          9|         20|          2|     -74.54|        236|
++-+-----------+-----------+-----------+-----------+-----------+
+
+Selected candidate:           2	mean value:     -74.54
+
+Description of the selected candidate:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+20            0.173                44          28                    0.507                0.457                0.613          0.797           0.513  0.44
+
+
+# Elite candidates:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+20            0.173                44          28                    0.507                0.457                0.613          0.797           0.513 0.440
+30            0.419                10          45                    0.723                0.421                0.882          0.930           0.485 2.784
+53            0.368                50          40                    0.336                0.666                0.227          0.590           0.388 2.445
+37            0.891                34          37                    0.104                0.777                0.091          0.471           0.153 2.857
+46            0.831                43          40                    0.487                0.549                0.349          0.771           0.673 2.942
+# 2015-01-19 13:33:43 CET: Iteration 3 of 5
+# experimentsUsedSoFar: 476
+# timeUsedSoFar: 0
+# timeEstimate: 0
+# remainingBudget: 724
+# currentBudget: 241
+# nbCandidates: 30
+                            Markers:                           
+                               x No test is performed.         
+                               - The test is performed and     
+                                 some candidates are discarded.
+                               = The test is performed but     
+                                 no candidate is discarded.    
+                                                               
+                                                               
++-+-----------+-----------+-----------+-----------+-----------+
+| |       Task|      Alive|       Best|  Mean best| Exp so far|
++-+-----------+-----------+-----------+-----------+-----------+
+|x|          1|         30|          3|     -75.63|         30|
+|x|          2|         30|         20|     -75.18|         60|
+|x|          3|         30|         20|     -74.89|         90|
+|=|          4|         30|          2|     -74.79|        120|
+|=|          5|         30|          4|      -74.7|        150|
+|-|          6|         22|          3|     -74.59|        180|
+|=|          7|         22|          8|     -74.48|        202|
+|=|          8|         22|          3|     -74.64|        224|
++-+-----------+-----------+-----------+-----------+-----------+
+
+Selected candidate:           3	mean value:     -74.64
+
+Description of the selected candidate:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+53            0.368                50          40                    0.336                0.666                0.227           0.59           0.388 2.445
+
+
+# Elite candidates:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+53            0.368                50          40                    0.336                0.666                0.227          0.590           0.388 2.445
+84            0.645                10          45                    0.752                0.130                0.625          0.968           0.959 2.614
+72            0.265                14          45                    0.579                0.281                0.470          0.957           0.499 1.683
+20            0.173                44          28                    0.507                0.457                0.613          0.797           0.513 0.440
+78            0.284                34          47                    0.460                0.696                0.195          0.677           0.533 2.504
+# 2015-01-19 14:20:03 CET: Iteration 4 of 5
+# experimentsUsedSoFar: 700
+# timeUsedSoFar: 0
+# timeEstimate: 0
+# remainingBudget: 500
+# currentBudget: 250
+# nbCandidates: 27
+                            Markers:                           
+                               x No test is performed.         
+                               - The test is performed and     
+                                 some candidates are discarded.
+                               = The test is performed but     
+                                 no candidate is discarded.    
+                                                               
+                                                               
++-+-----------+-----------+-----------+-----------+-----------+
+| |       Task|      Alive|       Best|  Mean best| Exp so far|
++-+-----------+-----------+-----------+-----------+-----------+
+|x|          1|         27|         18|     -76.21|         27|
+|x|          2|         27|          1|     -75.02|         54|
+|x|          3|         27|         16|     -74.49|         81|
+|=|          4|         27|         16|     -74.71|        108|
+|=|          5|         27|          1|     -74.58|        135|
+|=|          6|         27|          7|     -74.65|        162|
+|=|          7|         27|          7|     -74.72|        189|
+|=|          8|         27|          7|      -74.8|        216|
+|=|          9|         27|          7|     -74.64|        243|
++-+-----------+-----------+-----------+-----------+-----------+
+
+Selected candidate:           7	mean value:     -74.64
+
+Description of the selected candidate:
+   mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+96            0.967                11          44                    0.705                0.206                0.565          0.682           0.973 2.786
+
+
+# Elite candidates:
+    mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+96             0.967                11          44                    0.705                0.206                0.565          0.682           0.973 2.786
+20             0.173                44          28                    0.507                0.457                0.613          0.797           0.513 0.440
+53             0.368                50          40                    0.336                0.666                0.227          0.590           0.388 2.445
+72             0.265                14          45                    0.579                0.281                0.470          0.957           0.499 1.683
+104            0.320                35          40                    0.306                0.845                0.403          0.179           0.442 1.973
+# 2015-01-19 15:12:14 CET: Iteration 5 of 5
+# experimentsUsedSoFar: 943
+# timeUsedSoFar: 0
+# timeEstimate: 0
+# remainingBudget: 257
+# currentBudget: 257
+# nbCandidates: 25
+                            Markers:                           
+                               x No test is performed.         
+                               - The test is performed and     
+                                 some candidates are discarded.
+                               = The test is performed but     
+                                 no candidate is discarded.    
+                                                               
+                                                               
++-+-----------+-----------+-----------+-----------+-----------+
+| |       Task|      Alive|       Best|  Mean best| Exp so far|
++-+-----------+-----------+-----------+-----------+-----------+
+|x|          1|         25|          3|     -75.63|         25|
+|x|          2|         25|         12|      -74.9|         50|
+|x|          3|         25|         12|     -74.78|         75|
+|=|          4|         25|         12|     -74.53|        100|
+|=|          5|         25|         19|     -74.54|        125|
+|=|          6|         25|         19|      -74.6|        150|
+|=|          7|         25|         19|     -74.58|        175|
+|=|          8|         25|          1|      -74.8|        200|
+|=|          9|         25|         19|     -74.57|        225|
+|=|         10|         25|         19|     -74.63|        250|
++-+-----------+-----------+-----------+-----------+-----------+
+
+Selected candidate:          19	mean value:     -74.63
+
+Description of the selected candidate:
+    mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+130            0.558                13          43                    0.606                0.288                0.418          0.974            0.53 1.442
+
+
+# Elite candidates:
+    mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+130            0.558                13          43                    0.606                0.288                0.418          0.974           0.530 1.442
+96             0.967                11          44                    0.705                0.206                0.565          0.682           0.973 2.786
+20             0.173                44          28                    0.507                0.457                0.613          0.797           0.513 0.440
+72             0.265                14          45                    0.579                0.281                0.470          0.957           0.499 1.683
+53             0.368                50          40                    0.336                0.666                0.227          0.590           0.388 2.445
+# 2015-01-19 16:09:05 CET: Stopped because there is no enough budget left to race newly sampled configurations
+# Iteration: 6
+# nbIterations: 6
+# experimentsUsedSoFar: 1193
+# timeUsedSoFar: 0
+# timeEstimate: 0
+# remainingBudget: 7
+# currentBudget: 7
+# number of elites: 5
+# nbCandidates: 0
+# mu: 5
+# Best candidates
+    mutate_only_prob gMaturationPeriod gMaxPopSize mutate_link_weights_prob mutate_add_node_prob mutate_add_link_prob mate_only_prob recur_only_prob sigma
+130            0.558                13          43                    0.606                0.288                0.418          0.974           0.530 1.442
+96             0.967                11          44                    0.705                0.206                0.565          0.682           0.973 2.786
+20             0.173                44          28                    0.507                0.457                0.613          0.797           0.513 0.440
+72             0.265                14          45                    0.579                0.281                0.470          0.957           0.499 1.683
+53             0.368                50          40                    0.336                0.666                0.227          0.590           0.388 2.445
+# Best candidates (as commandlines)
+1  -m 0.558 -w 0.606 -n 0.288 -l 0.418 -x 0.974 -r 0.53 -s 1.442 -q13 -p43
+2  -m 0.967 -w 0.705 -n 0.206 -l 0.565 -x 0.682 -r 0.973 -s 2.786 -q11 -p44
+3  -m 0.173 -w 0.507 -n 0.457 -l 0.613 -x 0.797 -r 0.513 -s 0.44 -q44 -p28
+4  -m 0.265 -w 0.579 -n 0.281 -l 0.47 -x 0.957 -r 0.499 -s 1.683 -q14 -p45
+5  -m 0.368 -w 0.336 -n 0.666 -l 0.227 -x 0.59 -r 0.388 -s 2.445 -q50 -p40

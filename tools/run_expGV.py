@@ -25,15 +25,18 @@ if os.path.isfile(sr_extraction_list):
 
 template_name=template_file.split('.')[0]
 
-# copy template prameter file 
-dst_path = os.path.join(config_dir, 'run-'+template_name+'.properties') 
-shutil.copy(src_path, dst_path)
-
 p='parallel-'+template_name
 
 # create single instances file (fed to parallel)
 with open(p, 'w') as file:
     for r in xrange(1,nb_exec+1):
+        # copy template prameter file 
+        dst_path = os.path.join(config_dir, 'run-%03d'%r+'-'+template_name+'.properties') 
+        shutil.copy(src_path, dst_path)
+        # add the experiments parameters
+        with open(dst_path, 'a') as file_run:
+            line = ' gEvolutionLogFile= '+log_dir+ '= %03d'%r+'-evo-'+template_name+'.log\n'
+            file_run.write(line)
         rnd = random.random() * 5.0
         line = 'sleep '+str(rnd)+' ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/'+template_name+'%03d.log'%(r)+'\n'
         file.write(line)

@@ -29,12 +29,14 @@ class odNeatGCWorldObserver : public WorldObserver
 		int _generationCount;
 		int _lifeIterationCount;
         int _countGeneClockCollisions;
+        int _countGenes;
 
 	public:
 		odNeatGCWorldObserver(World *world);
 		~odNeatGCWorldObserver();
         std::set<int> usedGeneCounters;
         void incrementCollisions();
+        void incrementCounterGenes();
 		void reset();
 		void step();
 

@@ -53,6 +53,7 @@ odNeatGCWorldObserver::odNeatGCWorldObserver( World* world ) : WorldObserver( wo
     gProperties.checkAndGetPropertyValue("gTabuThreshold",&odNeatGCSharedData::gTabuThreshold,true);
     gProperties.checkAndGetPropertyValue("gEnergItemValue",&odNeatGCSharedData::gEnergyItemValue,true);
     gProperties.checkAndGetPropertyValue("gFitnessFreq",&odNeatGCSharedData::gFitnessFreq,true);
+    gProperties.checkAndGetPropertyValue("gUpdateGC",&odNeatGCSharedData::gUpdateGC,false);
 
 
     odNeatGCSharedData::gEvoLog.open(odNeatGCSharedData::gEvolutionLogFile);//, std::ofstream::out | std::ofstream::app);
@@ -76,6 +77,7 @@ odNeatGCWorldObserver::odNeatGCWorldObserver( World* world ) : WorldObserver( wo
     _generationCount = -1;
 
     _countGeneClockCollisions = 0;
+    _countGenes = 0;
 
 }
 
@@ -179,6 +181,7 @@ void odNeatGCWorldObserver::updateMonitoring()
             std::vector<int>::iterator it = c->_newGenes.begin();
             for(; it !=c->_newGenes.end(); it++)
             {
+                incrementCounterGenes();
                 geneCounter = *it;
                 if(usedGeneCounters.find(geneCounter) != usedGeneCounters.end())
                 {//If it exists already, increment gene counter collision (concurrent event) counter
@@ -214,11 +217,21 @@ void odNeatGCWorldObserver::updateMonitoring()
                                           << std::endl;
         }
         odNeatGCSharedData::gEvoLog.close();
+        if(odNeatGCSharedData::gUpdateGC)
+            std::cout << "Updating GC" << std::endl;
+        else
+            std::cout << "No update GC" << std::endl;
         //Out number of concurrent gene counters
-        std::cout << "Concurrent events= " << _countGeneClockCollisions << std::endl;
+        std::cout << "Concurrent events= " << _countGeneClockCollisions << " (out of " << _countGenes
+                  << " ). Ratio: " << (double)(1.0 * _countGeneClockCollisions) /_countGenes <<   std::endl;
+
     }
 }
 void odNeatGCWorldObserver::incrementCollisions()
 {
     _countGeneClockCollisions++;
+}
+void odNeatGCWorldObserver::incrementCounterGenes()
+{
+    _countGenes++;
 }
