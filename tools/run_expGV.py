@@ -38,7 +38,7 @@ with open(p, 'w') as file:
             line = ' gEvolutionLogFile= '+log_dir+ '= %03d'%r+'-evo-'+template_name+'.log\n'
             file_run.write(line)
         rnd = random.random() * 5.0
-        line = 'sleep '+str(rnd)+' ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/'+template_name+'%03d.log'%(r)+'\n'
+        line = 'sleep '+str(rnd)+' ;  roborobo -l '+ dst_path + ' > '+log_dir+'/'+template_name+'%03d.log'%(r)+'\n'
         file.write(line)
 
 exit(0)
@@ -75,7 +75,7 @@ for p in var_values :
     with open(p, 'w') as file:
         for r in xrange(1,nb_exec+1):
             rnd = random.random() * 5.0
-            line = 'sleep '+str(rnd)+' ;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
+            line = 'sleep '+str(rnd)+' ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
             file.write(line)
         
     # prepare the survival rate script
