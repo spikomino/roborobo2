@@ -75,7 +75,7 @@ for p in var_values :
     with open(p, 'w') as file:
         for r in xrange(1,nb_exec+1):
             rnd = random.random() * 5.0
-            line = 'sleep '+str(rnd)+' ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
+            line = 'sleep '+str(rnd)+' ;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
             file.write(line)
         
     # prepare the survival rate script
