@@ -13,7 +13,7 @@ backIter <- 40;
 
 data <- read.table(args[1]);
 
-
+timeback <- 0.8
 if(!is.na(as.numeric(args[2])))
 {
 	timeback <- as.numeric(args[2]);

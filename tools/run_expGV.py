@@ -3,6 +3,7 @@
 #-----------------------------------------------------------------------------
 
 import os, shutil, random
+import sys
 #from datalog_stats import *
 
 home = os.environ["HOME"]
@@ -13,6 +14,10 @@ nb_exec       = 32
 global_script = 'run-all'
 sr_extraction_script = 'genome_phylo_stats.py'
 sr_extraction_list = 'sr_list'
+
+if len(sys.argv) > 1:
+    template_file = sys.argv[1]
+
 
 # copy the tenmplate file and update the values 
 src_path = os.path.join(config_dir, template_file)
