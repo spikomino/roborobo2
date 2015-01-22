@@ -153,7 +153,7 @@ def plot_one_curve(data, color, axis, label, quartiles=False):
     med, perc_25, perc_75 = perc(data)
     if quartiles :
         axis.fill_between(np.arange(0, len(med)), perc_25, perc_75,
-                          alpha=0.25, linewidth=0, color=colors)
+                          alpha=0.25, linewidth=0, color=color)
     axis.plot(med, lw=2, label=label, color=color)
     
       

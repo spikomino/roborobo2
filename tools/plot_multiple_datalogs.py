@@ -18,4 +18,4 @@ for d in sys.argv[1:] :
     data, stats, survival = process_experiment(d)
     D.append((d, data, stats, survival))
         
-draw_data(D, runs=False, tex=False)
+draw_data(D, runs=True, tex=False)
