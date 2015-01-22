@@ -52,7 +52,7 @@ int odNeatRandomSharedData::gFitnessFreq = 10;
 int odNeatRandomSharedData::gTabuTimeout = 15;
 double odNeatRandomSharedData::gTabuThreshold = 1.0;
 
-double odNeatRandomSharedData::gEnergyItemValue = 20.0;
-double odNeatRandomSharedData::gEnergyConsumption = 0.5;
+double odNeatRandomSharedData::gEnergyItemValue = 10.0;
+double odNeatRandomSharedData::gEnergyConsumption = 0.1;
 
 int odNeatRandomSharedData::gMaxRandomInnov = 1000;
