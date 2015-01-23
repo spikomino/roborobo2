@@ -51,7 +51,7 @@ odNeatGCWorldObserver::odNeatGCWorldObserver( World* world ) : WorldObserver( wo
     gProperties.checkAndGetPropertyValue("gCompatThreshold",&odNeatGCSharedData::gCompatThreshold,true);
     gProperties.checkAndGetPropertyValue("gTabuTimeout",&odNeatGCSharedData::gTabuTimeout,true);
     gProperties.checkAndGetPropertyValue("gTabuThreshold",&odNeatGCSharedData::gTabuThreshold,true);
-    gProperties.checkAndGetPropertyValue("gEnergItemValue",&odNeatGCSharedData::gEnergyItemValue,true);
+    gProperties.checkAndGetPropertyValue("gEnergyItemValue",&odNeatGCSharedData::gEnergyItemValue,true);
     gProperties.checkAndGetPropertyValue("gFitnessFreq",&odNeatGCSharedData::gFitnessFreq,true);
     gProperties.checkAndGetPropertyValue("gUpdateGC",&odNeatGCSharedData::gUpdateGC,false);
 
