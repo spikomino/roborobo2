@@ -1,11 +1,8 @@
 nbR <- 32
 maxIt <- 0
-exp <- "gcNoUpNav"
+exp <- "gcNav"
 for(i in 1:nbR)
 {
-# name <- sprintf("%03d-evo-odNNavTune.log",i)
-# name <- sprintf("%03d-evo-gcNavTune.log",i)
-# name <- sprintf("%03d-evo-rdmNavTuned.log",i)
  name <- sprintf(paste(paste("%03d-evo-",exp,sep=""),"Tune.log",sep=""),i)
  aux <- read.table(name)
  if(max(aux[,1]) > maxIt)
@@ -13,9 +10,6 @@ for(i in 1:nbR)
    maxIt <- max(aux[,1])
  }
 }
-#temp = list.files(pattern="*-evo-odNNav*")
-#temp = list.files(pattern="*-evo-gcNav*")
-#temp = list.files(pattern="*-evo-rdmNav*")
 temp = list.files(pattern=paste(paste("*-evo-",exp,sep=""),"*",sep=""))
 named.list <- lapply(temp, read.table)
 library(data.table)
@@ -55,7 +49,7 @@ if(i == 1)
 else
 	lines(meanFitness)
 	
-row.names(meanFitness) <- rep('[fitness: ',length(meanFitness))
+row.names(meanFitness) <- rep('[fitness:',length(meanFitness))
 	write.table(meanFitness,sprintf(paste("%03d-meanFitPerRobot-",exp,sep=""),i),row.names= TRUE,col.names=FALSE,sep="",quote=FALSE)
 }
 
