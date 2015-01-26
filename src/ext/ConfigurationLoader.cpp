@@ -12,6 +12,7 @@
 #include "Config/odNeatConfigurationLoader.h"
 #include "Config/odNeatGCConfigurationLoader.h"
 #include "Config/odNeatRandomConfigurationLoader.h"
+#include "Config/testInnovConfigurationLoader.h"
 //###DO-NOT-DELETE-THIS-LINE###TAG:INCLUDE###//
 
 
@@ -95,6 +96,12 @@ ConfigurationLoader* ConfigurationLoader::make_ConfigurationLoader (std::string 
 	else if (configurationLoaderObjectName == "odNeatRandomConfigurationLoader" )
 	{
 		return new odNeatRandomConfigurationLoader();
+	}
+#endif
+#if defined PRJ_TESTINNOV || !defined MODULAR
+	else if (configurationLoaderObjectName == "testInnovConfigurationLoader" )
+	{
+		return new testInnovConfigurationLoader();
 	}
 #endif
     //###DO-NOT-DELETE-THIS-LINE###TAG:SWITCH###//
