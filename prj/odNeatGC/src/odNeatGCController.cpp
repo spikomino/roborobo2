@@ -58,6 +58,7 @@ odNeatGCController::reset()
     //Fitness initialized to 0, so species will be "hindered"
     //Pay attention to initial species (see constructor above)
     _genome ->species = -1;
+    _genome->nbFitnessUpdates ++;
     add_unconditional_to_population(message(_genome,_energy,_sigma,_birthdate,_nodeId,_innovNumber));
 
     recomputeAllSpecies();
@@ -469,7 +470,7 @@ odNeatGCController::stepEvolution ()
 {
 
     //logGenome();
-
+    _genome->nbFitnessUpdates ++;
     add_to_population(message(_genome, _fitness, _sigma, _birthdate,_nodeId,_innovNumber));
     add_to_tabu_list(_genome);
     Genome* offspring =  generate_offspring();
@@ -914,9 +915,9 @@ void odNeatGCController::add_unconditional_to_population(message msg)
     if(population.find(receivedId) != population.end())
     {
         std::get<1>(population[receivedId]) =
-                         std::get<1>(population[receivedId]) +
-                         ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
-                         /(std::get<0>(population[receivedId])->nbFitnessUpdates);
+                std::get<1>(population[receivedId]) +
+                ( std::get<1>(msg) - std::get<1>(population[receivedId]) )
+                /(std::get<0>(population[receivedId])->nbFitnessUpdates);
     }
     else //new genome
     {

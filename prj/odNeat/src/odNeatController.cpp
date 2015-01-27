@@ -59,6 +59,7 @@ odNeatController::reset()
     //Fitness initialized to 0, so species will be "hindered"
     //Pay attention to initial species (see constructor above)
     _genome ->species = -1;
+    _genome->nbFitnessUpdates ++;
     add_unconditional_to_population(message(_genome,_energy,_sigma,_birthdate));
 
     recomputeAllSpecies();
@@ -457,7 +458,7 @@ odNeatController::stepEvolution ()
 {
 
     //logGenome();
-
+    _genome->nbFitnessUpdates ++;
     add_to_population(message(_genome, _fitness, _sigma, _birthdate));
     add_to_tabu_list(_genome);
     Genome* offspring =  generate_offspring();
