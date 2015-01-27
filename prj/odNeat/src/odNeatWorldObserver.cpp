@@ -153,8 +153,8 @@ void odNeatWorldObserver::updateMonitoring()
                                             << " " << c->_fitness
                                             << " " << c->population.size()
                                             << " " << c->species.size()
-                                            << "" << c->_genome->nodes.size()
-                                            << "" << c->_genome->genes.size() //Including disabled links
+                                            << " " << c->_genome->nodes.size()
+                                            << " " << c->_genome->genes.size() //Including disabled links
                                             << std::endl;
             }
 
@@ -178,8 +178,8 @@ void odNeatWorldObserver::updateMonitoring()
                                         << " " << c->_fitness
                                         << " " << c->population.size()
                                         << " " << c->species.size()
-                                        << "" << c->_genome->nodes.size()
-                                        << "" << c->_genome->genes.size() //Including disabled links
+                                        << " " << c->_genome->nodes.size()
+                                        << " " << c->_genome->genes.size() //Including disabled links
                                         << std::endl;
         }
         odNeatSharedData::gEvoLog.close();
