@@ -9,8 +9,8 @@ import sys
 home = os.environ["HOME"]
 config_dir    = 'config'
 log_dir       = 'logs'
-template_file = 'gcNavTune.properties'
-#template_file = 'odNNavTune.properties'
+#template_file = 'gcNavTune.properties'
+template_file = 'odNNavTune.properties'
 nb_exec       = 64
 global_script = 'run-all'
 sr_extraction_script = 'genome_phylo_stats.py'
