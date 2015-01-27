@@ -9,7 +9,8 @@ import sys
 home = os.environ["HOME"]
 config_dir    = 'config'
 log_dir       = 'logs'
-template_file = 'gcNavTune.properties'
+#template_file = 'gcNavTune.properties'
+template_file = 'gcNavTuneWithOdN.properties'
 #template_file = 'odNNavTune.properties'
 nb_exec       = 64
 global_script = 'run-all'
