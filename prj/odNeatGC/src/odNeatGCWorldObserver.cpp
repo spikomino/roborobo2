@@ -154,7 +154,7 @@ void odNeatGCWorldObserver::updateMonitoring()
     }
 
     if(gWorld->getIterations() >= 1)
-    {//Log "iteration idRobot idGenome energy fitness" every N iterations
+    {//Log "iteration idRobot idGenome energy fitness popsize nbspecies nbnodes nblinks" every N iterations
         int n = 100;
         if((gWorld->getIterations() % n) == 0)
         {
@@ -167,6 +167,10 @@ void odNeatGCWorldObserver::updateMonitoring()
                                             << " " << c->_genome->genome_id
                                             <<   " " << c->_energy
                                               << " " << c->_fitness
+                                              << " " << c->population.size()
+                                              << " " << c->species.size()
+                                              << "" << c->_genome->nodes.size()
+                                              << "" << c->_genome->genes.size() //Including disabled links
                                               << std::endl;
             }
 
@@ -214,6 +218,10 @@ void odNeatGCWorldObserver::updateMonitoring()
                                         << " " << c->_genome->genome_id
                                         <<   " " << c->_energy
                                           << " " << c->_fitness
+                                          << " " << c->population.size()
+                                          << " " << c->species.size()
+                                          << "" << c->_genome->nodes.size()
+                                          << "" << c->_genome->genes.size() //Including disabled links
                                           << std::endl;
         }
         odNeatGCSharedData::gEvoLog.close();

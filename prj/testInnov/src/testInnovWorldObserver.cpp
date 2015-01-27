@@ -120,8 +120,10 @@ void testInnovWorldObserver::updateMonitoring()
     {
         Genome* g1 = (dynamic_cast<testInnovController*>(gWorld->getRobot(1)->getController()))->_genome;
         Genome* g2 = (dynamic_cast<testInnovController*>(gWorld->getRobot(2)->getController()))->_genome;
-        Gene* gene1 = g1->genes[25];
-        Gene* gene2 = g2->genes[24];
+        Gene* gene1 = g1->genes[g1->genes.size()-1];
+        //Gene* gene1 = g1->genes[12];
+        Gene* gene2 = g2->genes[g2->genes.size()-1];
+        //Gene* gene2 = g2->genes[12];
         char time1[30], time2[30];
 
         struct tm  *t1 = gmtime(&(gene1->innovation_num.timestamp.tv_sec));
@@ -143,6 +145,8 @@ void testInnovWorldObserver::updateMonitoring()
         std::cout << tempbuf;
         std::cout << std::endl;
         std::cout << (gene1->innovation_num< gene2->innovation_num) << std::endl;
+        std::cout << (gene1->innovation_num> gene2->innovation_num) << std::endl;
+        std::cout << (gene1->innovation_num== gene2->innovation_num) << std::endl;
     }
 
     // * Log at end of each generation

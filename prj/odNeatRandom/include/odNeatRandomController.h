@@ -33,10 +33,6 @@ private:
 
     Network *nn;
 
-    std::map<int, message> population; //<genomeId, <genome, fitness,sigma, birthdate>>
-
-    //Map of all <idspecies,species> with their respective fitness values
-    std::map<int,std::pair<std::set<Genome*>,double>> species;
 
     std::vector< std::pair<Genome*, int> > tabu; //Set of dropped genomes, with the timeout when they are not to be accepted
     int _fitnessUpdateCounter; //Fitness is measured every gFitnessFreq steps    
@@ -142,6 +138,11 @@ public:
     double _energy;
     Genome *_genome;
     float _fitness;
+
+    std::map<int, message> population; //<genomeId, <genome, fitness,sigma, birthdate>>
+
+    //Map of all <idspecies,species> with their respective fitness values
+    std::map<int,std::pair<std::set<Genome*>,double>> species;
 
     std::vector<int> _newGenes;
 

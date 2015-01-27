@@ -59,8 +59,9 @@ odNeatGCController::reset()
     //Pay attention to initial species (see constructor above)
     _genome ->species = -1;
     add_unconditional_to_population(message(_genome,_energy,_sigma,_birthdate,_nodeId,_innovNumber));
-    adjust_species_fitness();
+
     recomputeAllSpecies();
+    adjust_species_fitness();
 }
 
 void

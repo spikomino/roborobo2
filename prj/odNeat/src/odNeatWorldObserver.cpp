@@ -138,8 +138,7 @@ void odNeatWorldObserver::updateMonitoring()
         gLogManager->flush();
     }
     if(gWorld->getIterations() >= 1)
-    {
-        //Log "iteration idRobot idGenome energy fitness" every N iterations
+    {//Log "iteration idRobot idGenome energy fitness popsize nbspecies nbnodes nblinks" every N iterations
         int n = 100;
         if((gWorld->getIterations() % n) == 0)
         {
@@ -148,11 +147,15 @@ void odNeatWorldObserver::updateMonitoring()
                 odNeatController* c = (dynamic_cast<odNeatController*>(gWorld->getRobot(i)->getController()));
 
                 odNeatSharedData::gEvoLog << gWorld->getIterations()
-                                            << " " << c->getWorldModel()->getId()
-                                            << " " << c->_genome->genome_id
-                                            <<   " " << c->_energy
-                                              << " " << c->_fitness
-                                              << std::endl;
+                                          << " " << c->getWorldModel()->getId()
+                                          << " " << c->_genome->genome_id
+                                          <<   " " << c->_energy
+                                            << " " << c->_fitness
+                                            << " " << c->population.size()
+                                            << " " << c->species.size()
+                                            << "" << c->_genome->nodes.size()
+                                            << "" << c->_genome->genes.size() //Including disabled links
+                                            << std::endl;
             }
 
         }
@@ -169,11 +172,15 @@ void odNeatWorldObserver::updateMonitoring()
             odNeatController* c = (dynamic_cast<odNeatController*>(gWorld->getRobot(i)->getController()));
 
             odNeatSharedData::gEvoLog << gWorld->getIterations() +1
-                                        << " " << c->getWorldModel()->getId()
-                                        << " " << c->_genome->genome_id
-                                        <<   " " << c->_energy
-                                          << " " << c->_fitness
-                                          << std::endl;
+                                      << " " << c->getWorldModel()->getId()
+                                      << " " << c->_genome->genome_id
+                                      <<   " " << c->_energy
+                                        << " " << c->_fitness
+                                        << " " << c->population.size()
+                                        << " " << c->species.size()
+                                        << "" << c->_genome->nodes.size()
+                                        << "" << c->_genome->genes.size() //Including disabled links
+                                        << std::endl;
         }
         odNeatSharedData::gEvoLog.close();
     }

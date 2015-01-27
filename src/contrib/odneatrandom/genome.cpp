@@ -1474,8 +1474,8 @@ double     mateOnlyProbOdNRandom = 0; // Prob. of mating without mutation
 double     recurOnlyProbOdNRandom = 0;  // Probability of forcing selection of ONLY links that are naturally recurrent
 int        newStructureTriesOdNRandom = 0;  // Number of tries mutateAddLink will attempt to find an open link
 
-double     coefEOdNRandom = 1.0;
-double     coefDOdNRandom = 1.0;
+double     coefEOdNRandom = 0.5;
+double     coefDOdNRandom = 1.5;
 double     coefWOdNRandom = 0.4;
 
 double     rangeWOdNRandom = 10.0;

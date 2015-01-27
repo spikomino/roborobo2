@@ -152,7 +152,7 @@ void odNeatRandomWorldObserver::updateMonitoring()
     }*/
 
     if(gWorld->getIterations() >= 1)
-    {//Log "iteration idRobot idGenome energy fitness" every N iterations
+    {//Log "iteration idRobot idGenome energy fitness popsize nbspecies nbnodes nblinks" every N iterations
         int n = 100;
         if((gWorld->getIterations() % n) == 0)
         {
@@ -161,11 +161,15 @@ void odNeatRandomWorldObserver::updateMonitoring()
                 odNeatRandomController* c = (dynamic_cast<odNeatRandomController*>(gWorld->getRobot(i)->getController()));
 
                 odNeatRandomSharedData::gEvoLog << gWorld->getIterations()
-                                            << " " << c->getWorldModel()->getId()
-                                            << " " << c->_genome->genome_id
-                                            <<   " " << c->_energy
-                                              << " " << c->_fitness
-                                              << std::endl;
+                                                << " " << c->getWorldModel()->getId()
+                                                << " " << c->_genome->genome_id
+                                                <<   " " << c->_energy
+                                                  << " " << c->_fitness
+                                                  << " " << c->population.size()
+                                                  << " " << c->species.size()
+                                                  << "" << c->_genome->nodes.size()
+                                                  << "" << c->_genome->genes.size() //Including disabled links
+                                                  << std::endl;
             }
 
         }
@@ -201,21 +205,25 @@ void odNeatRandomWorldObserver::updateMonitoring()
         for ( int i = 0 ; i != gNumberOfRobots ; i++ )
         {
             // (dynamic_cast<odNeatRandomController*>(gWorld->getRobot(i)->getController()))->printAll();
-             (dynamic_cast<odNeatRandomController*>(gWorld->getRobot(i)->getController()))->save_genome();
+            (dynamic_cast<odNeatRandomController*>(gWorld->getRobot(i)->getController()))->save_genome();
             // (dynamic_cast<odNeatRandomController*>(gWorld->getRobot(i)->getController()))->logGenome();
 
             odNeatRandomController* c = (dynamic_cast<odNeatRandomController*>(gWorld->getRobot(i)->getController()));
 
             odNeatRandomSharedData::gEvoLog << gWorld->getIterations() +1
-                                        << " " << c->getWorldModel()->getId()
-                                        << " " << c->_genome->genome_id
-                                        <<   " " << c->_energy
-                                          << " " << c->_fitness
-                                          << std::endl;
+                                            << " " << c->getWorldModel()->getId()
+                                            << " " << c->_genome->genome_id
+                                            <<   " " << c->_energy
+                                              << " " << c->_fitness
+                                              << " " << c->population.size()
+                                              << " " << c->species.size()
+                                              << "" << c->_genome->nodes.size()
+                                              << "" << c->_genome->genes.size() //Including disabled links
+                                              << std::endl;
         }
         odNeatRandomSharedData::gEvoLog.close();
         //Out number of concurrent gene counters
-       // std::cout << "Concurrent events= " << _countGeneClockCollisions << std::endl;
+        // std::cout << "Concurrent events= " << _countGeneClockCollisions << std::endl;
     }
 }
 void odNeatRandomWorldObserver::incrementCollisions()
