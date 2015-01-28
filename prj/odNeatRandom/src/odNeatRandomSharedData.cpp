@@ -55,4 +55,4 @@ double odNeatRandomSharedData::gTabuThreshold = 1.0;
 double odNeatRandomSharedData::gEnergyItemValue = 10.0;
 double odNeatRandomSharedData::gEnergyConsumption = 0.1;
 
-int odNeatRandomSharedData::gMaxRandomInnov = 1000;
+int odNeatRandomSharedData::gMaxRandomInnov = 100;
