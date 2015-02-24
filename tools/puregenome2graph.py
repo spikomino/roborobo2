@@ -11,8 +11,8 @@ from subprocess import Popen, PIPE
 #       called exclusively by process_graph 
 def process_node(g, d):
     shapes = ['circle', 'box', 'diamond', 'doublecircle']
-    colors = ['yellow', 'gray', 'darkorchid', 'cyan']    
-    n = int(d[1])
+    colors = [ 'gray', 'darkorchid', 'cyan','yellow']    
+    n = "<"+d[1]+","+d[2]+">"#int(d[1])
     g.add_node(n)
     g.node[n]['type']  = d[3] # 0=>output, 1=>input
     g.node[n]['lbl']   = d[4] # 0=>hidden, 1=>input, 2=>output, 3=>bias
@@ -24,21 +24,21 @@ def process_node(g, d):
 # in  : a graph object and the splited line from the genome file
 #       called exclusively by process_graph 
 def process_gene(g, d):
-    n0 = int(d[2])
-    n1 = int(d[3])
-    w  = float(d[4])
+    n0 = "<"+d[1]+","+d[2]+">"#int(d[2])
+    n1 = "<"+d[3]+","+d[4]+">" #int(d[3])
+    w  = float(d[5])
     g.add_edge(n0, n1, weight=w)
-    g.edge[n0][n1]['label']    = "{0: 2.3f}".format(float(d[4]))
-    g.edge[n0][n1]['recurent'] =d[5] # 0/1 yes/no
-    g.edge[n0][n1]['inov_num'] =d[6] # int
-    g.edge[n0][n1]['mut_num']  =d[7] # float
-    g.edge[n0][n1]['enable']   =d[8] # 0/1 yes/no
+    g.edge[n0][n1]['label']    = "{0: 2.3f}".format(float(d[5]))
+    g.edge[n0][n1]['recurent'] =d[6] # 0/1 yes/no
+    g.edge[n0][n1]['inov_num'] ="<"+d[7]+","+d[8]+">" # pair idRobot gc
+    #g.edge[n0][n1]['mut_num']  =d[7] # float
+    g.edge[n0][n1]['enable']   =d[9] # 0/1 yes/no
     g.edge[n0][n1]['style'] = 'solid'
     g.edge[n0][n1]['color'] = 'black'
     g.edge[n0][n1]['labelfontcolor'] = 'black'
     g.edge[n0][n1]['labelfontsize'] = 4
 
-    if d[8]=='0':
+    if d[9]=='0':
         g.edge[n0][n1]['style'] = 'dashed' 
         g.edge[n0][n1]['color'] = 'red'
         g.edge[n0][n1]['labelfontcolor'] = 'red'

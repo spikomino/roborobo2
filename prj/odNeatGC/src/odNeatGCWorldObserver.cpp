@@ -208,7 +208,7 @@ void odNeatGCWorldObserver::updateMonitoring()
         for ( int i = 0 ; i != gNumberOfRobots ; i++ )
         {
             // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->printAll();
-            // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->save_genome();
+             //(dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->save_genome();
             // (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()))->logGenome();
 
             odNeatGCController* c = (dynamic_cast<odNeatGCController*>(gWorld->getRobot(i)->getController()));

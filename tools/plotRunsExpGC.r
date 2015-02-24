@@ -1,6 +1,6 @@
 nbR <- 64
 maxIt <- 0
-exp <- "odNFor"
+exp <- "odNNav"
 for(i in 1:nbR)
 {
  name <- sprintf(paste(paste("%03d-evo-",exp,sep=""),"Tune.log",sep=""),i)
