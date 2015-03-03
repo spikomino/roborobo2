@@ -18,13 +18,13 @@ var_parameter = 'gSelectionPressure'
 var_values = [ '0.00', '0.25', '0.50', '0.75', '1.00' ]
 
 parameters={
-    'gInitialNumberOfRobots': 600,
-    'gNbOfPhysicalObjects': 0,
-    'gSigmaRef': 0.5,
-    'gFitnessFunction': 0,  # 0: locomotion, 1: collection, 2: forraging 
-    'gControllerType': 1,   # 0 = NEAT, 1 = FFNN
-    'gEvaluationTime': 200,
-    'gMaxIt'         : 20000, 
+    'gInitialNumberOfRobots': 100,
+    'gNbOfPhysicalObjects': 100,
+    'gSigmaRef': 0.8,
+    'gFitnessFunction': 2,  # 0: locomotion, 1: collection, 2: forraging 
+    'gControllerType': 0,   # 0 = NEAT, 1 = FFNN
+    'gEvaluationTime': 500,
+    'gMaxIt'         : 50000, 
     'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 
@@ -54,7 +54,7 @@ for p in var_values :
     # create single instances file (fed to parallel)
     with open(p, 'w') as file:
         for r in xrange(1,nb_exec+1):
-            rnd = random.random() * 5.0
+            rnd = random() * 5.0
             line = 'sleep '+str(rnd)+' ;;  roborobo -l '+ dst_path + ' > '+log_dir+'/%03d.log'%(r)+'\n'
             file.write(line)
         
