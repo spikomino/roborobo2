@@ -18,11 +18,15 @@
 #include "neatest/include/neatestSharedData.h"
 #include "neatest/include/neatestSharedData.h"
 
+#include <list>
+
 //class World;
 
 class neatestWorldObserver : public WorldObserver{
 
 private:
+    std::list<int> _pickedItems;
+    
     void updateEnvironment();
     void updateMonitoring();
     

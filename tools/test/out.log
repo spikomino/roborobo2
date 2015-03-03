@@ -3,14 +3,14 @@
  =-= nicolas.bredeche(at)upmc.fr
  =-= Current build name      : Ljubljana build
  =-= Official version tag    : 20140923
- =-= Compilation version tag : Jan  5 2015 - 10:43:27
+ =-= Compilation version tag : Jan 16 2015 - 17:26:15
 
 [INFO] Command-line parameter: properties will be loaded from file "config/neatest.properties".
-[INFO] Current location : /mnt/data/boumaza/repositories/git/roborobo2
+[INFO] Current location : /Volumes/users/amine/repositories/git/roborobo2
 
 
 [WARNING] gRobotDisplayImageFilename string value is missing (value will be copied from gRobotMaskImageFilename).
-[WARNING] No default gLogFilename string value. Log data will be written in "datalog_20150115-14h03m15s936694us.txt"
+[WARNING] No default gLogFilename string value. Log data will be written in "datalog_20150116-17h27m48s964303us.txt"
 
 =-=-=-=-=-=-=-=-=-=-=-= roborobo! =-=-=-=-=-=-=-=-=-=-=-=
 Fast 2D autonomous agent simulator for large population of robots/agents
@@ -18,7 +18,7 @@ nicolas.bredeche(at)upmc.fr
 Official version tag    : 20140923
 Current build name      : Ljubljana build
 
-Compilation version tag : Jan  5 2015 - 10:43:27
+Compilation version tag : Jan 16 2015 - 17:26:15
  >>>> Keys:
        h : help! (ie. this text)
        r : refresh on-screen rendering (no impact on simulation)
@@ -78,117 +78,118 @@ print_every=5
 babies_stolen=0
 num_runs=1
 [initRobot] id=0 in=13 out=2
-[Robot: id=0 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=0 mom=-1 dad=-1 ][INFO] Robot #0 positioned at (    27 ,    61 ) with orientation  43.6306° -- [random pick after 1 try]
+[Robot: id=0 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=0 mom=-1 dad=-1 ][INFO] Robot #0 positioned at (    50 ,    50 ) with orientation       90° -- [user-defined position]
 [initRobot] id=1 in=13 out=2
-[Robot: id=1 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=1 idtrace=1 mom=-1 dad=-1 ][INFO] Robot #1 positioned at (    42 ,    23 ) with orientation  55.7257° -- [random pick after 1 try]
+[Robot: id=1 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=1 idtrace=1 mom=-1 dad=-1 ][INFO] Robot #1 positioned at (    55 ,    50 ) with orientation       90° -- [user-defined position]
 [initRobot] id=2 in=13 out=2
-[Robot: id=2 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=2 idtrace=2 mom=-1 dad=-1 ][INFO] Robot #2 positioned at (    35 ,    35 ) with orientation   54.105° -- [random pick after 2 tries]
+[Robot: id=2 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=2 idtrace=2 mom=-1 dad=-1 ][INFO] Robot #2 positioned at (    45 ,    50 ) with orientation       90° -- [user-defined position]
 [initRobot] id=3 in=13 out=2
-[Robot: id=3 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=3 idtrace=3 mom=-1 dad=-1 ][INFO] Robot #3 positioned at (    68 ,     9 ) with orientation  43.3426° -- [random pick after 2 tries]
+[Robot: id=3 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=3 idtrace=3 mom=-1 dad=-1 ][INFO] Robot #3 positioned at (    45 ,    55 ) with orientation       90° -- [user-defined position]
 [initRobot] id=4 in=13 out=2
-[Robot: id=4 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=4 mom=-1 dad=-1 ][INFO] Robot #4 positioned at (    77 ,    61 ) with orientation  92.4822° -- [random pick after 1 try]
+[Robot: id=4 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=4 mom=-1 dad=-1 ][INFO] Robot #4 positioned at (    50 ,    55 ) with orientation       90° -- [user-defined position]
 [initRobot] id=5 in=13 out=2
-[Robot: id=5 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=5 idtrace=5 mom=-1 dad=-1 ][INFO] Robot #5 positioned at (    23 ,    68 ) with orientation -166.611° -- [random pick after 2 tries]
+[Robot: id=5 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=5 idtrace=5 mom=-1 dad=-1 ][INFO] Robot #5 positioned at (    55 ,    55 ) with orientation       90° -- [user-defined position]
 [initRobot] id=6 in=13 out=2
-[Robot: id=6 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=6 idtrace=6 mom=-1 dad=-1 ][INFO] Robot #6 positioned at (    24 ,    19 ) with orientation -160.449° -- [random pick after 1 try]
+[Robot: id=6 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=6 idtrace=6 mom=-1 dad=-1 ][INFO] Robot #6 positioned at (    45 ,    45 ) with orientation       90° -- [user-defined position]
 [initRobot] id=7 in=13 out=2
-[Robot: id=7 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=7 mom=-1 dad=-1 ][INFO] Robot #7 positioned at (    33 ,    43 ) with orientation  94.7558° -- [random pick after 1 try]
+[Robot: id=7 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=7 mom=-1 dad=-1 ][INFO] Robot #7 positioned at (    50 ,    45 ) with orientation       90° -- [user-defined position]
 [initRobot] id=8 in=13 out=2
-[Robot: id=8 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=8 mom=-1 dad=-1 ][INFO] Robot #8 positioned at (    43 ,    71 ) with orientation  139.722° -- [random pick after 1 try]
-[initRobot] id=9 in=13 out=2
-[Robot: id=9 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=9 mom=-1 dad=-1 ][INFO] Robot #9 positioned at (    13 ,    27 ) with orientation -24.3548° -- [random pick after 3 tries]
+[Robot: id=8 iteration=0 birthdate=0 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=8 mom=-1 dad=-1 ][INFO] Robot #8 positioned at (    55 ,    45 ) with orientation       90° -- [user-defined position]
 pause mode is OFF.
-[Robot: id=9 iteration=200 birthdate=0 fitness=0.0473538 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=1 idtrace=10009 mom=1 dad=-1 ][Popsize: 3] 
-[Robot: id=0 iteration=200 birthdate=0 fitness=0.0365462 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=10000 mom=7 dad=-1 ][Popsize: 5] 
-[Robot: id=8 iteration=200 birthdate=0 fitness=0.029263 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=5 idtrace=10008 mom=5 dad=-1 ][Popsize: 4] 
-[Robot: id=1 iteration=200 birthdate=0 fitness=0.0341898 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=10001 mom=9 dad=-1 ][Popsize: 5] 
-[Robot: id=5 iteration=200 birthdate=0 fitness=0.0189104 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=10005 mom=7 dad=-1 ][Popsize: 4] 
-[Robot: id=4 iteration=200 birthdate=0 fitness=0.061044 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=10004 mom=7 dad=-1 ][Popsize: 4] 
-[Robot: id=7 iteration=200 birthdate=0 fitness=0.104928 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=10007 mom=8 dad=-1 ][Popsize: 7] 
-[Robot: id=2 iteration=200 birthdate=0 fitness=0.0813907 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=10002 mom=0 dad=-1 ][Popsize: 4] 
-[Robot: id=6 iteration=200 birthdate=0 fitness=0.0166417 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=10006 mom=9 dad=-1 ][Popsize: 4] 
-[Robot: id=3 iteration=200 birthdate=0 fitness=0.0133213 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=10003 mom=4 dad=-1 ][Popsize: 2] 
-[gen:1;pop:10;fit:0.443589;popsize:4.2]
-[Robot: id=8 iteration=400 birthdate=199 fitness=0 reported fitness=0.029263 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20008 mom=10005 dad=-1 ][Popsize: 3] 
-[Robot: id=9 iteration=400 birthdate=199 fitness=0.0580466 reported fitness=0.0473538 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=20009 mom=10001 dad=-1 ][Popsize: 3] 
-[Robot: id=6 iteration=400 birthdate=199 fitness=5.03671e-07 reported fitness=0.0166417 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=1 idtrace=20006 mom=10009 dad=-1 ][Popsize: 3] 
-[Robot: id=7 iteration=400 birthdate=199 fitness=0.00109285 reported fitness=0.104928 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=20007 mom=10007 dad=-1 ][Popsize: 3] 
-[Robot: id=5 iteration=400 birthdate=199 fitness=0.0465714 reported fitness=0.0189104 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=20005 mom=10007 dad=-1 ][Popsize: 3] 
-[Robot: id=1 iteration=400 birthdate=199 fitness=0.0530816 reported fitness=0.0341898 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=1 idtrace=20001 mom=10009 dad=-1 ][Popsize: 3] 
-[Robot: id=4 iteration=400 birthdate=199 fitness=0.0491797 reported fitness=0.061044 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=20004 mom=10001 dad=-1 ][Popsize: 2] 
-[Robot: id=3 iteration=400 birthdate=199 fitness=0.0569012 reported fitness=0.0133213 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=20003 mom=10003 dad=-1 ][Popsize: 2] 
-[Robot: id=0 iteration=400 birthdate=199 fitness=0 reported fitness=0.0365462 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20000 mom=10000 dad=-1 ][Popsize: 2] 
-[Robot: id=2 iteration=400 birthdate=199 fitness=0 reported fitness=0.0813907 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20002 mom=10000 dad=-1 ][Popsize: 2] 
-[gen:2;pop:10;fit:0.264874;popsize:2.6]
-[Robot: id=2 iteration=600 birthdate=399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=30002 mom=20002 dad=-1 ][Popsize: 1] 
-[Robot: id=7 iteration=600 birthdate=399 fitness=0.00285563 reported fitness=0.00109285 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=30007 mom=20007 dad=-1 ][Popsize: 3] 
-[Robot: id=5 iteration=600 birthdate=399 fitness=0.00508621 reported fitness=0.0465714 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=30005 mom=20005 dad=-1 ][Popsize: 3] 
-[Robot: id=1 iteration=600 birthdate=399 fitness=0.0538466 reported fitness=0.0530816 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=30001 mom=20009 dad=-1 ][Popsize: 3] 
-[Robot: id=3 iteration=600 birthdate=399 fitness=0.00538394 reported fitness=0.0569012 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=30003 mom=20009 dad=-1 ][Popsize: 3] 
-[Robot: id=4 iteration=600 birthdate=399 fitness=0.00187294 reported fitness=0.0491797 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=30004 mom=20004 dad=-1 ][Popsize: 3] 
-[Robot: id=6 iteration=600 birthdate=399 fitness=0.047273 reported fitness=5.03671e-07 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=30006 mom=20009 dad=-1 ][Popsize: 3] 
-[Robot: id=9 iteration=600 birthdate=399 fitness=0.0215156 reported fitness=0.0580466 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=30009 mom=20009 dad=-1 ][Popsize: 5] 
-[Robot: id=0 iteration=600 birthdate=399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=30000 mom=20008 dad=-1 ][Popsize: 3] 
-[Robot: id=8 iteration=600 birthdate=399 fitness=0.014322 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=30008 mom=20000 dad=-1 ][Popsize: 4] 
-[gen:3;pop:10;fit:0.152156;popsize:3.1]
-[Robot: id=0 iteration=800 birthdate=599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40000 mom=30008 dad=-1 ][Popsize: 2] 
-[Robot: id=9 iteration=800 birthdate=599 fitness=0 reported fitness=0.0215156 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=40009 mom=30009 dad=-1 ][Popsize: 3] 
-[Robot: id=7 iteration=800 birthdate=599 fitness=0 reported fitness=0.00285563 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=40007 mom=30007 dad=-1 ][Popsize: 2] 
-[Robot: id=8 iteration=800 birthdate=599 fitness=0.00716927 reported fitness=0.014322 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40008 mom=30000 dad=-1 ][Popsize: 2] 
-[Robot: id=5 iteration=800 birthdate=599 fitness=0 reported fitness=0.00508621 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=40005 mom=30007 dad=-1 ][Popsize: 2] 
-[Robot: id=1 iteration=800 birthdate=599 fitness=0.000181377 reported fitness=0.0538466 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=40001 mom=30006 dad=-1 ][Popsize: 2] 
-[Robot: id=3 iteration=800 birthdate=599 fitness=0 reported fitness=0.00538394 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=40003 mom=30003 dad=-1 ][Popsize: 2] 
-[Robot: id=4 iteration=800 birthdate=599 fitness=0 reported fitness=0.00187294 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=40004 mom=30009 dad=-1 ][Popsize: 3] 
-[Robot: id=2 iteration=800 birthdate=599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40002 mom=30002 dad=-1 ][Popsize: 1] 
-[Robot: id=6 iteration=800 birthdate=599 fitness=1.70796e-06 reported fitness=0.047273 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=40006 mom=30006 dad=-1 ][Popsize: 2] 
-[gen:4;pop:10;fit:0.00735235;popsize:2.1]
-[Robot: id=5 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=50005 mom=40007 dad=-1 ][Popsize: 2] 
-[Robot: id=4 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=50004 mom=40009 dad=-1 ][Popsize: 4] 
-[Robot: id=3 iteration=1000 birthdate=799 fitness=8.98425e-06 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=50003 mom=40009 dad=-1 ][Popsize: 3] 
-[Robot: id=8 iteration=1000 birthdate=799 fitness=0 reported fitness=0.00716927 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50008 mom=40008 dad=-1 ][Popsize: 3] 
-[Robot: id=9 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=50009 mom=40009 dad=-1 ][Popsize: 4] 
-[Robot: id=7 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=50007 mom=40005 dad=-1 ][Popsize: 2] 
-[Robot: id=2 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50002 mom=40002 dad=-1 ][Popsize: 2] 
-[Robot: id=6 iteration=1000 birthdate=799 fitness=0.0298301 reported fitness=1.70796e-06 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=50006 mom=40001 dad=-1 ][Popsize: 2] 
-[Robot: id=0 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50000 mom=40008 dad=-1 ][Popsize: 3] 
-[Robot: id=1 iteration=1000 birthdate=799 fitness=0.188985 reported fitness=0.000181377 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=50001 mom=40006 dad=-1 ][Popsize: 8] 
-[50 fps]
-[gen:5;pop:10;fit:0.218824;popsize:3.3]
-[Robot: id=9 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60009 mom=50006 dad=-1 ][Popsize: 4] 
-[Robot: id=5 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=60005 mom=50007 dad=-1 ][Popsize: 3] 
-[Robot: id=4 iteration=1200 birthdate=999 fitness=0.061659 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60004 mom=50006 dad=-1 ][Popsize: 4] 
-[Robot: id=8 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60008 mom=50000 dad=-1 ][Popsize: 4] 
-[Robot: id=1 iteration=1200 birthdate=999 fitness=0.0103528 reported fitness=0.188985 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60001 mom=50001 dad=-1 ][Popsize: 5] 
-[Robot: id=3 iteration=1200 birthdate=999 fitness=0.000196429 reported fitness=8.98425e-06 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60003 mom=50003 dad=-1 ][Popsize: 4] 
-[Robot: id=6 iteration=1200 birthdate=999 fitness=0.175206 reported fitness=0.0298301 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60006 mom=50006 dad=-1 ][Popsize: 9] 
-[Robot: id=2 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60002 mom=50006 dad=-1 ][Popsize: 3] 
-[Robot: id=7 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=60007 mom=50007 dad=-1 ][Popsize: 3] 
-[Robot: id=0 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=60000 mom=50001 dad=-1 ][Popsize: 4] 
-[gen:6;pop:10;fit:0.247414;popsize:4.3]
-[Robot: id=9 iteration=1400 birthdate=1199 fitness=3.2062e-12 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=70009 mom=60009 dad=-1 ][Popsize: 4] 
-[Robot: id=4 iteration=1400 birthdate=1199 fitness=0.0299556 reported fitness=0.061659 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=70004 mom=60002 dad=-1 ][Popsize: 6] 
-[Robot: id=0 iteration=1400 birthdate=1199 fitness=0.000297423 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=70000 mom=60002 dad=-1 ][Popsize: 6] 
-[Robot: id=5 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=70005 mom=60007 dad=-1 ][Popsize: 3] 
-[Robot: id=2 iteration=1400 birthdate=1199 fitness=0.189245 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=70002 mom=60005 dad=-1 ][Popsize: 9] 
-[Robot: id=3 iteration=1400 birthdate=1199 fitness=0 reported fitness=0.000196429 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=70003 mom=60004 dad=-1 ][Popsize: 4] 
-[Robot: id=7 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=70007 mom=60005 dad=-1 ][Popsize: 3] 
-[Robot: id=1 iteration=1400 birthdate=1199 fitness=0.00264493 reported fitness=0.0103528 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70001 mom=60008 dad=-1 ][Popsize: 5] 
-[Robot: id=8 iteration=1400 birthdate=1199 fitness=0.015717 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=70008 mom=60004 dad=-1 ][Popsize: 6] 
-[Robot: id=6 iteration=1400 birthdate=1199 fitness=0.105103 reported fitness=0.175206 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=70006 mom=60004 dad=-1 ][Popsize: 5] 
-[gen:7;pop:10;fit:0.342962;popsize:5.1]
-[Robot: id=2 iteration=1600 birthdate=1399 fitness=0.0109474 reported fitness=0.189245 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=80002 mom=70004 dad=-1 ][Popsize: 6] 
-[Robot: id=7 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=80007 mom=70007 dad=-1 ][Popsize: 3] 
-[Robot: id=6 iteration=1600 birthdate=1399 fitness=0.10156 reported fitness=0.105103 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=80006 mom=70000 dad=-1 ][Popsize: 6] 
-[Robot: id=9 iteration=1600 birthdate=1399 fitness=0.016218 reported fitness=3.2062e-12 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=80009 mom=70008 dad=-1 ][Popsize: 5] 
-[Robot: id=5 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=80005 mom=70005 dad=-1 ][Popsize: 3] 
-[Robot: id=4 iteration=1600 birthdate=1399 fitness=0.146126 reported fitness=0.0299556 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=80004 mom=70008 dad=-1 ][Popsize: 8] 
-[Robot: id=0 iteration=1600 birthdate=1399 fitness=0.121663 reported fitness=0.000297423 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=80000 mom=70008 dad=-1 ][Popsize: 7] 
-[Robot: id=8 iteration=1600 birthdate=1399 fitness=0.118923 reported fitness=0.015717 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=80008 mom=70002 dad=-1 ][Popsize: 8] 
-[Robot: id=3 iteration=1600 birthdate=1399 fitness=0.0429457 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=80003 mom=70002 dad=-1 ][Popsize: 6] 
-[Robot: id=1 iteration=1600 birthdate=1399 fitness=0.104717 reported fitness=0.00264493 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=9 idtrace=80001 mom=70008 dad=-1 ][Popsize: 5] 
-[gen:8;pop:10;fit:0.6631;popsize:5.7]
+Display mode is now 1
+[Robot: id=2 iteration=200 birthdate=0 fitness=0.104964 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=10002 mom=4 dad=-1 ][Popsize: 7] 
+[Robot: id=7 iteration=200 birthdate=0 fitness=0.00174429 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=2 idtrace=10007 mom=2 dad=-1 ][Popsize: 7] 
+[Robot: id=4 iteration=200 birthdate=0 fitness=9.84981e-06 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=10004 mom=0 dad=-1 ][Popsize: 9] 
+[Robot: id=5 iteration=200 birthdate=0 fitness=0.000671543 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=3 idtrace=10005 mom=3 dad=-1 ][Popsize: 5] 
+[Robot: id=8 iteration=200 birthdate=0 fitness=0.0363501 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=6 idtrace=10008 mom=6 dad=-1 ][Popsize: 7] 
+[Robot: id=3 iteration=200 birthdate=0 fitness=0.0010793 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=10003 mom=7 dad=-1 ][Popsize: 8] 
+[Robot: id=1 iteration=200 birthdate=0 fitness=0.00509533 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=10001 mom=8 dad=-1 ][Popsize: 8] 
+[Robot: id=0 iteration=200 birthdate=0 fitness=0.0140594 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=6 idtrace=10000 mom=6 dad=-1 ][Popsize: 9] 
+[Robot: id=6 iteration=200 birthdate=0 fitness=0.00991249 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=2 idtrace=10006 mom=2 dad=-1 ][Popsize: 7] 
+[gen:1;pop:9;fit:0.173886;popsize:7.44444]
+[Robot: id=3 iteration=400 birthdate=199 fitness=2.76293e-08 reported fitness=0.0010793 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=20003 mom=10004 dad=-1 ][Popsize: 8] 
+[Robot: id=6 iteration=400 birthdate=199 fitness=0.0794079 reported fitness=0.00991249 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20006 mom=10003 dad=-1 ][Popsize: 9] 
+[Robot: id=1 iteration=400 birthdate=199 fitness=0.0306781 reported fitness=0.00509533 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=20001 mom=10002 dad=-1 ][Popsize: 9] 
+[Robot: id=2 iteration=400 birthdate=199 fitness=0.0179309 reported fitness=0.104964 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20002 mom=10003 dad=-1 ][Popsize: 7] 
+[Robot: id=4 iteration=400 birthdate=199 fitness=0.0325553 reported fitness=9.84981e-06 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=20004 mom=10002 dad=-1 ][Popsize: 8] 
+[Robot: id=7 iteration=400 birthdate=199 fitness=0.0706461 reported fitness=0.00174429 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20007 mom=10003 dad=-1 ][Popsize: 6] 
+[Robot: id=5 iteration=400 birthdate=199 fitness=0.0609751 reported fitness=0.000671543 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=20005 mom=10003 dad=-1 ][Popsize: 8] 
+[Robot: id=0 iteration=400 birthdate=199 fitness=0.076248 reported fitness=0.0140594 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=20000 mom=10001 dad=-1 ][Popsize: 9] 
+[Robot: id=8 iteration=400 birthdate=199 fitness=0.0168245 reported fitness=0.0363501 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=20008 mom=10004 dad=-1 ][Popsize: 7] 
+[gen:2;pop:9;fit:0.385266;popsize:7.88889]
+[Robot: id=4 iteration=600 birthdate=399 fitness=0.000560173 reported fitness=0.0325553 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=30004 mom=20003 dad=-1 ][Popsize: 6] 
+[Robot: id=6 iteration=600 birthdate=399 fitness=0.077968 reported fitness=0.0794079 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=30006 mom=20004 dad=-1 ][Popsize: 7] 
+[Robot: id=7 iteration=600 birthdate=399 fitness=0.0406178 reported fitness=0.0706461 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=30007 mom=20002 dad=-1 ][Popsize: 5] 
+[Robot: id=2 iteration=600 birthdate=399 fitness=0.0143761 reported fitness=0.0179309 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=30002 mom=20004 dad=-1 ][Popsize: 7] 
+[Robot: id=1 iteration=600 birthdate=399 fitness=4.46446e-06 reported fitness=0.0306781 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=30001 mom=20002 dad=-1 ][Popsize: 8] 
+[Robot: id=3 iteration=600 birthdate=399 fitness=0.0591896 reported fitness=2.76293e-08 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=30003 mom=20000 dad=-1 ][Popsize: 4] 
+[Robot: id=0 iteration=600 birthdate=399 fitness=0.0707251 reported fitness=0.076248 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=30000 mom=20000 dad=-1 ][Popsize: 3] 
+[Robot: id=8 iteration=600 birthdate=399 fitness=0.0711774 reported fitness=0.0168245 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=30008 mom=20005 dad=-1 ][Popsize: 4] 
+[Robot: id=5 iteration=600 birthdate=399 fitness=0.0132291 reported fitness=0.0609751 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=0 idtrace=30005 mom=20003 dad=-1 ][Popsize: 7] 
+[gen:3;pop:9;fit:0.347848;popsize:5.66667]
+[Robot: id=7 iteration=800 birthdate=599 fitness=0.0236477 reported fitness=0.0406178 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=40007 mom=30006 dad=-1 ][Popsize: 4] 
+[Robot: id=1 iteration=800 birthdate=599 fitness=0.0296642 reported fitness=4.46446e-06 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=4 idtrace=40001 mom=30006 dad=-1 ][Popsize: 5] 
+[Robot: id=0 iteration=800 birthdate=599 fitness=0.0502071 reported fitness=0.0707251 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=40000 mom=30000 dad=-1 ][Popsize: 1] 
+[Robot: id=6 iteration=800 birthdate=599 fitness=0.0180653 reported fitness=0.077968 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40006 mom=30007 dad=-1 ][Popsize: 3] 
+[Robot: id=3 iteration=800 birthdate=599 fitness=0.0502495 reported fitness=0.0591896 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=40003 mom=30003 dad=-1 ][Popsize: 2] 
+[Robot: id=4 iteration=800 birthdate=599 fitness=0.0673562 reported fitness=0.000560173 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40004 mom=30001 dad=-1 ][Popsize: 5] 
+[Robot: id=5 iteration=800 birthdate=599 fitness=0 reported fitness=0.0132291 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40005 mom=30007 dad=-1 ][Popsize: 5] 
+[Robot: id=2 iteration=800 birthdate=599 fitness=0.00451875 reported fitness=0.0143761 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40002 mom=30001 dad=-1 ][Popsize: 4] 
+[Robot: id=8 iteration=800 birthdate=599 fitness=0 reported fitness=0.0711774 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=40008 mom=30008 dad=-1 ][Popsize: 1] 
+[gen:4;pop:9;fit:0.243709;popsize:3.33333]
+[Robot: id=2 iteration=1000 birthdate=799 fitness=0.0486081 reported fitness=0.00451875 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50002 mom=40005 dad=-1 ][Popsize: 2] 
+[Robot: id=7 iteration=1000 birthdate=799 fitness=0 reported fitness=0.0236477 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50007 mom=40006 dad=-1 ][Popsize: 2] 
+[Robot: id=6 iteration=1000 birthdate=799 fitness=0 reported fitness=0.0180653 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50006 mom=40006 dad=-1 ][Popsize: 2] 
+[Robot: id=1 iteration=1000 birthdate=799 fitness=0.000753769 reported fitness=0.0296642 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50001 mom=40006 dad=-1 ][Popsize: 2] 
+[Robot: id=0 iteration=1000 birthdate=799 fitness=0.0499593 reported fitness=0.0502071 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=50000 mom=40000 dad=-1 ][Popsize: 1] 
+[Robot: id=4 iteration=1000 birthdate=799 fitness=0.00748035 reported fitness=0.0673562 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50004 mom=40004 dad=-1 ][Popsize: 2] 
+[Robot: id=8 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50008 mom=40008 dad=-1 ][Popsize: 1] 
+[Robot: id=3 iteration=1000 birthdate=799 fitness=0.0502512 reported fitness=0.0502495 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=50003 mom=40003 dad=-1 ][Popsize: 1] 
+[Robot: id=5 iteration=1000 birthdate=799 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=50005 mom=40005 dad=-1 ][Popsize: 2] 
+[174 fps]
+[gen:5;pop:9;fit:0.157053;popsize:1.66667]
+[Robot: id=4 iteration=1200 birthdate=999 fitness=0 reported fitness=0.00748035 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60004 mom=50004 dad=-1 ][Popsize: 1] 
+[Robot: id=7 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60007 mom=50007 dad=-1 ][Popsize: 2] 
+[Robot: id=5 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60005 mom=50002 dad=-1 ][Popsize: 2] 
+[Robot: id=3 iteration=1200 birthdate=999 fitness=0.0502512 reported fitness=0.0502512 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=60003 mom=50003 dad=-1 ][Popsize: 1] 
+[Robot: id=2 iteration=1200 birthdate=999 fitness=0.040662 reported fitness=0.0486081 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60002 mom=50002 dad=-1 ][Popsize: 2] 
+[Robot: id=8 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60008 mom=50008 dad=-1 ][Popsize: 1] 
+[Robot: id=0 iteration=1200 birthdate=999 fitness=0.0502185 reported fitness=0.0499593 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=60000 mom=50000 dad=-1 ][Popsize: 1] 
+[Robot: id=6 iteration=1200 birthdate=999 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60006 mom=50001 dad=-1 ][Popsize: 2] 
+[Robot: id=1 iteration=1200 birthdate=999 fitness=0 reported fitness=0.000753769 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=60001 mom=50001 dad=-1 ][Popsize: 2] 
+[gen:6;pop:9;fit:0.141132;popsize:1.55556]
+[Robot: id=0 iteration=1400 birthdate=1199 fitness=0.0496703 reported fitness=0.0502185 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=70000 mom=60000 dad=-1 ][Popsize: 1] 
+[Robot: id=6 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70006 mom=60001 dad=-1 ][Popsize: 2] 
+[Robot: id=7 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70007 mom=60006 dad=-1 ][Popsize: 2] 
+[Robot: id=8 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70008 mom=60008 dad=-1 ][Popsize: 1] 
+[Robot: id=4 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70004 mom=60004 dad=-1 ][Popsize: 1] 
+[Robot: id=1 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70001 mom=60006 dad=-1 ][Popsize: 2] 
+[Robot: id=3 iteration=1400 birthdate=1199 fitness=0.0502512 reported fitness=0.0502512 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=70003 mom=60003 dad=-1 ][Popsize: 1] 
+[Robot: id=2 iteration=1400 birthdate=1199 fitness=0.0262293 reported fitness=0.040662 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70002 mom=60002 dad=-1 ][Popsize: 2] 
+[Robot: id=5 iteration=1400 birthdate=1199 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=70005 mom=60002 dad=-1 ][Popsize: 2] 
+[gen:7;pop:9;fit:0.126151;popsize:1.55556]
+[Robot: id=5 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80005 mom=70005 dad=-1 ][Popsize: 2] 
+[Robot: id=2 iteration=1600 birthdate=1399 fitness=0.000393041 reported fitness=0.0262293 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80002 mom=70002 dad=-1 ][Popsize: 2] 
+[Robot: id=0 iteration=1600 birthdate=1399 fitness=0.0495308 reported fitness=0.0496703 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=80000 mom=70000 dad=-1 ][Popsize: 1] 
+[Robot: id=8 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80008 mom=70008 dad=-1 ][Popsize: 1] 
+[Robot: id=6 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80006 mom=70006 dad=-1 ][Popsize: 2] 
+[Robot: id=4 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80004 mom=70004 dad=-1 ][Popsize: 1] 
+[Robot: id=1 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80001 mom=70001 dad=-1 ][Popsize: 2] 
+[Robot: id=7 iteration=1600 birthdate=1399 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=80007 mom=70006 dad=-1 ][Popsize: 2] 
+[Robot: id=3 iteration=1600 birthdate=1399 fitness=0.0502512 reported fitness=0.0502512 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=80003 mom=70003 dad=-1 ][Popsize: 1] 
+[gen:8;pop:9;fit:0.100175;popsize:1.55556]
+[Robot: id=7 iteration=1800 birthdate=1599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90007 mom=80006 dad=-1 ][Popsize: 2] 
+[Robot: id=3 iteration=1800 birthdate=1599 fitness=0.0502512 reported fitness=0.0502512 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=90003 mom=80003 dad=-1 ][Popsize: 1] 
+[Robot: id=0 iteration=1800 birthdate=1599 fitness=0.0502367 reported fitness=0.0495308 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=8 idtrace=90000 mom=80000 dad=-1 ][Popsize: 1] 
+[Robot: id=2 iteration=1800 birthdate=1599 fitness=0.000173444 reported fitness=0.000393041 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90002 mom=80005 dad=-1 ][Popsize: 2] 
+[Robot: id=1 iteration=1800 birthdate=1599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90001 mom=80001 dad=-1 ][Popsize: 2] 
+[Robot: id=6 iteration=1800 birthdate=1599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90006 mom=80001 dad=-1 ][Popsize: 2] 
+[Robot: id=5 iteration=1800 birthdate=1599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90005 mom=80002 dad=-1 ][Popsize: 2] 
+[Robot: id=4 iteration=1800 birthdate=1599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90004 mom=80004 dad=-1 ][Popsize: 1] 
+[Robot: id=8 iteration=1800 birthdate=1599 fitness=0 reported fitness=0 collected=0/5 forraged=0 sigma=0.5 ][Genome: id=7 idtrace=90008 mom=80008 dad=-1 ][Popsize: 1] 
+[gen:9;pop:9;fit:0.100661;popsize:1.55556]
 
-[timestamp::start] 20150115-14h03m15s936694us
-[timestamp::stop ] 20150115-14h03m48s564226us
-[Chronometer] 0 day(s), 0 hour(s), 0 minute(s), 33 second(s).
+[timestamp::start] 20150116-17h27m48s964303us
+[timestamp::stop ] 20150116-17h27m55s342390us
+[Chronometer] 0 day(s), 0 hour(s), 0 minute(s), 7 second(s).
 

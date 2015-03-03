@@ -149,7 +149,7 @@ void neatestController::reset(){
     _items_miss_droped = 0;
     _locomotion        = 0;
  
-    emptyBasket();
+    // emptyBasket(); item dont respawn should not empty 
     emptyGenomeList();
 }
 
@@ -184,10 +184,8 @@ bool is_energy_item(int id){
 } 
 
 void neatestController::pickItem(int item_id){
-    _items_in_basket++;
+    _basket.push_back(item_id);
     _items_collected++;
-    _basket.push(item_id);
-    
 }
 
 void neatestController::emptyBasket(){
@@ -195,10 +193,9 @@ void neatestController::emptyBasket(){
 }
 
 void neatestController::dropItem(int n){
-    if(_items_in_basket - n <= 0)
-	_items_in_basket = 0;
-    else
-	_items_in_basket -= n;
+    for (int i=0; i<n; i++)
+	if(!_basket.empty())
+	    _basket.pop_front();
 }
  
 bool neatestController::stillRoomInBasket() { 
@@ -334,11 +331,11 @@ void neatestController::stepBehaviour(){
    
     /* Foraging : drop items */ 
     if (neatestSharedData::gFitnessFunction > 1 ){
-	droped = (int) (outputs[D] * _items_in_basket);
+	droped = (int) (outputs[D] * _basket.size());
 	dropItem(droped);
 	const int nest_color = 255*256; 
 	at_nest = _wm->getGroundSensorValue() == nest_color; 
-	/*std::cout << "Dropped " << droped << "/" << _items_in_basket ;  
+	/*std::cout << "Dropped " << droped << "/" << _basket.size() ;  
 	if (! at_nest)  
 	    std::cout<< " not " ;
 	std::cout  << " at nest." 
@@ -636,10 +633,19 @@ void neatestController::printRobot(){
 	      << " ]";
 }
 
+void neatestController::printBasket(){
+    std::cout << "[Basket: ";
+	
+    for(const auto& c : _basket)
+	std::cout << c << " ";
+    std::cout << " ]";
+}
+
 void neatestController::printAll(){
     printRobot();
     print_genome(_genome);
     printPopsize();
+    printBasket();
     std::cout << "\n";
     //std::cout << "\t";
     //printGenomeList();

@@ -87,15 +87,13 @@ void neatestAgentObserver::step(){
 		/* notify the robot that it picked an item  */
 		cont->pickItem(targetIndex);
 		
-		/* store in a list and remove from */
-		gPhysicalObjects[targetIndex]->unregisterObject();
-		gPhysicalObjects[targetIndex]->hide();
+
 
 		/*std::cout << "Robot " << cont->getId() 
 			  << " picked " << targetIndex 
-			  << " it has "  << cont->ItemsPicked() 
+			  << " it has "  << cont->getBasket().size() 
 			  << " items in basket" 
-			  << std::endl; */
+			  << std::endl;*/
 	    }
 	}
 

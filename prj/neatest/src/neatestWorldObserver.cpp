@@ -9,6 +9,7 @@
 #include "neatest/include/neatestController.h"
 #include "World/World.h"
 
+#include <list>
 
 neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
     _world = world;
@@ -65,6 +66,8 @@ void neatestWorldObserver::reset(){
 
 void neatestWorldObserver::step(){
     _lifeIterationCount++;
+
+    updateEnvironment();
     updateMonitoring();
 
     // switch to next generation.
@@ -74,12 +77,33 @@ void neatestWorldObserver::step(){
         _generationCount++;
     }
 
-    updateEnvironment();
+    
 }
 
 
 void neatestWorldObserver::updateEnvironment(){
-	// ...
+
+    // hide items that were picked 
+    _pickedItems.clear();
+    for ( int i=0 ; i != gNumberOfRobots ; i++ ){
+	std::list<int> basket = (dynamic_cast<neatestController*>
+				  (gWorld->getRobot(i)->getController()))
+	    ->getBasket();
+
+	for(const auto& c : basket)
+	    _pickedItems.push_back(c);
+    }
+    /*std::cout << "Hiding " << _pickedItems.size() << " items: " ;*/
+    
+    
+    for(const auto& c : _pickedItems){
+	/*std::cout << c << " ";*/
+	gPhysicalObjects[c]->unregisterObject();
+	gPhysicalObjects[c]->hide();
+    }
+
+    /*std::cout<< std::endl;*/
+    
 }
 
 void neatestWorldObserver::updateMonitoring(){
@@ -113,9 +137,11 @@ void neatestWorldObserver::updateMonitoring(){
 	popsize /= gNumberOfRobots;
 	
 	/* when foraging get all the miss droped items */
-	double droped    = 0.0;
-	double collected = 0.0;
-	double forraged  = 0.0; 
+	int droped    = 0;
+	int collected = 0;
+	int forraged  = 0;
+	int basket    = 0;
+	
 	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
 	    droped += (dynamic_cast<neatestController*>
 			     (gWorld->getRobot(i)->getController()))
@@ -125,6 +151,9 @@ void neatestWorldObserver::updateMonitoring(){
 		->getCollected();
 	    forraged += (dynamic_cast<neatestController*>
 			    (gWorld->getRobot(i)->getController()))
+		->getForraged();
+	    basket += (dynamic_cast<neatestController*>
+			 (gWorld->getRobot(i)->getController()))
 		->getForraged();
 	}
 	/*droped    /= gNumberOfRobots;
@@ -140,7 +169,11 @@ void neatestWorldObserver::updateMonitoring(){
 		      << ";popsize:" << popsize  
 		      << ";col:" << collected 
 		      << ";for:" << forraged  
-		      << ";mis:" << droped << "]\n";		
+		      << ";mis:" << droped
+		      << ";bsk:" << basket
+		      << ";lst"  << _pickedItems.size()
+		      << ";tot:"  << collected -(forraged+droped)
+		      << "]\n";		
         
         // Logging
         std::string s = std::string("") + 
