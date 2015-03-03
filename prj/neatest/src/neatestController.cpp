@@ -74,7 +74,11 @@ void neatestController::initRobot (){
 
     if(neatestSharedData::gFitnessFunction > 1){   // Foraging
 	_nbInputs ++;                              // basket capacity sensor
-	_nbInputs ++;                              // ground sensor
+	_nbInputs += 3;                            // ground sensor 3 inputs
+	if(gLandmarks.size() > 0){
+	    _nbInputs ++;                          // landmark direction
+	    _nbInputs ++;                          // landmark distance
+	}
     }
         
     _nbOutputs = 2;                                // motor output
@@ -110,14 +114,14 @@ void neatestController::initRobot (){
 }
 
 void neatestController::createNeuroController (){
-  if (_neurocontroller != NULL)
-    delete _neurocontroller;
-  _neurocontroller = _genome->genesis(_wm->_id);
+    if (_neurocontroller != NULL)
+	delete _neurocontroller;
+    _neurocontroller = _genome->genesis(_wm->_id);
 }
 
 void neatestController::reset(){
     _birthdate = gWorld->getIterations();
-
+    
     /* fitness related resets */
     _reported_popsize = _glist.size(); 
     _reported_fitness = _fitness;
@@ -130,26 +134,26 @@ void neatestController::reset(){
 }
 
 void neatestController::step(){
-  _iteration++;
-  if(_wm->isAlive()){
-      stepBehaviour(); // execute the neuro controller
-      if(matured())
-	  broadcast();     // broadcast genome to neighbors
-  }
-  else{ // if not alive stop motor from any residual voltage
-      _wm->_desiredTranslationalValue = 0.0; 
-      _wm->_desiredRotationalVelocity = 0.0; 
-  }
-
-  if(lifeTimeOver()){
-      stepEvolution (); // select, mutate, replace
-      
-      if (gVerbose){
-	  save_genome();
-	  printAll();
-      }
-      reset();          // reset fitness and neurocontroller
-  }
+    _iteration++;
+    if(_wm->isAlive()){
+	stepBehaviour(); // execute the neuro controller
+	if(matured())
+	    broadcast();     // broadcast genome to neighbors
+    }
+    else{ // if not alive stop motor from any residual voltage
+	_wm->_desiredTranslationalValue = 0.0; 
+	_wm->_desiredRotationalVelocity = 0.0; 
+    }
+    
+    if(lifeTimeOver()){
+	stepEvolution (); // select, mutate, replace
+	
+	if (gVerbose){
+	    save_genome();
+	    printAll();
+	}
+	reset();          // reset fitness and neurocontroller
+    }
 }
 
 // ################ ######################## ################
@@ -203,17 +207,17 @@ void neatestController::stepBehaviour(){
 
     /* foraging */
     bool at_nest = false;
-    int droped = 0;
+    int  droped  = 0;
 
     // (1)  Read inputs 
  
     /* read distance sensors  [0 -> 1 ] (1 = touching object)  */
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
-	inputs[inputToUse++] = 1 - (
+	inputs[inputToUse++] = 1.0 - (
 	    _wm->getDistanceValueFromCameraSensor (i) /
 	    _wm->getCameraSensorMaximumDistanceValue (i));
     
-    /* get the most activated obstacle sensor for floreano fitness*/
+    /* get the most activated obstacle sensor for floreano fitness */
     md = inputs[0];
     for(int i = 1; i < _wm->_cameraSensorsNb; i++)
 	if(md < inputs[i])
@@ -247,15 +251,24 @@ void neatestController::stepBehaviour(){
 	inputs[inputToUse++] = activation;
 
 	/* ground sensor */
-	const int max_activation = 255*256*256 + 255*256 + 255; 
-	double ground = _wm->getGroundSensorValue() / (double) max_activation;
-	inputs[inputToUse++] = ground;
-	
+	inputs[inputToUse++] = (double)_wm->getGroundSensor_redValue()/ 255.0;
+	inputs[inputToUse++] = (double)_wm->getGroundSensor_greenValue()/ 255.0;
+	inputs[inputToUse++] = (double)_wm->getGroundSensor_blueValue()/ 255.0;
+
 	/* are we on a green nest ? */
 	const int nest_color = 255*256; 
 	at_nest = _wm->getGroundSensorValue() == nest_color; 
+
+	/* landmarck sensors */
+	if(gLandmarks.size() > 0){
+	    _wm->updateLandmarkSensor();
+	    double landmark_dir=(_wm->getLandmarkDirectionAngleValue()+1.0)/2.0;
+	    double landmark_dis= 1.0 - _wm->getLandmarkDistanceValue();
+	    inputs[inputToUse++] = landmark_dir;
+	    inputs[inputToUse++] = landmark_dis;
+	}
     }
-	
+    
     /* bias node : neat put biases after sensors */
     inputs[inputToUse++] = 1.0; 
     
@@ -276,7 +289,7 @@ void neatestController::stepBehaviour(){
      
     // (4) execute the motor commands 
     
-    /* outputs => rot & trans */ 
+    /* outputs => rot & trans (not used) */ 
     //_wm->_desiredTranslationalValue = outputs[0]; 
     //_wm->_desiredRotationalVelocity = 2.0 * (outputs[1] - 0.5); /* [-1, 1] */
 
@@ -311,7 +324,7 @@ void neatestController::stepBehaviour(){
 	_locomotion += (fabs(lv) + fabs(rv)) * 
 	    (1.0 - sqrt(fabs(lv - rv))) * 
 	    (1.0 - md) ;
-	_fitness = (double) _locomotion / (double) get_lifetime();
+	_fitness = _locomotion / (double) get_lifetime();
 	break;
 
     case 1: /* Collection */
@@ -346,6 +359,7 @@ void neatestController::stepBehaviour(){
 	    if ((i % _wm->_cameraSensorsNb) == 0)
 		std::cout << "]" <<  std::endl << "\t\t\t[ ";
 	}
+	
 	std::cout <<  " ]" << std::endl;
 
 	std::cout << "\t\tOutputs :[ " ;
@@ -354,15 +368,21 @@ void neatestController::stepBehaviour(){
 	    std::cout << to_string(*itr) + " ";
 	std::cout << "]"
 		  << std::endl;
-
-	
-
 		  }*/
-
     
 
-    /* _wm->_desiredTranslationalValue = 0.0; */
-    /* _wm->_desiredRotationalVelocity = 0.0; */
+    /*std::cout << "NETWORK ";
+    for(unsigned int i = 0; i < _nbInputs; i++)
+	std::cout << to_string(inputs[i]) + " ";
+
+    std::vector<double>::iterator itr;
+    for(itr = outputs.begin (); itr != outputs.end (); itr++)
+	std::cout << to_string(*itr) + " ";
+    std::cout << std::endl;
+
+
+    _wm->_desiredTranslationalValue = 0.0;
+    _wm->_desiredRotationalVelocity = 0.0;*/
 
 } 
 
