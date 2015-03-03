@@ -15,7 +15,7 @@
 #include <neat/gene.h>
 #include <neat/genome.h>
 #include <neat/genomeAdapted.h>
-
+#include <stack> 
 #include <iomanip>
 
 using namespace NEAT;
@@ -30,13 +30,22 @@ private:
     int            _birthdate; // iteration at which we are created 
 
     double         _fitness;
-    double         _reported_fitness; // to report to World observer
+
+    double         _reported_fitness; // to report to the World observer
     int            _reported_popsize;
-    
+    int            _reported_missed;
+    int            _reported_collected;
+    int            _reported_forraged;
+
     int            _items_collected; // items collected 
     int            _items_forraged;  // items brought back to the nest
-    int            _items_max;       // basket capacity 
+    int            _items_miss_droped; // item dropeed outside of nest
+
+    int            _items_in_basket;
+    std::stack<int> _basket;
+    unsigned int            _items_max;       // basket capacity 
     double         _locomotion;      // accumulates the locomotion fitness
+   
 
     double                  _sigma;
     GenomeAdapted*          _genome;
@@ -93,9 +102,14 @@ public:
     int          getId             () { return _wm->getId(); }
     double       getFitness        () { return _reported_fitness; }
     double       getPopsize        () { return _reported_popsize; }
+    double       getMisseDroped    () { return _reported_missed; }
+    double       getCollected      () { return _reported_collected; }
+    double       getForraged       () { return _reported_forraged; }
+    
+
     bool         stillRoomInBasket () ;
-    int ItemsPicked       () { return _items_collected; }
-    void         pickItem          ();
+    int ItemsPicked                () { return _items_collected; }
+    void         pickItem          (int);
 
 };
 

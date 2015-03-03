@@ -112,21 +112,45 @@ void neatestWorldObserver::updateMonitoring(){
 		->getPopsize();
 	popsize /= gNumberOfRobots;
 	
-	
+	/* when foraging get all the miss droped items */
+	double droped    = 0.0;
+	double collected = 0.0;
+	double forraged  = 0.0; 
+	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
+	    droped += (dynamic_cast<neatestController*>
+			     (gWorld->getRobot(i)->getController()))
+		->getMisseDroped();
+	    collected += (dynamic_cast<neatestController*>
+			    (gWorld->getRobot(i)->getController()))
+		->getCollected();
+	    forraged += (dynamic_cast<neatestController*>
+			    (gWorld->getRobot(i)->getController()))
+		->getForraged();
+	}
+	/*droped    /= gNumberOfRobots;
+	collected /= gNumberOfRobots;
+	forraged  /= gNumberOfRobots;*/
+
 	if ( gVerbose )
 	    std::cout << "[gen:" 
 		      << (gWorld->getIterations()/
 			  neatestSharedData::gEvaluationTime) 
 		      << ";pop:" << activeCount 
 		      << ";fit:" << fitness
-		      << ";popsize:" << popsize << "]\n";		
+		      << ";popsize:" << popsize  
+		      << ";col:" << collected 
+		      << ";for:" << forraged  
+		      << ";mis:" << droped << "]\n";		
         
         // Logging
         std::string s = std::string("") + 
 	    "{" + std::to_string(gWorld->getIterations()) + 
 	    "}[all] [pop_alive:" + std::to_string(activeCount) + 
 	    "] [fit:" + std::to_string(fitness) +
-	    "] [popsize:" + std::to_string(popsize) +"]\n";
+	    "] [popsize:" + std::to_string(popsize) +
+	    "] [col:" + std::to_string(collected) +
+	    "] [for:" + std::to_string(forraged) +
+	    "] [mis:" + std::to_string(droped) + "]\n";
         gLogManager->write(s);
 	gLogManager->flush();
     }

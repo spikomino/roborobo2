@@ -85,10 +85,18 @@ void neatestAgentObserver::step(){
 		gPhysicalObjects[targetIndex]->isWalked(_wm->getId());
 	
 		/* notify the robot that it picked an item  */
-		cont->pickItem();
+		cont->pickItem(targetIndex);
+		
+		/* store in a list and remove from */
+		gPhysicalObjects[targetIndex]->unregisterObject();
+		gPhysicalObjects[targetIndex]->hide();
+
+		/*std::cout << "Robot " << cont->getId() 
+			  << " picked " << targetIndex 
+			  << " it has "  << cont->ItemsPicked() 
+			  << " items in basket" 
+			  << std::endl; */
 	    }
-	    /* std::cout << "Robot " << cont->getId() */
-	    /* 	      << " has "  << cont->ItemsPicked() << std::endl; */
 	}
 
 	/* if(gVerbose) */

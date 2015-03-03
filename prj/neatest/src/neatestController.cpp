@@ -37,18 +37,29 @@ bool lifeTimeOver(){
 
 neatestController::neatestController(RobotWorldModel * wm){
   _wm              = wm;
+
   _iteration       = 0;
   _birthdate       = 0;
 
-  _reported_fitness  = 0.0;
-  _reported_popsize  = 0.0;
   _fitness           = 0.0;
+
+  _reported_fitness   = 0.0;
+  _reported_popsize   = 0;
+  _reported_missed    = 0;
+  _reported_collected = 0;
+  _reported_forraged  = 0; 
 
   _items_collected   = 0;
   _items_forraged    = 0;
+  _items_miss_droped = 0;
+
+  _items_in_basket   = 0;
+  _items_max         = 5; // todo put in parameters
+  
   _locomotion        = 0.0;
 
-  _items_max         = 5;
+  
+
 
   _neurocontroller = NULL;
   _sigma           = neatestSharedData::gSigmaRef;
@@ -65,14 +76,17 @@ neatestController::~neatestController (){
 
 void neatestController::initRobot (){
     // setup the number of input and outputs
+
     // Locomotion
     _nbInputs = 1;		                   // bias 
     _nbInputs += _wm->_cameraSensorsNb;	           // proximity sensors
 
-    if(neatestSharedData::gFitnessFunction > 0)    // Collection 
+    // Collection 
+    if(neatestSharedData::gFitnessFunction > 0)   
 	_nbInputs += (1) * _wm->_cameraSensorsNb;  // object sensor
 
-    if(neatestSharedData::gFitnessFunction > 1){   // Foraging
+    // Foraging
+    if(neatestSharedData::gFitnessFunction > 1){   
 	_nbInputs ++;                              // basket capacity sensor
 	_nbInputs += 3;                            // ground sensor 3 inputs
 	if(gLandmarks.size() > 0){
@@ -80,7 +94,7 @@ void neatestController::initRobot (){
 	    _nbInputs ++;                          // landmark distance
 	}
     }
-        
+    
     _nbOutputs = 2;                                // motor output
     if (neatestSharedData::gFitnessFunction > 1 )
 	_nbOutputs ++ ;                            // drop  items effector 
@@ -122,13 +136,19 @@ void neatestController::createNeuroController (){
 void neatestController::reset(){
     _birthdate = gWorld->getIterations();
     
-    /* fitness related resets */
-    _reported_popsize = _glist.size(); 
-    _reported_fitness = _fitness;
-    _fitness = 0.0;
+    /* store for world observer (previous generation) */
+    _reported_popsize   = _glist.size(); 
+    _reported_fitness   = _fitness;
+    _reported_missed    = _items_miss_droped;
+    _reported_collected = _items_collected;
+    _reported_forraged  = _items_forraged;
+
+    _fitness           = 0.0;
     _items_collected   = 0;
     _items_forraged    = 0;
-    _locomotion        = 0.0;
+    _items_miss_droped = 0;
+    _locomotion        = 0;
+ 
     emptyBasket();
     emptyGenomeList();
 }
@@ -163,26 +183,29 @@ bool is_energy_item(int id){
     return (gPhysicalObjects[id-gPhysicalObjectIndexStartOffset]->getType()==1);
 } 
 
-void neatestController::pickItem(){
+void neatestController::pickItem(int item_id){
+    _items_in_basket++;
     _items_collected++;
+    _basket.push(item_id);
+    
 }
 
 void neatestController::emptyBasket(){
-    _items_collected = 0;
+    _items_in_basket = 0;
 }
 
 void neatestController::dropItem(int n){
-    if(_items_collected - n <= 0)
-	_items_collected = 0;
+    if(_items_in_basket - n <= 0)
+	_items_in_basket = 0;
     else
-	_items_collected -= n;
+	_items_in_basket -= n;
 }
  
 bool neatestController::stillRoomInBasket() { 
 
     /* forraging => fixed capacity basket */
     if (neatestSharedData::gFitnessFunction > 1)
-	return _items_max > _items_collected;
+	return _items_max > _basket.size();
     /* collection no limit */
     return true;
     
@@ -255,11 +278,9 @@ void neatestController::stepBehaviour(){
 	inputs[inputToUse++] = (double)_wm->getGroundSensor_greenValue()/ 255.0;
 	inputs[inputToUse++] = (double)_wm->getGroundSensor_blueValue()/ 255.0;
 
-	/* are we on a green nest ? */
-	const int nest_color = 255*256; 
-	at_nest = _wm->getGroundSensorValue() == nest_color; 
 
-	/* landmarck sensors */
+
+	/* landmark sensors */
 	if(gLandmarks.size() > 0){
 	    _wm->updateLandmarkSensor();
 	    double landmark_dir=(_wm->getLandmarkDirectionAngleValue()+1.0)/2.0;
@@ -313,8 +334,15 @@ void neatestController::stepBehaviour(){
    
     /* Foraging : drop items */ 
     if (neatestSharedData::gFitnessFunction > 1 ){
-	droped = (int) (outputs[D] * _items_collected);
+	droped = (int) (outputs[D] * _items_in_basket);
 	dropItem(droped);
+	const int nest_color = 255*256; 
+	at_nest = _wm->getGroundSensorValue() == nest_color; 
+	/*std::cout << "Dropped " << droped << "/" << _items_in_basket ;  
+	if (! at_nest)  
+	    std::cout<< " not " ;
+	std::cout  << " at nest." 
+	<< std::endl;*/
     }
     
     /* (5) update the fitness function */
@@ -332,12 +360,13 @@ void neatestController::stepBehaviour(){
 	break;
 
     case 2: /* Forraging */ 
-	if(at_nest)
+	if(at_nest){
 	    _items_forraged += droped;
-	/*else  
-	  _items_forraged -= droped;*/
-	    
-	_fitness = (double) _items_forraged / (double) get_lifetime(); 
+	    _fitness = (double) _items_forraged / (double) get_lifetime();
+	}
+	else  
+	    _items_miss_droped += droped;
+
 	break;
     default:
 	std::cerr << "Error unknown fitness function" << std::endl;

@@ -15,6 +15,7 @@
 
 class neatestAgentObserver : public AgentObserver{
 
+
 public:
     neatestAgentObserver(RobotWorldModel *wm);
     ~neatestAgentObserver();
