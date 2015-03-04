@@ -15,15 +15,15 @@ sr_extraction_script = 'genome_phylo_stats.py'
 sr_extraction_list = 'sr_list'
 
 var_parameter = 'gSelectionPressure'
-var_values = [ '0.00', '0.25', '0.50', '0.75', '1.00' ]
+var_values = [ '1.00', '0.75', '0.50', '0.25', '0.00' ]
 
 parameters={
     'gInitialNumberOfRobots': 100,
-    'gNbOfPhysicalObjects': 100,
-    'gSigmaRef': 0.8,
+    'gNbOfPhysicalObjects': 50,
+    'gSigmaRef': 0.5,
     'gFitnessFunction': 2,  # 0: locomotion, 1: collection, 2: forraging 
     'gControllerType': 0,   # 0 = NEAT, 1 = FFNN
-    'gEvaluationTime': 500,
+    'gEvaluationTime': 1000,
     'gMaxIt'         : 500000, 
     'gBatchMode'     : 'true'}
 
