@@ -275,8 +275,6 @@ void neatestController::stepBehaviour(){
 	inputs[inputToUse++] = (double)_wm->getGroundSensor_greenValue()/ 255.0;
 	inputs[inputToUse++] = (double)_wm->getGroundSensor_blueValue()/ 255.0;
 
-
-
 	/* landmark sensors */
 	if(gLandmarks.size() > 0){
 	    _wm->updateLandmarkSensor();
@@ -335,11 +333,12 @@ void neatestController::stepBehaviour(){
 	dropItem(droped);
 	const int nest_color = 255*256; 
 	at_nest = _wm->getGroundSensorValue() == nest_color; 
-	/*std::cout << "Dropped " << droped << "/" << _basket.size() ;  
-	if (! at_nest)  
-	    std::cout<< " not " ;
-	std::cout  << " at nest." 
-	<< std::endl;*/
+
+	/* std::cout << "Dropped " << droped << "/" << _basket.size() ;   */
+	/* if (! at_nest)   */
+	/*     std::cout<< " not " ; */
+	/* std::cout  << " at nest."  */
+	/* << std::endl; */
     }
     
     /* (5) update the fitness function */
@@ -405,10 +404,10 @@ void neatestController::stepBehaviour(){
     for(itr = outputs.begin (); itr != outputs.end (); itr++)
 	std::cout << to_string(*itr) + " ";
     std::cout << std::endl;
+    */
 
-
-    _wm->_desiredTranslationalValue = 0.0;
-    _wm->_desiredRotationalVelocity = 0.0;*/
+    /* _wm->_desiredTranslationalValue = 0.0; */
+    /* _wm->_desiredRotationalVelocity = 0.0; */
 
 } 
 

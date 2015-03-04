@@ -93,16 +93,23 @@ void neatestWorldObserver::updateEnvironment(){
 	for(const auto& c : basket)
 	    _pickedItems.push_back(c);
     }
-    /*std::cout << "Hiding " << _pickedItems.size() << " items: " ;*/
-    
-    
+       
+    for(const auto& c : gPhysicalObjects){
+	if(c->canRegister())
+	    c->registerObject();
+	
+	c->display();
+    }	
+
     for(const auto& c : _pickedItems){
-	/*std::cout << c << " ";*/
 	gPhysicalObjects[c]->unregisterObject();
 	gPhysicalObjects[c]->hide();
     }
 
-    /*std::cout<< std::endl;*/
+    /* std::cout << "Hiding " << _pickedItems.size() << " items: " ; */
+    /* for(const auto& c : _pickedItems) */
+    /* 	std::cout << c << " "; */
+    /* std::cout<< std::endl; */
     
 }
 
@@ -154,7 +161,7 @@ void neatestWorldObserver::updateMonitoring(){
 		->getForraged();
 	    basket += (dynamic_cast<neatestController*>
 			 (gWorld->getRobot(i)->getController()))
-		->getForraged();
+		->getBasketSize();
 	}
 	/*droped    /= gNumberOfRobots;
 	collected /= gNumberOfRobots;
@@ -172,9 +179,14 @@ void neatestWorldObserver::updateMonitoring(){
 		      << ";mis:" << droped
 		      << ";bsk:" << basket
 		      << ";lst"  << _pickedItems.size()
-		      << ";tot:"  << collected -(forraged+droped)
+		      << ";counted:"  << collected-(forraged+droped)
+		      << ";total:" << gPhysicalObjects.size()
 		      << "]\n";		
-        
+	
+	/* NOTE collected / forrage this generation. Basket spans mutltiple */
+	/* generation */
+
+
         // Logging
         std::string s = std::string("") + 
 	    "{" + std::to_string(gWorld->getIterations()) + 

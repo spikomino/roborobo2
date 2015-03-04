@@ -103,9 +103,9 @@ public:
     int          getId             () { return _wm->getId(); }
     double       getFitness        () { return _reported_fitness; }
     double       getPopsize        () { return _reported_popsize; }
-    int       getMisseDroped    () { return _reported_missed; }
-    int       getCollected      () { return _reported_collected; }
-    int       getForraged       () { return _reported_forraged; }
+    int          getMisseDroped    () { return _reported_missed; }
+    int          getCollected      () { return _reported_collected; }
+    int          getForraged       () { return _reported_forraged; }
     int          getBasketSize     () { return _basket.size(); }
 
     bool         stillRoomInBasket () ;
