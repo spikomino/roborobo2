@@ -53,7 +53,6 @@ neatestController::neatestController(RobotWorldModel * wm){
   _items_forraged    = 0;
   _items_miss_droped = 0;
 
-  _items_in_basket   = 0;
   _items_max         = 5; // todo put in parameters
   
   _locomotion        = 0.0;
@@ -142,14 +141,15 @@ void neatestController::reset(){
     _reported_missed    = _items_miss_droped;
     _reported_collected = _items_collected;
     _reported_forraged  = _items_forraged;
+    _reported_basket    = _basket.size();
 
     _fitness           = 0.0;
     _items_collected   = 0;
     _items_forraged    = 0;
     _items_miss_droped = 0;
-    _locomotion        = 0;
+    _locomotion        = 0.0;
  
-    // emptyBasket(); item dont respawn should not empty 
+    emptyBasket();      // item dont respawn should not empty 
     emptyGenomeList();
 }
 
@@ -189,13 +189,17 @@ void neatestController::pickItem(int item_id){
 }
 
 void neatestController::emptyBasket(){
-    _items_in_basket = 0;
+    _basket.clear();
 }
 
-void neatestController::dropItem(int n){
+void neatestController::dropItem(int n, bool at_nest){
     for (int i=0; i<n; i++)
 	if(!_basket.empty())
 	    _basket.pop_front();
+    if(at_nest)
+	_items_forraged += n;
+    else  
+	_items_miss_droped += n;
 }
  
 bool neatestController::stillRoomInBasket() { 
@@ -330,10 +334,10 @@ void neatestController::stepBehaviour(){
     /* Foraging : drop items */ 
     if (neatestSharedData::gFitnessFunction > 1 ){
 	droped = (int) (outputs[D] * _basket.size());
-	dropItem(droped);
 	const int nest_color = 255*256; 
 	at_nest = _wm->getGroundSensorValue() == nest_color; 
-
+	dropItem(droped, at_nest);
+	
 	/* std::cout << "Dropped " << droped << "/" << _basket.size() ;   */
 	/* if (! at_nest)   */
 	/*     std::cout<< " not " ; */
@@ -348,7 +352,7 @@ void neatestController::stepBehaviour(){
 	_locomotion += (fabs(lv) + fabs(rv)) * 
 	    (1.0 - sqrt(fabs(lv - rv))) * 
 	    (1.0 - md) ;
-	_fitness = _locomotion / (double) get_lifetime();
+	_fitness = _locomotion  / (double) get_lifetime();
 	break;
 
     case 1: /* Collection */
@@ -356,14 +360,9 @@ void neatestController::stepBehaviour(){
 	break;
 
     case 2: /* Forraging */ 
-	if(at_nest){
-	    _items_forraged += droped;
-	    _fitness = (double) _items_forraged / (double) get_lifetime();
-	}
-	else  
-	    _items_miss_droped += droped;
-
+	_fitness = (double) _items_forraged / (double) get_lifetime();
 	break;
+	
     default:
 	std::cerr << "Error unknown fitness function" << std::endl;
 	exit (-1);
@@ -585,8 +584,7 @@ void neatestController::printMessage(message msg){
 // Save a genome (file name = robot_id-genome_id.gen)
 void neatestController::save_genome(){
     char fname[128];
-    snprintf(fname, 127, "logs/%04d-%010d.gen", 
-	     getId(), _genome->getIdTrace());
+    snprintf(fname, 127, "logs/%04d-%010d.gen", getId(), _genome->getIdTrace());
     std::ofstream oFile(fname);
     _genome->print_to_file(oFile);
     oFile.close();
@@ -596,12 +594,11 @@ void print_genome(GenomeAdapted* g){
     std::cout << "[Genome: id=" << g->genome_id
 	      << " idtrace="    << g->getIdTrace()
 	      << " mom="        << g->getMom()
-	      << " dad="        << g->getDad() << " ]";
+	      << " dad="        << g->getDad() << "]";
 }
 
 void neatestController::printPopsize(){
-    std::cout << "[Popsize: " << _glist.size()  << "] " ; 
-    
+    std::cout << "[Popsize: " << _glist.size()  << "]" ; 
 }
 
 void neatestController::printGenomeList(){
@@ -627,14 +624,15 @@ void neatestController::printRobot(){
 	      << " fitness="           <<  _fitness
 	      << " reported fitness="  <<  _reported_fitness
 	      << " collected="         <<  _items_collected << "/" << _items_max
-	      << " forraged="          <<  _items_forraged 
+	      << " forraged="          <<  _items_forraged
+	      << " dropped="           <<  _reported_missed
+	      << " crrying="           <<  _basket.size()
 	      << " sigma="             <<  _sigma 
 	      << " ]";
 }
 
 void neatestController::printBasket(){
     std::cout << "[Basket: ";
-	
     for(const auto& c : _basket)
 	std::cout << c << " ";
     std::cout << " ]";

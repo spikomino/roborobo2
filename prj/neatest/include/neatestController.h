@@ -36,15 +36,17 @@ private:
     int            _reported_missed;
     int            _reported_collected;
     int            _reported_forraged;
-
-    int            _items_collected; // items collected 
-    int            _items_forraged;  // items brought back to the nest
+    int            _reported_basket;
+    
+    double         _locomotion;        // accumulates the locomotion fitness
+    int            _items_collected;   // items collected 
+    int            _items_forraged;    // items brought back to the nest
     int            _items_miss_droped; // item dropeed outside of nest
 
-    int            _items_in_basket;
+    //   int            _items_in_basket;
     std::list<int> _basket;
-    unsigned int            _items_max;       // basket capacity 
-    double         _locomotion;      // accumulates the locomotion fitness
+    unsigned int   _items_max;        // basket capacity 
+    
    
 
     double                  _sigma;
@@ -69,18 +71,14 @@ private:
     /* neuro controller */
     void createNeuroController ();
 
-    /* vvolution */
+    /* evolution */
     void stepEvolution ();
     int  selectRandom  ();
     int  selectBest    ();
     int  select        (double sp);
 
-    void updateFitnessForaging   ();
-    void updateFitnessNavigation ();
-    void updateFitnessCollecting ();
     void emptyBasket   ();
-
-    void dropItem(int n);
+    void dropItem      (int n, bool at_nest);
 
     /* misc */
   
@@ -106,10 +104,9 @@ public:
     int          getMisseDroped    () { return _reported_missed; }
     int          getCollected      () { return _reported_collected; }
     int          getForraged       () { return _reported_forraged; }
-    int          getBasketSize     () { return _basket.size(); }
+    int          getBasketSize     () { return _reported_basket; }
 
     bool         stillRoomInBasket () ;
-    //int ItemsPicked                () { return _items_collected; }
     void         pickItem          (int);
     std::list<int> getBasket(){ return _basket ; }
 };

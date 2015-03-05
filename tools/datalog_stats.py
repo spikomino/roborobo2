@@ -45,6 +45,7 @@ def process_datalog(fname):
             if o.startswith('fit', 1, 4):
                 f = re.sub('[:\[\]]', ' ', o)
                 f = float(f.split()[1])
+                print f
                 d.append(f)
     fh.close()
     return d

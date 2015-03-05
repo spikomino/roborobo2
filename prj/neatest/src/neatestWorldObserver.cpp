@@ -179,7 +179,6 @@ void neatestWorldObserver::updateMonitoring(){
 		      << ";mis:" << droped
 		      << ";bsk:" << basket
 		      << ";lst"  << _pickedItems.size()
-		      << ";counted:"  << collected-(forraged+droped)
 		      << ";total:" << gPhysicalObjects.size()
 		      << "]\n";		
 	
