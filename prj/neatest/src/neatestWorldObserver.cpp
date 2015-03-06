@@ -66,18 +66,16 @@ void neatestWorldObserver::reset(){
 
 void neatestWorldObserver::step(){
     _lifeIterationCount++;
-
-    updateEnvironment();
-    updateMonitoring();
-
+    
     // switch to next generation.
     if( _lifeIterationCount >= neatestSharedData::gEvaluationTime ) {
         // update iterations and generations counters
         _lifeIterationCount = 0;
         _generationCount++;
     }
-
     
+    updateEnvironment();
+    updateMonitoring();
 }
 
 
@@ -118,74 +116,49 @@ void neatestWorldObserver::updateMonitoring(){
     
     // switch to next generation.
     if( _lifeIterationCount >= neatestSharedData::gEvaluationTime ) {
-	/* * monitoring: count number of active agents. */        
+	
+	/* * monitoring: count number of active agents. */
+	
+	double fitness  = 0.0;
+	double popsize  = 0.0;
 	int activeCount = 0;
+	int droped      = 0;
+	int collected   = 0;
+	int forraged    = 0;
+	int basket      = 0;
+	
 	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
-	    if ( (dynamic_cast<neatestController*>
-		  (gWorld->getRobot(i)->getController()))->getWorldModel()->
-		 isAlive() == true )
+	    neatestController* controller = dynamic_cast<neatestController*>
+		(gWorld->getRobot(i)->getController());
+	    
+	    if ( controller->getWorldModel()->isAlive() == true )
 		activeCount++;
+
+	    fitness   += controller->getFitness();
+	    popsize   += controller->getPopsize();
+	    droped    += controller->getMisseDroped();
+	    collected += controller->getCollected();
+	    forraged  += controller->getForraged();
+	    basket    += controller->getBasketSize();
 	}
-
-	/* get all agents fitness */
-	double fitness =0.0;
-	for ( int i = 0 ; i != gNumberOfRobots ; i++ )
-	    fitness += (dynamic_cast<neatestController*>
-			(gWorld->getRobot(i)->getController()))->getFitness();
 	
-
-	
-	/* get all agents popsize */
-	double popsize =0.0;
-	for ( int i = 0 ; i != gNumberOfRobots ; i++ )
-	    popsize += (dynamic_cast<neatestController*>
-			(gWorld->getRobot(i)->getController()))
-		->getPopsize();
 	popsize /= gNumberOfRobots;
-	
-	/* when foraging get all the miss droped items */
-	int droped    = 0;
-	int collected = 0;
-	int forraged  = 0;
-	int basket    = 0;
-	
-	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
-	    droped += (dynamic_cast<neatestController*>
-			     (gWorld->getRobot(i)->getController()))
-		->getMisseDroped();
-	    collected += (dynamic_cast<neatestController*>
-			    (gWorld->getRobot(i)->getController()))
-		->getCollected();
-	    forraged += (dynamic_cast<neatestController*>
-			    (gWorld->getRobot(i)->getController()))
-		->getForraged();
-	    basket += (dynamic_cast<neatestController*>
-			 (gWorld->getRobot(i)->getController()))
-		->getBasketSize();
-	}
-	/*droped    /= gNumberOfRobots;
-	collected /= gNumberOfRobots;
-	forraged  /= gNumberOfRobots;*/
-
+	    
 	if ( gVerbose )
 	    std::cout << "[gen:" 
 		      << (gWorld->getIterations()/
 			  neatestSharedData::gEvaluationTime) 
-		      << ";pop:" << activeCount 
-		      << ";fit:" << fitness
+		      << ";pop:"     << activeCount 
+		      << ";fit:"     << fitness
 		      << ";popsize:" << popsize  
-		      << ";col:" << collected 
-		      << ";for:" << forraged  
-		      << ";mis:" << droped
-		      << ";bsk:" << basket
-		      << ";lst"  << _pickedItems.size()
-		      << ";total:" << gPhysicalObjects.size()
+		      << ";col:"     << collected 
+		      << ";for:"     << forraged  
+		      << ";mis:"     << droped
+		      << ";bsk:"     << basket
+		      << ";lst"      << _pickedItems.size()
+		      << ";total:"   << gPhysicalObjects.size()
 		      << "]\n";		
 	
-	/* NOTE collected / forrage this generation. Basket spans mutltiple */
-	/* generation */
-
-
         // Logging
         std::string s = std::string("") + 
 	    "{" + std::to_string(gWorld->getIterations()) + 
