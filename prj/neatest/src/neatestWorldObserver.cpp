@@ -67,6 +67,9 @@ void neatestWorldObserver::reset(){
 void neatestWorldObserver::step(){
     _lifeIterationCount++;
     
+    updateMonitoring();
+    updateEnvironment();
+
     // switch to next generation.
     if( _lifeIterationCount >= neatestSharedData::gEvaluationTime ) {
         // update iterations and generations counters
@@ -74,8 +77,7 @@ void neatestWorldObserver::step(){
         _generationCount++;
     }
     
-    updateEnvironment();
-    updateMonitoring();
+    
 }
 
 
