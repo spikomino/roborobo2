@@ -45,7 +45,6 @@ def process_datalog(fname):
             if o.startswith('fit', 1, 4):
                 f = re.sub('[:\[\]]', ' ', o)
                 f = float(f.split()[1])
-                print f
                 d.append(f)
     fh.close()
     return d
@@ -67,14 +66,14 @@ def ave_accu_sf(data, cut=0.1):
         result.append(average(d[-gen:]))
     return result
 
-def fix_budg_sf(data, cut=0.9):
+def fix_budg_sf(data, cut=0.8):
     gen = int(cut * len(data[0])) 
     result=[]
     for d in data:
         result.append(d[gen])
     return result
 
-def time_reach_target(data, pers=0.9):
+def time_reach_target(data, pers=0.8):
     max_l=[]
     for d in data:
         max_l.append(max(d))
@@ -114,13 +113,16 @@ def stars(p):
        return "-"
 
 def perc(data_l):
+    #for i in xrange(len(data_l)):
+    #    print len(data_l[i])
+
     
     data = np.asarray(data_l)
-
+    
     median = np.zeros(data.shape[1])
     perc_25 = np.zeros(data.shape[1])
     perc_75 = np.zeros(data.shape[1])
-    for i in range(0, len(median)):
+    for i in xrange(0, len(median)):
         median[i] = np.median(data[:, i])
         perc_25[i] = np.percentile(data[:, i], 25)
         perc_75[i] = np.percentile(data[:, i], 75)
@@ -137,8 +139,8 @@ def process_experiment(path):
         D.append(process_datalog(f))
 
     R=[]
-    for f in survival:
-        R.append(process_srfile(f))
+    #for f in survival:
+    #    R.append(process_srfile(f))
 
     S = {} 
     S['aasf'] = ave_accu_sf(D)
@@ -267,16 +269,16 @@ def draw_data(exp, runs=False, tex=False):
     ax1.set_ylabel('Fitness')   
 
     # Median Lineage survival rate
-    ax11 = subplot2grid((2,3), (1,0))
-    c=0
-    for e in exp:
-        (n, data, stats, survival) = e
-        plot_one_curve(survival, colors[c], ax11,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    ax11.set_title('Genetic lines over time (%d runs)'%(len(data)))
-    ax11.legend(loc='upper right')
-    ax11.set_xlabel('Generations')
-    ax11.set_ylabel('Rate of survival')  
+    #ax11 = subplot2grid((2,3), (1,0))
+    #c=0
+    #for e in exp:
+    #    (n, data, stats, survival) = e
+    #    plot_one_curve(survival, colors[c], ax11,  re.sub('[_/]', '', n), runs)
+    #    c=c+1
+    #ax11.set_title('Genetic lines over time (%d runs)'%(len(data)))
+    #ax11.legend(loc='upper right')
+    #ax11.set_xlabel('Generations')
+    #ax11.set_ylabel('Rate of survival')  
 
 
     # average accumulated swarm fitness
