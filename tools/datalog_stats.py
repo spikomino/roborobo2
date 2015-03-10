@@ -28,7 +28,7 @@ def list_logfiles(path):
 
 def list_srfiles(path):
     files = [ f for f in listdir(path) 
-              if isfile(join(path,f)) and f.endswith('.log.sr2') ]
+              if isfile(join(path,f)) and f.endswith('.log.sr') ]
 
     logs = map(lambda f: join(path,f), files) 
     return logs
@@ -113,9 +113,7 @@ def stars(p):
        return "-"
 
 def perc(data_l):
-    #for i in xrange(len(data_l)):
-    #    print len(data_l[i])
-
+  
     
     data = np.asarray(data_l)
     
@@ -134,13 +132,14 @@ def process_experiment(path):
     datalogs = list_datalogs(path)
     survival = list_srfiles(path)
     
+   
     D=[]
     for f in datalogs:
         D.append(process_datalog(f))
 
     R=[]
-    #for f in survival:
-    #    R.append(process_srfile(f))
+    for f in survival:
+        R.append(process_srfile(f))
 
     S = {} 
     S['aasf'] = ave_accu_sf(D)
@@ -153,6 +152,7 @@ def process_experiment(path):
 # draw a figure
 
 def plot_one_curve(data, color, axis, label, quartiles=False):
+    
     med, perc_25, perc_75 = perc(data)
     if quartiles :
         axis.fill_between(np.arange(0, len(med)), perc_25, perc_75,
@@ -269,16 +269,16 @@ def draw_data(exp, runs=False, tex=False):
     ax1.set_ylabel('Fitness')   
 
     # Median Lineage survival rate
-    #ax11 = subplot2grid((2,3), (1,0))
-    #c=0
-    #for e in exp:
-    #    (n, data, stats, survival) = e
-    #    plot_one_curve(survival, colors[c], ax11,  re.sub('[_/]', '', n), runs)
-    #    c=c+1
-    #ax11.set_title('Genetic lines over time (%d runs)'%(len(data)))
-    #ax11.legend(loc='upper right')
-    #ax11.set_xlabel('Generations')
-    #ax11.set_ylabel('Rate of survival')  
+    ax11 = subplot2grid((2,3), (1,0))
+    c=0
+    for e in exp:
+        (n, data, stats, survival) = e
+        plot_one_curve(survival, colors[c], ax11,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    ax11.set_title('Genetic lines over time (%d runs)'%(len(data)))
+    ax11.legend(loc='upper right')
+    ax11.set_xlabel('Generations')
+    ax11.set_ylabel('Rate of survival')  
 
 
     # average accumulated swarm fitness
