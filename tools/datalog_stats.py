@@ -47,6 +47,7 @@ def process_datalog(fname):
                 f = float(f.split()[1])
                 d.append(f)
     fh.close()
+    print fname, len(d)
     return d
 
 # read the survival rate file 
@@ -56,6 +57,8 @@ def process_srfile(fname):
     for line in fh :
         d.append(float(line))
     fh.close()
+    print fname, len(d)
+
     return d
 
 # statistics measures
@@ -113,11 +116,12 @@ def stars(p):
        return "-"
 
 def perc(data_l):
+    
   
     
     data = np.asarray(data_l)
-    
-    median = np.zeros(data.shape[1])
+    print data.shape
+    median  = np.zeros(data.shape[1])
     perc_25 = np.zeros(data.shape[1])
     perc_75 = np.zeros(data.shape[1])
     for i in xrange(0, len(median)):
