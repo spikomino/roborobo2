@@ -24,7 +24,7 @@ parameters={
     'gFitnessFunction': 2,  # 0: locomotion, 1: collection, 2: forraging 
     'gControllerType': 0,   # 0 = NEAT, 1 = FFNN
     'gEvaluationTime': 1000,
-    'gMaxIt'         : 500000, 
+    'gMaxIt'         : 250000, 
     'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 
