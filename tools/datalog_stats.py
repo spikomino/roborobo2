@@ -36,13 +36,13 @@ def list_srfiles(path):
 # read a datalog and extract the [fit:##.###] component
 # in  : a file name 
 # out : returns a list of fitness values. 
-def process_datalog(fname):
+def process_datalog(fname, key='fit'):
     d=[]
     fh = open(fname, 'r')
     for line in fh :
         data = line.split()
         for o in data :
-            if o.startswith('fit', 1, 4):
+            if o.startswith(key, 1, len(key)+1):
                 f = re.sub('[:\[\]]', ' ', o)
                 f = float(f.split()[1])
                 d.append(f)
@@ -139,7 +139,8 @@ def process_experiment(path):
    
     D=[]
     for f in datalogs:
-        D.append(process_datalog(f))
+        # default 'fit'. Possible: popsize col for mis
+        D.append(process_datalog(f, 'mis')) 
 
     R=[]
     for f in survival:
