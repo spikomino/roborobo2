@@ -131,7 +131,7 @@ def perc(data_l):
     return median, perc_25, perc_75
 
 
-# process multiple datalogs
+# process multiple datalogs Fitness + boxplot
 def process_experiment(path):
     datalogs = list_datalogs(path)
     survival = list_srfiles(path)
@@ -153,6 +153,31 @@ def process_experiment(path):
     S['aat']  = acc_above_target(D, S['trt']) 
 
     return D,S,R
+
+# process multiple datalogs Fitness + missed + collected + foraged 
+def process_experiment2(path):
+    datalogs = list_datalogs(path)
+    survival = list_srfiles(path)
+       
+    F=[]
+    C=[]
+    Fr=[]
+    M=[]
+    P=[]
+    for f in datalogs:
+        # default 'fit'. Possible: popsize col for mis
+        F.append(process_datalog(f, 'fit')) 
+        C.append(process_datalog(f, 'col')) 
+        Fr.append(process_datalog(f, 'for')) 
+        M.append(process_datalog(f, 'mis')) 
+        P.append(process_datalog(f, 'popsize')) 
+        
+    R=[]
+    for f in survival:
+        R.append(process_srfile(f))
+
+    return F,C,Fr,M,P,R
+
 
 # draw a figure
 
@@ -176,12 +201,12 @@ def plot_one_curve(data, color, axis, label, quartiles=False):
     for spine in axis.spines.values():
         spine.set_position(('outward', 5))
     axis.set_axisbelow(True)
+   
+
 
 def plot_boxplot(stats, colors, axis, labels, sig=False):
     
     bp = axis.boxplot(stats)
-
-    print bp
     
     for i in range(0, len(bp['boxes'])):
         bp['boxes'][i].set_color(colors[i])
@@ -247,6 +272,106 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
                          verticalalignment='center')
                 
          
+
+
+# designed for foraging experiements
+def draw_data2(exp, runs=False, tex=False): 
+    font = {'family' : 'serif', 'size'   : 6}
+    if tex :
+        matplotlib.rc('text', usetex=True)
+    matplotlib.rc('font', **font)
+    bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
+    colors = bmap.mpl_colors
+   
+
+    figure(num=None, figsize=(10, 5), dpi=100)
+    clf()
+
+    
+
+    # median Fitness
+    ax1 = subplot2grid((2,3), (0,0))
+    c=0
+    for e in exp:
+        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(F, colors[c], ax1,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    #ax1.set_title('Median swarm fitness over time (%d runs)'%(len(F)))
+    #ax1.legend(loc='lower right')
+    ax1.set_xlabel('Generations')
+    ax1.set_ylabel('Fitness')
+
+
+    # Median Lineage survival rate
+    ax11 = subplot2grid((2,3), (1,0))
+    c=0
+    for e in exp:
+        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(R, colors[c], ax11,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    #ax11.set_title('Genetic lines over time (%d runs)'%(len(R)))
+    ax11.legend(loc='upper right')
+    ax11.set_xlabel('Generations')
+    ax11.set_ylabel('Rate of survival')  
+
+
+    # Items collected
+    print 'ax2'
+    ax2 = subplot2grid((2,3), (0,1))
+    c=0
+    for e in exp:
+        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(C, colors[c], ax2,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    #ax2.set_title('Items collected over time (%d runs)'%(len(C)))
+    #ax2.legend(loc='upper right')
+    ax2.set_xlabel('Generations')
+    ax2.set_ylabel('Items collected')  
+
+
+    # Items forraged 
+    print 'ax3'
+    ax3 = subplot2grid((2,3), (0, 2))
+    c=0
+    for e in exp:
+        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(Fr, colors[c], ax3,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    #ax3.set_title('Items forraged over time (%d runs)'%(len(Fr)))
+    #ax3.legend(loc='upper right')
+    ax3.set_xlabel('Generations')
+    ax3.set_ylabel('Items foraged') 
+
+ 
+    # Items droped
+    print 'ax4'
+    ax4 = subplot2grid((2,3), (1, 1))
+    c=0
+    for e in exp:
+        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(M, colors[c], ax4,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    #ax4.set_title('Items droped over time (%d runs)'%(len(M)))
+    # ax4.legend(loc='upper right')
+    ax4.set_xlabel('Generations')
+    ax4.set_ylabel('Items droped') 
+    
+
+    # Population size
+    print 'ax5'
+    ax5 = subplot2grid((2,3), (1, 2))
+    c=0
+    for e in exp:
+        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(P, colors[c], ax5,  re.sub('[_/]', '', n), runs)
+        c=c+1
+    #ax5.set_title('Median average population size over time(%d runs)'%(len(P)))
+    #ax5.legend(loc='upper right')
+    ax5.set_xlabel('Generations')
+    ax5.set_ylabel('Average population size') 
+
+    draw()
+    show()
 
 
 
