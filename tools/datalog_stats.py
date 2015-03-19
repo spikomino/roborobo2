@@ -181,6 +181,8 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
     
     bp = axis.boxplot(stats)
 
+    print bp
+    
     for i in range(0, len(bp['boxes'])):
         bp['boxes'][i].set_color(colors[i])
         # we have two whiskers!
@@ -287,6 +289,7 @@ def draw_data(exp, runs=False, tex=False):
 
 
     # average accumulated swarm fitness
+    print 'ax2'
     ax2 = subplot2grid((2,3), (0,1))
     stats=[]
     l=[]
@@ -294,11 +297,13 @@ def draw_data(exp, runs=False, tex=False):
         (n, d, s, r) = e 
         stats.append(s['aasf']) 
         l.append(re.sub('[_/]', '', n))
-        
-        plot_boxplot(stats, colors, ax2, l, sig=False)
-        ax2.set_title('Average accumulated swarm fitness')
+       
+    plot_boxplot(stats, colors, ax2, l, sig=False)
+    ax2.set_title('Average accumulated swarm fitness')
+    
 
     # Fix budget swarm fitness
+    print 'ax3'
     ax3 = subplot2grid((2,3), (0, 2))
     stats=[]
     l=[]
@@ -310,7 +315,8 @@ def draw_data(exp, runs=False, tex=False):
     ax3.set_title('Fixed budget swarm fitness')
     
 
-    # Time to reach target 
+    # Time to reach target
+    print 'ax4'
     ax4 = subplot2grid((2,3), (1, 1))
     stats=[]
     l=[]
@@ -322,6 +328,7 @@ def draw_data(exp, runs=False, tex=False):
     ax4.set_title('Time to reach target')
 
     # accumulated fitness above target
+    print 'ax5'
     ax5 = subplot2grid((2,3), (1, 2))
     stats=[]
     l=[]
