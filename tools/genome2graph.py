@@ -206,12 +206,12 @@ def graph_from_graph(G, fname):
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
-    if d[10] != '][Genome:' :
+    if d[12] != '][Genome:' :
         return (None, None, None, None)
-    rob     = int(d[11].split('=')[1]) 
-    idtrace = int(d[12].split('=')[1]) 
-    mom     = int(d[13].split('=')[1])
-    dad     = int(d[14].split('=')[1])
+    rob     = int(d[13].split('=')[1]) 
+    idtrace = int(d[14].split('=')[1]) 
+    mom     = int(d[15].split('=')[1])
+    dad     = int((d[16].split('=')[1]).split(']')[0] )
     
     return (rob, idtrace, mom, dad)
 
@@ -247,7 +247,7 @@ def trac_genome(gl, id, G, col, genpath=None):
     #extrac the robot number from id -> to read the gen file name
     nbrobsize =len(str(len(gl.keys())))
     id_robid = int(str(id)[-nbrobsize:])
-
+    
     for i in gl :
         for g in gl[i] :
             (tr, m, d) = g
@@ -265,11 +265,11 @@ def trac_genome(gl, id, G, col, genpath=None):
                         "{:0>10d}".format(id)+'.gen'
                     tr_fname = "{:0>4d}".format(tr_robid)+'-'+\
                         "{:0>10d}".format(tr)+'.gen'
-                    print id_fname, tr_fname
+                    #print id_fname, tr_fname
                     w =weight_matrix_dist(
                         process_weight_matrix(genpath+'/'+id_fname),
                         process_weight_matrix(genpath+'/'+tr_fname))
-                    G.edge[id][tr]['label'] = "{0: 2.5f}".format(w)               
+                    G.edge[id][tr]['label'] = "{0: 2.5f}".format(w) 
                 trac_genome(gl, tr, G, col, genpath)
 
 
@@ -287,26 +287,33 @@ def create_phylo_tree(fname, dotfile=None, pngfile=None, genpath=None):
     gl = process_file(fname)
 
     # create the phylo-tree
-    prog = progressbar.ProgressBar()
-    
+    pbar = progressbar.ProgressBar(maxval=len(gl.keys())).start()
+    i=0
     for n in gl.keys():
+        pbar.update(i+1)
+        i = i+1
         G.add_node(n) # the root node (the initial gene)
         G.node[n]['agent'] = n
         G.node[n]['id']    = n
         G.node[n]['color'] = colors[n%len(colors)]
         trac_genome(gl, n, G, colors, genpath)
-    
+
+    pbar.finish()
+
     # write the file 
     if dotfile != None :
+        print 'Writing %s ...'%(dotfile)
         nx.write_dot(G, dotfile)
+        print 'done'
     if pngfile != None :
+        print 'Writing %s ...'%(pngfile)
         dot2png(dotfile, pngfile)
-
+        print 'done'
 
     return G
 
 
-# Crete a phylogenetic tree matrix similarity
+# Crete a phylogenetic tree based on matrix similarity
 # in  : log file in the correct format see above
 # out : the graphe og the phylo tree (root nodes are the initial genes)
 def create_phylo_tree_dist(genpath, dotfile=None, pngfile=None): 
@@ -371,23 +378,15 @@ def create_phylo_tree_dist(genpath, dotfile=None, pngfile=None):
     
     # write the file 
     if dotfile != None :
+        print 'Writing %s ...'%(dotfile)
         nx.write_dot(G, dotfile)
+        print 'done'
     if pngfile != None :
+        print 'Writing %s ...'%(pngfile)
         dot2png(dotfile, pngfile)
-
+        print 'done'
 
     return G
-
-
-
-
-
-
-
-
-
-
-
 
 # modified survival rate computation based on genome id at each generation
 # in  : a log file.
