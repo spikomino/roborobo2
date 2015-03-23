@@ -62,7 +62,7 @@ def process_srfile(fname):
     return d
 
 # statistics measures
-def ave_accu_sf(data, cut=0.1):
+def ave_accu_sf(data, cut=0.25):
     gen = int(cut * len(data[0])) 
     result=[]
     for d in data:
@@ -76,7 +76,7 @@ def fix_budg_sf(data, cut=0.8):
         result.append(d[gen])
     return result
 
-def time_reach_target(data, pers=0.8):
+def time_reach_target(data, pers=0.75):
     max_l=[]
     for d in data:
         max_l.append(max(d))
@@ -140,7 +140,7 @@ def process_experiment(path):
     D=[]
     for f in datalogs:
         # default 'fit'. Possible: popsize col for mis
-        D.append(process_datalog(f, 'mis')) 
+        D.append(process_datalog(f, 'fit')) 
 
     R=[]
     for f in survival:
