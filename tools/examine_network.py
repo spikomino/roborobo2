@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #-----------------------------------------------------------------------------
 
-from ffnet import ffnet, mlgraph, savenet, loadnet, exportnet
+
 import pylab
 import networkx as nx
 from optparse import OptionParser
