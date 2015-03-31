@@ -99,8 +99,6 @@ def process_graph(fname):
     fh.close()
     return G
 
-<<<<<<< HEAD
-=======
 # Reads a neat genome file and return the number of elements in the network 
 #   inputs, bias, hidden, outputs.
 # in  : a filename of the genome (neat format)
@@ -229,11 +227,10 @@ def execute_mlp(g, inputs):
 
 
     
->>>>>>> 484f135d6b2bbcfa5e0d4f8d2a4cdea61b59f764
 # Reads a neat genome filename and greate the coresponding weight matrix
 # in  : a filename of the genome (neat format)
 # out : a list of list (weight matrix) [inputs][outputs]
-# NOTE : Does not work for MLP only for FF
+# NOTE : Does not work for MLP only for perceptron
 def process_weight_matrix(fname):
     
     nb_in  = 0
