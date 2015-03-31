@@ -37,11 +37,13 @@ private:
     int            _reported_collected;
     int            _reported_forraged;
     int            _reported_basket;
-    
+    double         _reported_basket_usage;
+
     double         _locomotion;        // accumulates the locomotion fitness
     int            _items_collected;   // items collected 
     int            _items_forraged;    // items brought back to the nest
     int            _items_miss_droped; // item dropeed outside of nest
+    double         _basket_usage;      // basket usage accumulator
 
     //   int            _items_in_basket;
     std::list<int> _basket;
@@ -101,10 +103,12 @@ public:
     int          getId             () { return _wm->getId(); }
     double       getFitness        () { return _reported_fitness; }
     double       getPopsize        () { return _reported_popsize; }
+    double       getBasketUsage    () { return _reported_basket_usage; }
     int          getMisseDroped    () { return _reported_missed; }
     int          getCollected      () { return _reported_collected; }
     int          getForraged       () { return _reported_forraged; }
     int          getBasketSize     () { return _reported_basket; }
+    
 
     bool         stillRoomInBasket () ;
     void         pickItem          (int);

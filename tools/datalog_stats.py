@@ -8,6 +8,7 @@ from os.path import isfile, join
 from scipy.stats import *
 from pylab import *
 import brewer2mpl
+from genome2graph import *
 
 # find datalog in a directory coresponfing to one experiment
 # in  : a directory path
@@ -168,9 +169,10 @@ def process_experiment2(path):
         # default 'fit'. Possible: popsize col for mis
         F.append(process_datalog(f, 'fit')) 
         C.append(process_datalog(f, 'col')) 
-        Fr.append(process_datalog(f, 'for')) 
+        Fr.append(process_datalog(f, 'bskuse')) 
         M.append(process_datalog(f, 'mis')) 
-        P.append(process_datalog(f, 'popsize')) 
+        P.append(process_datalog(f, 'popsize'))
+        
         
     R=[]
     for f in survival:
@@ -340,7 +342,7 @@ def draw_data2(exp, runs=False, tex=False):
     #ax3.set_title('Items forraged over time (%d runs)'%(len(Fr)))
     #ax3.legend(loc='upper right')
     ax3.set_xlabel('Generations')
-    ax3.set_ylabel('Items foraged') 
+    ax3.set_ylabel('Basket Usage') 
 
  
     # Items droped
@@ -469,3 +471,165 @@ def draw_data(exp, runs=False, tex=False):
     show()
 
 
+
+# extract the performance of ONE ROBOT durring its lifetime.
+# in  : the outpout log NOT the datalog
+#       the robot id 
+# out : a tupple (fitness, collected, forraged, dropped) 
+def extract_data_by_rob(fname, rid, inputs=None, path=None):
+    fit=[]
+    col=[]
+    frg=[]
+    drp=[]
+    usg=[]
+    out=[]
+
+    # extract the fitness into the lists 
+    fh = open(fname, 'r')
+    gen=0
+    for line in fh :
+        data = line.split()
+        if data!=[] and data[0]=='[Robot:' and int(data[1].split('=')[1])==rid:
+            fit.append(float(data[4].split('=')[1]))
+            tmp=data[7].split('=')[1]
+            col.append(int(tmp.split('/')[0]))
+            frg.append(int(data[8].split('=')[1]))
+            drp.append(int(data[9].split('=')[1]))
+            usg.append(float(data[12].split('=')[1]))
+
+            # execute network with inputs
+            if inputs != None:
+                gname=fname_from_gen_and_rob(gen, int(rid))
+                gen = gen+1
+                g = process_graph(path+'/'+gname)
+                outputs = execute_mlp(g, inputs)
+                out.append(outputs) 
+
+
+    fh.close()
+    return (fit,col,frg,drp, usg, out)
+
+def draw_robot_stats(stats, tex=False):
+    font = {'family' : 'serif', 'size'   : 6}
+    if tex :
+        matplotlib.rc('text', usetex=True)
+    matplotlib.rc('font', **font)
+    bmap = brewer2mpl.get_map('Set2', 'qualitative', 7)
+    colors = bmap.mpl_colors
+   
+
+    (fit,col,frg,drp,usg,out) = stats
+
+    figure(num=None, figsize=(10, 5), dpi=100)
+    clf()
+    
+    # fitness 
+    ax1 = subplot2grid((2,3), (0,0))
+    ax1.plot(fit, lw=1, label='fit', color=colors[0])
+    ax1.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    ax1.spines['left'].set_visible(False)
+    ax1.get_xaxis().tick_bottom()
+    ax1.get_yaxis().tick_left()
+    ax1.tick_params(axis='x', direction='out')
+    ax1.tick_params(axis='y', length=0)
+    for spine in ax1.spines.values():
+        spine.set_position(('outward', 5))
+    ax1.set_axisbelow(True)
+    ax1.set_xlabel('Generations')
+    ax1.set_ylabel('Fitness')
+    
+    # items
+    ax2 = subplot2grid((2,3), (0,1))
+    #ax2.plot(col, lw=1, label='col', color=colors[0])
+    #ax2.plot(frg, lw=1, label='forraged', color=colors[1])
+    ax2.plot(drp, lw=1, label='dropped', color=colors[2])
+    ax2.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.spines['left'].set_visible(False)
+    ax2.get_xaxis().tick_bottom()
+    ax2.get_yaxis().tick_left()
+    ax2.tick_params(axis='x', direction='out')
+    ax2.tick_params(axis='y', length=0)
+    for spine in ax2.spines.values():
+        spine.set_position(('outward', 5))
+    ax2.set_axisbelow(True)
+    ax2.legend(loc='upper right')
+    ax2.set_xlabel('Generations')
+    ax2.set_ylabel('Items')
+
+    # items
+    ax5 = subplot2grid((2,3), (0,2))
+    ax5.plot(usg, lw=1, label='basket usage', color=colors[0])
+    ax5.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+    ax5.spines['top'].set_visible(False)
+    ax5.spines['right'].set_visible(False)
+    ax5.spines['left'].set_visible(False)
+    ax5.get_xaxis().tick_bottom()
+    ax5.get_yaxis().tick_left()
+    ax5.tick_params(axis='x', direction='out')
+    ax5.tick_params(axis='y', length=0)
+    for spine in ax5.spines.values():
+        spine.set_position(('outward', 5))
+    ax5.set_axisbelow(True)
+    ax5.legend(loc='upper right')
+    ax5.set_xlabel('Generations')
+    ax5.set_ylabel('Rate')
+
+
+
+
+
+    # network activations 
+
+    if out != [] :
+
+        O = map(list, zip(*out))
+        ax3 = subplot2grid((2,3), (1,0))
+   
+        ax3.plot(O[0], lw=1, label='L', color=colors[0])
+        ax3.plot(O[1], lw=1, label='R', color=colors[1])
+        ax3.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+        ax3.spines['top'].set_visible(False)
+        ax3.spines['right'].set_visible(False)
+        ax3.spines['left'].set_visible(False)
+        ax3.get_xaxis().tick_bottom()
+        ax3.get_yaxis().tick_left()
+        ax3.tick_params(axis='x', direction='out')
+        ax3.tick_params(axis='y', length=0)
+        for spine in ax3.spines.values():
+            spine.set_position(('outward', 5))
+        ax3.set_axisbelow(True)
+        ax3.legend(loc='upper right')
+        ax3.set_xlabel('Generations')
+        ax3.set_ylabel('Items')
+    
+
+        ax4 = subplot2grid((2,3), (1,1))
+        ax4.plot(O[2], lw=1, label='D', color=colors[0])
+        ax4.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
+        ax4.spines['top'].set_visible(False)
+        ax4.spines['right'].set_visible(False)
+        ax4.spines['left'].set_visible(False)
+        ax4.get_xaxis().tick_bottom()
+        ax4.get_yaxis().tick_left()
+        ax4.tick_params(axis='x', direction='out')
+        ax4.tick_params(axis='y', length=0)
+        for spine in ax4.spines.values():
+            spine.set_position(('outward', 5))
+        ax4.set_axisbelow(True)
+        ax4.legend(loc='upper right')
+        ax4.set_xlabel('Generations')
+        ax4.set_ylabel('Items')
+    
+    
+
+
+
+    draw()
+    show()
+
+
+    

@@ -53,6 +53,10 @@ class neatestSharedData {
   static int gFitnessFunction;  
   static double gSelectionPressure;
   static double gMaturationTime;
+  static int gBasketCapacity;
+  static bool gPaintFloor;
+  static int gPaintFloorIteration;
+
   // -----  
   
 };

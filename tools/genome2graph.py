@@ -21,6 +21,8 @@ def gen_from_fname(fname):
 def fname_from_gen_and_rob(g,r):
     return "{:0>4d}".format(r)+'-'+"{:0>10d}".format(g*10000+r)+'.gen'
 
+
+
 def gid_from_gen_and_rob(g,r):
     return int("{:0>10d}".format(g*10000+r))
 
@@ -215,6 +217,9 @@ def execute_mlp(g, inputs):
     for o in out_nodes :
         s= compute_neuron(g, o, inputs, sigmoid_neat)
         outputs.append(s)
+    
+    outputs[0] = 2.0 * (outputs[0]-0.5);
+    outputs[1] = 2.0 * (outputs[1]-0.5);
     return outputs
 
 
@@ -331,12 +336,14 @@ def graph_from_graph(G, fname):
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
-    if d[12] != '][Genome:' :
+    gstart = 13 # depends on the log format  
+
+    if d[gstart] != '][Genome:' :
         return (None, None, None, None)
-    rob     = int(d[13].split('=')[1]) 
-    idtrace = int(d[14].split('=')[1]) 
-    mom     = int(d[15].split('=')[1])
-    dad     = int((d[16].split('=')[1]).split(']')[0] )
+    rob     = int(d[gstart+1].split('=')[1]) 
+    idtrace = int(d[gstart+2].split('=')[1]) 
+    mom     = int(d[gstart+3].split('=')[1])
+    dad     = int((d[gstart+4].split('=')[1]).split(']')[0] )
     
     return (rob, idtrace, mom, dad)
 
