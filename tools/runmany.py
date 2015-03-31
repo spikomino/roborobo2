@@ -9,7 +9,7 @@ home = os.environ["HOME"]
 config_dir    = 'config'
 log_dir       = 'logs'
 template_file = 'template.properties'
-nb_exec       = 32
+nb_exec       = 16
 global_script = 'run-all'
 sr_extraction_script = 'genome_phylo_stats.py'
 sr_extraction_list = 'sr_list'
@@ -24,7 +24,10 @@ parameters={
     'gFitnessFunction': 2,  # 0: locomotion, 1: collection, 2: forraging 
     'gControllerType': 1,   # 0 = NEAT, 1 = FFNN
     'gEvaluationTime': 1000,
-    'gMaxIt'         : 250000, 
+    'gMaxIt'         : 300000,
+    'gPaintFloorIteration' : 150000,
+    'gBasketCapacity': 10,
+    'gPaintFloor'    : 'false',
     'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 

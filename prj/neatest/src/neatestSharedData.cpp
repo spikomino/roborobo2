@@ -41,3 +41,6 @@ int         neatestSharedData::gControllerType = 0; // cf. header file
 int         neatestSharedData::gFitnessFunction = 0; 
 double      neatestSharedData::gSelectionPressure = 1.0;
 std::string neatestSharedData::gNeatParameters="prj/neatest/src/explo.ne";
+int         neatestSharedData::gBasketCapacity=5;
+bool        neatestSharedData::gPaintFloor = true;
+int         neatestSharedData::gPaintFloorIteration=150000;

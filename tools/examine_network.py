@@ -40,12 +40,12 @@ if __name__ == '__main__':
     # Create the graph object of the genome
     g = process_graph(options.infile)
      
-    print 'Nodes '+str(len(g.nodes()))+':', g.nodes()
-    print 'Edges '+str(len(g.edges()))+':', g.edges() 
+    #print 'Nodes '+str(len(g.nodes()))+':', g.nodes()
+    #print 'Edges '+str(len(g.edges()))+':', g.edges() 
 
-    e = genome_elements(g) 
+    #e = genome_elements(g) 
     
-    print 'Elements:', e[1]
+    #print 'Elements:', e[1]
 
     # test values
     inputs = [
@@ -57,24 +57,25 @@ if __name__ == '__main__':
         1.0 # bias
         ]
   
-    inputs = [
+    inputs2 = [
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # obs
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # itm
         1.0, # basket
         0.0, 1.0, 0.0, # nest (rgb) 
-        0.0, 1.0, # landmark dist, orientation
+        1.0, 0.5, # landmark dist, orientation
         1.0 # bias
         ]
   
 
 
 
-    print inputs
+    #print inputs
 
-    outputs = execute_mlp(g, inputs)
-    print outputs
+    outputs = execute_mlp(g, inputs2)
+    print options.infile,  outputs
 
-    
+    #for x in xrange(100):
+    #    print 'id=\'%04d\';  wd=`ls -1 $id-*.gen` ; for i in $wd; do python ../tools/examine_network.py -f $i ; done  > $id-exec.dat'%(x)
 
 
 

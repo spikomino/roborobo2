@@ -47,13 +47,15 @@ neatestController::neatestController(RobotWorldModel * wm){
   _reported_popsize   = 0;
   _reported_missed    = 0;
   _reported_collected = 0;
-  _reported_forraged  = 0; 
+  _reported_forraged  = 0.0; 
 
   _items_collected   = 0;
   _items_forraged    = 0;
   _items_miss_droped = 0;
+  _basket_usage      = 0.0;
 
-  _items_max         = 5; // todo put in parameters
+
+  _items_max         = neatestSharedData::gBasketCapacity; 
   
   _locomotion        = 0.0;
 
@@ -122,7 +124,7 @@ void neatestController::initRobot (){
 		  << std::endl;
 	printRobot();
 	print_genome(_genome);
-	save_genome();
+	//save_genome();
     }
 }
 
@@ -142,13 +144,16 @@ void neatestController::reset(){
     _reported_collected = _items_collected;
     _reported_forraged  = _items_forraged;
     _reported_basket    = _basket.size();
+    _reported_basket_usage = _basket_usage / 
+	(double) neatestSharedData::gEvaluationTime;
 
     _fitness           = 0.0;
     _items_collected   = 0;
     _items_forraged    = 0;
     _items_miss_droped = 0;
     _locomotion        = 0.0;
- 
+    _basket_usage      = 0.0;
+
     emptyBasket();      // item dont respawn should not empty 
     emptyGenomeList();
 }
@@ -169,7 +174,7 @@ void neatestController::step(){
 	stepEvolution (); // select, mutate, replace
 	
 	if (gVerbose){
-	    save_genome();
+	    //save_genome();
 	    printAll();
 	}
 	reset();          // reset fitness and neurocontroller
@@ -186,6 +191,7 @@ bool is_energy_item(int id){
 void neatestController::pickItem(int item_id){
     _basket.push_back(item_id);
     _items_collected++;
+    
 }
 
 void neatestController::emptyBasket(){
@@ -267,6 +273,9 @@ void neatestController::stepBehaviour(){
 		inputs[inputToUse++] = 0.0;
 	}
 
+
+    
+
     /* Forraging */
     if (neatestSharedData::gFitnessFunction > 1){
     
@@ -274,10 +283,27 @@ void neatestController::stepBehaviour(){
 	double activation = (double) _items_collected / (double) _items_max; 
 	inputs[inputToUse++] = activation;
 
+	/* update the basket usage */
+	_basket_usage += activation;
+
 	/* ground sensor */
-	inputs[inputToUse++] = (double)_wm->getGroundSensor_redValue()/ 255.0;
-	inputs[inputToUse++] = (double)_wm->getGroundSensor_greenValue()/ 255.0;
-	inputs[inputToUse++] = (double)_wm->getGroundSensor_blueValue()/ 255.0;
+	double r = (double)_wm->getGroundSensor_redValue()/ 255.0;
+	double g = (double)_wm->getGroundSensor_greenValue()/ 255.0;
+	double b = (double)_wm->getGroundSensor_blueValue()/ 255.0;
+	
+	if (neatestSharedData::gPaintFloor &&  // make all the floor as nest 
+	    gWorld->getIterations() > neatestSharedData::gPaintFloorIteration) {
+	    r = 0.0;
+	    g = 1.0;
+	    b = 0.0;
+	}
+	
+	inputs[inputToUse++] = r;
+	inputs[inputToUse++] = g;
+	inputs[inputToUse++] = b;
+
+	
+
 
 	/* landmark sensors */
 	if(gLandmarks.size() > 0){
@@ -628,6 +654,7 @@ void neatestController::printRobot(){
 	      << " dropped="           <<  _reported_missed
 	      << " crrying="           <<  _basket.size()
 	      << " sigma="             <<  _sigma 
+	      << " usage="             << _basket_usage / (double) neatestSharedData::gEvaluationTime
 	      << " ]";
 }
 

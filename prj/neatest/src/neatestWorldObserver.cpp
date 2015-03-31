@@ -43,6 +43,18 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
 					 &neatestSharedData::gMaturationTime,
 					 false);
 
+    gProperties.checkAndGetPropertyValue("gBasketCapacity",
+					 &neatestSharedData::gBasketCapacity,
+					 false);
+    
+    gProperties.checkAndGetPropertyValue("gPaintFloor",
+					 &neatestSharedData::gPaintFloor,
+					 false);
+    gProperties.checkAndGetPropertyValue("gPaintFloorIteration",
+					 &neatestSharedData::gPaintFloorIteration,
+					 false);
+    
+
     NEAT::load_neat_params (neatestSharedData::gNeatParameters.c_str(), true);
     
     // ====
@@ -123,6 +135,7 @@ void neatestWorldObserver::updateMonitoring(){
 	
 	double fitness  = 0.0;
 	double popsize  = 0.0;
+	double basket_usage =0.0;
 	int activeCount = 0;
 	int droped      = 0;
 	int collected   = 0;
@@ -142,6 +155,7 @@ void neatestWorldObserver::updateMonitoring(){
 	    collected += controller->getCollected();
 	    forraged  += controller->getForraged();
 	    basket    += controller->getBasketSize();
+	    basket_usage += controller->getBasketUsage();
 	}
 	
 	popsize /= gNumberOfRobots;
@@ -159,6 +173,7 @@ void neatestWorldObserver::updateMonitoring(){
 		      << ";bsk:"     << basket
 		      << ";lst"      << _pickedItems.size()
 		      << ";total:"   << gPhysicalObjects.size()
+		      << ";bskuse:"  << basket_usage
 		      << "]\n";		
 	
         // Logging
@@ -169,6 +184,7 @@ void neatestWorldObserver::updateMonitoring(){
 	    "] [popsize:" + std::to_string(popsize) +
 	    "] [col:" + std::to_string(collected) +
 	    "] [for:" + std::to_string(forraged) +
+	    "] [use:" + std::to_string(basket_usage) +
 	    "] [mis:" + std::to_string(droped) + "]\n";
         gLogManager->write(s);
 	gLogManager->flush();

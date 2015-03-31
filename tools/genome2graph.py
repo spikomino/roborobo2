@@ -21,6 +21,8 @@ def gen_from_fname(fname):
 def fname_from_gen_and_rob(g,r):
     return "{:0>4d}".format(r)+'-'+"{:0>10d}".format(g*10000+r)+'.gen'
 
+
+
 def gid_from_gen_and_rob(g,r):
     return int("{:0>10d}".format(g*10000+r))
 
@@ -97,6 +99,137 @@ def process_graph(fname):
     fh.close()
     return G
 
+<<<<<<< HEAD
+=======
+# Reads a neat genome file and return the number of elements in the network 
+#   inputs, bias, hidden, outputs.
+# in  : a filename of the genome (neat format)
+# out : a tupple ( inputs, bias, hidden, outputs)
+def genome_elements_file(fname):
+
+    nb_in  = 0
+    nb_out = 0 
+    nb_hid = 0
+    nb_bia = 0
+
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data[0] == 'genomestart' :
+            gid = data[1]
+     
+        elif data[0] == 'node' : 
+            if data[4]   == '2' :
+                nb_out = nb_out +1
+            elif data[4] == '1':
+                nb_in  = nb_in +1
+            elif data[4] == '3' :
+                nb_bia = nb_bia +1 
+            elif data[4] == '0' :
+                nb_hid = nb_hid +1    
+
+        elif data[0] == 'genomeend' :
+            if gid != data[1] : 
+                print 'Error: mismatch genome end tag'
+                return None
+    fh.close()
+
+    return (nb_in, nb_out, nb_hid, nb_bia)
+
+# Reads a neat genome file and return the liste of the specified element
+#    inputs, bias, hidden, outputs.
+# in  : a filename of the genome (neat format), 
+#     : a string the name of the elements ([in], out, bia, hid)
+# out : a list of ( inputs, bias, hidden, outputs)
+def genome_elements_list_file(fname, elem='in'):
+    res=[]
+    fh = open(fname, 'r')
+    for line in fh :
+        data = line.split()
+        if data[0] == 'genomestart' :
+            gid = data[1]
+     
+        elif data[0] == 'node' : 
+            if   data[4] == '0' and elem == 'hid' :
+                res.append(int(data[1]))
+            elif data[4] == '1' and elem == 'in' :
+                res.append(int(data[1]))
+            elif data[4] == '2' and elem == 'out' :
+                res.append(int(data[1]))
+            elif data[4] == '3' and elem == 'bia' :
+                res.append(int(data[1]))     
+
+        elif data[0] == 'genomeend' :
+            if gid != data[1] : 
+                print 'Error: mismatch genome end tag'
+                return None
+    fh.close()
+    return res
+
+# Reads a graph and return the number of elements in the network 
+#   inputs, bias, hidden, outputs.
+# in  : a graph object
+# out : a tupple ( inputs, bias, hidden, outputs)
+def genome_elements(g):
+    nb_hid = len([v for v in g if g.node[v]['lbl'] == '0'])
+    nb_in  = len([v for v in g if g.node[v]['lbl'] == '1'])
+    nb_out = len([v for v in g if g.node[v]['lbl'] == '2'])
+    nb_bia = len([v for v in g if g.node[v]['lbl'] == '3'])
+    return (nb_in, nb_out, nb_hid, nb_bia)
+    
+# Reads a graph  and return the liste of the specified element
+#    inputs, bias, hidden, outputs.
+# in  : a graph object,
+#     : a string the name of the elements ([in], out, bia, hid)
+# out : a list of ( inputs, bias, hidden, outputs)
+def genome_elements_list(g, elem='in'):
+    if elem == 'hid' :
+        return  [v for v in g if g.node[v]['lbl'] == '0']
+    if elem == 'in' :
+        return  [v for v in g if g.node[v]['lbl'] == '1']
+    if elem == 'out' :
+        return  [v for v in g if g.node[v]['lbl'] == '2']
+    if elem == 'bia' :
+        return  [v for v in g if g.node[v]['lbl'] == '3']
+
+
+
+def sigmoid_neat(a): # [0,1] steep
+        return (1.0/(1.0+(pylab.np.exp(-(4.924273*a)))));   
+
+# computes the output of a neuron 
+def compute_neuron(g, n, inputs, func=sigmoid_neat):
+
+    # input 
+    if g.node[n]['lbl'] == '1' or g.node[n]['lbl'] == '3':
+        return inputs[n-1];
+    s=0
+    for i in g.predecessors(n) :
+        s = s + compute_neuron(g, i, inputs, func) * g[i][n]['weight']
+    return func(s)
+
+
+# Execute the network for one input 
+# in  : a graph object (the network)
+# out : a list of outputs
+# NOTE : works only on FF networks
+def execute_mlp(g, inputs):
+    outputs = []
+    out_nodes = genome_elements_list(g, 'out')
+    for o in out_nodes :
+        s= compute_neuron(g, o, inputs, sigmoid_neat)
+        outputs.append(s)
+    
+    outputs[0] = 2.0 * (outputs[0]-0.5);
+    outputs[1] = 2.0 * (outputs[1]-0.5);
+    return outputs
+
+
+
+
+
+    
+>>>>>>> 484f135d6b2bbcfa5e0d4f8d2a4cdea61b59f764
 # Reads a neat genome filename and greate the coresponding weight matrix
 # in  : a filename of the genome (neat format)
 # out : a list of list (weight matrix) [inputs][outputs]
@@ -206,12 +339,14 @@ def graph_from_graph(G, fname):
 # in  : a line from the evolution log
 # out : a tuple (rob_id, id_trace, mom, dad)
 def process_robot_entry(d):
-    if d[12] != '][Genome:' :
+    gstart = 13 # depends on the log format  
+
+    if d[gstart] != '][Genome:' :
         return (None, None, None, None)
-    rob     = int(d[13].split('=')[1]) 
-    idtrace = int(d[14].split('=')[1]) 
-    mom     = int(d[15].split('=')[1])
-    dad     = int((d[16].split('=')[1]).split(']')[0] )
+    rob     = int(d[gstart+1].split('=')[1]) 
+    idtrace = int(d[gstart+2].split('=')[1]) 
+    mom     = int(d[gstart+3].split('=')[1])
+    dad     = int((d[gstart+4].split('=')[1]).split(']')[0] )
     
     return (rob, idtrace, mom, dad)
 
