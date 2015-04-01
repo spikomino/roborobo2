@@ -169,7 +169,7 @@ def process_experiment2(path):
         # default 'fit'. Possible: popsize col for mis
         F.append(process_datalog(f, 'fit')) 
         C.append(process_datalog(f, 'col')) 
-        Fr.append(process_datalog(f, 'bskuse')) 
+        Fr.append(process_datalog(f, 'use')) 
         M.append(process_datalog(f, 'mis')) 
         P.append(process_datalog(f, 'popsize'))
         
