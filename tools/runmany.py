@@ -25,9 +25,9 @@ parameters={
     'gControllerType': 1,   # 0 = NEAT, 1 = FFNN
     'gEvaluationTime': 1000,
     'gMaxIt'         : 300000,
-    'gPaintFloorIteration' : 150000,
+    'gPaintFloorIteration' : 200000,
     'gBasketCapacity': 10,
-    'gPaintFloor'    : 'false',
+    'gPaintFloor'    : 'true',
     'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 
