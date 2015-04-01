@@ -546,9 +546,9 @@ def compute_survival_rate_by_genome_id(fname):
 
 
     def read_robot_line(d):
-        if d[12] != '][Genome:' :
+        if d[13] != '][Genome:' :
             return (None, None)
-        gid = int(d[13].split('=')[1]) 
+        gid = int(d[14].split('=')[1]) 
         itr = int(d[2].split('=')[1]) 
         return (gid, itr)
 
