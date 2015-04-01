@@ -27,7 +27,7 @@ parameters={
     'gMaxIt'         : 300000,
     'gPaintFloorIteration' : 200000,
     'gBasketCapacity': 10,
-    'gPaintFloor'    : 'true',
+    'gPaintFloor'    : 'false',
     'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 
