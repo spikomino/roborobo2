@@ -291,19 +291,16 @@ void neatestController::stepBehaviour(){
 	double g = (double)_wm->getGroundSensor_greenValue()/ 255.0;
 	double b = (double)_wm->getGroundSensor_blueValue()/ 255.0;
 	
-	if (neatestSharedData::gPaintFloor &&  // make all the floor as nest 
+	// make all the floor as nest 
+	if (neatestSharedData::gPaintFloor &&  
 	    gWorld->getIterations() > neatestSharedData::gPaintFloorIteration) {
 	    r = 0.0;
 	    g = 1.0;
 	    b = 0.0;
 	}
-	
 	inputs[inputToUse++] = r;
 	inputs[inputToUse++] = g;
 	inputs[inputToUse++] = b;
-
-	
-
 
 	/* landmark sensors */
 	if(gLandmarks.size() > 0){
@@ -362,6 +359,12 @@ void neatestController::stepBehaviour(){
 	droped = (int) (outputs[D] * _basket.size());
 	const int nest_color = 255*256; 
 	at_nest = _wm->getGroundSensorValue() == nest_color; 
+	
+	// make all the floor as nest 
+	if (neatestSharedData::gPaintFloor && 
+	    gWorld->getIterations() > neatestSharedData::gPaintFloorIteration) 
+	    at_nest=true;
+
 	dropItem(droped, at_nest);
 	
 	/* std::cout << "Dropped " << droped << "/" << _basket.size() ;   */
