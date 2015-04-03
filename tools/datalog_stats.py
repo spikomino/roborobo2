@@ -189,7 +189,7 @@ def plot_one_curve(data, color, axis, label, quartiles=False):
     if quartiles :
         axis.fill_between(np.arange(0, len(med)), perc_25, perc_75,
                           alpha=0.25, linewidth=0, color=color)
-    axis.plot(med, lw=2, label=label, color=color)
+    axis.plot(med, lw=1, label=label, color=color)
     
       
     axis.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
