@@ -53,8 +53,10 @@ neatestWorldObserver::neatestWorldObserver(World* world):WorldObserver(world){
     gProperties.checkAndGetPropertyValue("gPaintFloorIteration",
 					 &neatestSharedData::gPaintFloorIteration,
 					 false);
+    gProperties.checkAndGetPropertyValue("gHidePicked",
+					 &neatestSharedData::gHidePicked,
+					 false);
     
-
     NEAT::load_neat_params (neatestSharedData::gNeatParameters.c_str(), true);
     
     // ====
@@ -96,33 +98,33 @@ void neatestWorldObserver::step(){
 void neatestWorldObserver::updateEnvironment(){
 
     // hide items that were picked 
-    _pickedItems.clear();
-    for ( int i=0 ; i != gNumberOfRobots ; i++ ){
-	std::list<int> basket = (dynamic_cast<neatestController*>
-				  (gWorld->getRobot(i)->getController()))
-	    ->getBasket();
-
-	for(const auto& c : basket)
-	    _pickedItems.push_back(c);
-    }
-       
-    for(const auto& c : gPhysicalObjects){
-	if(c->canRegister())
-	    c->registerObject();
+    if(neatestSharedData::gHidePicked){
+	_pickedItems.clear();
+	for ( int i=0 ; i != gNumberOfRobots ; i++ ){
+	    std::list<int> basket = (dynamic_cast<neatestController*>
+				     (gWorld->getRobot(i)->getController()))
+		->getBasket();
+	    
+	    for(const auto& c : basket)
+		_pickedItems.push_back(c);
+	}
 	
-	c->display();
-    }	
+	for(const auto& c : gPhysicalObjects){
+	    if(c->canRegister())
+		c->registerObject();
+	    c->display();
+	}	
+	
+	for(const auto& c : _pickedItems){
+	    gPhysicalObjects[c]->unregisterObject();
+	    gPhysicalObjects[c]->hide();
+	}
 
-    for(const auto& c : _pickedItems){
-	gPhysicalObjects[c]->unregisterObject();
-	gPhysicalObjects[c]->hide();
+	std::cout << "Hiding " << _pickedItems.size() << " items: " ;
+	for(const auto& c : _pickedItems)
+		std::cout << c << " ";
+	std::cout<< std::endl;
     }
-
-    /* std::cout << "Hiding " << _pickedItems.size() << " items: " ; */
-    /* for(const auto& c : _pickedItems) */
-    /* 	std::cout << c << " "; */
-    /* std::cout<< std::endl; */
-    
 }
 
 void neatestWorldObserver::updateMonitoring(){

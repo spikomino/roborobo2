@@ -171,9 +171,15 @@ def process_experiment2(path):
         C.append(process_datalog(f, 'col')) 
         Fr.append(process_datalog(f, 'use')) 
         M.append(process_datalog(f, 'mis')) 
-        P.append(process_datalog(f, 'popsize'))
+        P.append(process_datalog(f, 'mis')) 
         
         
+    # compute the rate of col/drop
+    for j in xrange(len(datalogs)):
+        for i in xrange(len(P[j])):
+            P[j][i] = P[j][i] / (C[j][i] + 1e-19)
+        
+
     R=[]
     for f in survival:
         R.append(process_srfile(f))
@@ -278,7 +284,7 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
 
 # designed for foraging experiements
 def draw_data2(exp, runs=False, tex=False): 
-    font = {'family' : 'serif', 'size'   : 6}
+    font = {'family' : 'serif', 'size'   : 10}
     if tex :
         matplotlib.rc('text', usetex=True)
     matplotlib.rc('font', **font)
@@ -370,7 +376,7 @@ def draw_data2(exp, runs=False, tex=False):
     #ax5.set_title('Median average population size over time(%d runs)'%(len(P)))
     #ax5.legend(loc='upper right')
     ax5.set_xlabel('Generations')
-    ax5.set_ylabel('Average population size') 
+    ax5.set_ylabel('Ratio missed/collected') 
 
     draw()
     show()
@@ -379,7 +385,7 @@ def draw_data2(exp, runs=False, tex=False):
 
 
 def draw_data(exp, runs=False, tex=False): 
-    font = {'family' : 'serif', 'size'   : 6}
+    font = {'family' : 'serif', 'size'   : 10}
     if tex :
         matplotlib.rc('text', usetex=True)
     matplotlib.rc('font', **font)

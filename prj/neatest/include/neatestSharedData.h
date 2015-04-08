@@ -56,6 +56,7 @@ class neatestSharedData {
   static int gBasketCapacity;
   static bool gPaintFloor;
   static int gPaintFloorIteration;
+  static bool gHidePicked;
 
   // -----  
   

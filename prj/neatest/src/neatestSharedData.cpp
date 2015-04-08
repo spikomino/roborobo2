@@ -44,3 +44,4 @@ std::string neatestSharedData::gNeatParameters="prj/neatest/src/explo.ne";
 int         neatestSharedData::gBasketCapacity=5;
 bool        neatestSharedData::gPaintFloor = true;
 int         neatestSharedData::gPaintFloorIteration=150000;
+bool        neatestSharedData::gHidePicked = false;
