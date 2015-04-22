@@ -120,10 +120,10 @@ void neatestWorldObserver::updateEnvironment(){
 	    gPhysicalObjects[c]->hide();
 	}
 
-	std::cout << "Hiding " << _pickedItems.size() << " items: " ;
+	/*std::cout << "Hiding " << _pickedItems.size() << " items: " ;
 	for(const auto& c : _pickedItems)
 		std::cout << c << " ";
-	std::cout<< std::endl;
+		std::cout<< std::endl;*/
     }
 }
 

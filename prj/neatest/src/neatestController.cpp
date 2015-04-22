@@ -273,9 +273,6 @@ void neatestController::stepBehaviour(){
 		inputs[inputToUse++] = 0.0;
 	}
 
-
-    
-
     /* Forraging */
     if (neatestSharedData::gFitnessFunction > 1){
     
@@ -305,8 +302,8 @@ void neatestController::stepBehaviour(){
 	/* landmark sensors */
 	if(gLandmarks.size() > 0){
 	    _wm->updateLandmarkSensor();
-	    double landmark_dir=(_wm->getLandmarkDirectionAngleValue()+1.0)/2.0;
-	    double landmark_dis= 1.0 - _wm->getLandmarkDistanceValue();
+	    double landmark_dir=_wm->getLandmarkDirectionAngleValue(); // [-1,1]
+ 	    double landmark_dis= 1.0 - _wm->getLandmarkDistanceValue(); // [0,1]
 	    inputs[inputToUse++] = landmark_dir;
 	    inputs[inputToUse++] = landmark_dis;
 	}
@@ -407,9 +404,15 @@ void neatestController::stepBehaviour(){
 		  << " max_sens=" << md 
 		  << "]" << std::endl 
 		  << "\t\tInputs :[ " ;
-	for(unsigned int i = 1; i <= _nbInputs; i++){
+	for(int i = 1; i <= _nbInputs; i++){
 	    std::cout << to_string(inputs[i-1]) + " ";
-	    if ((i % _wm->_cameraSensorsNb) == 0)
+	    if (((i % _wm->_cameraSensorsNb) == 0) || // sensors 
+		(i==2*_wm->_cameraSensorsNb) || // basket (1)
+		(i>2*_wm->_cameraSensorsNb && 
+		 i< 2*_wm->_cameraSensorsNb+3) || // floor (3)
+		(i >= 2*_wm->_cameraSensorsNb+3 && 
+		 i< 2*_wm->_cameraSensorsNb+5)) // landmark (2)
+		
 		std::cout << "]" <<  std::endl << "\t\t\t[ ";
 	}
 	
@@ -424,18 +427,18 @@ void neatestController::stepBehaviour(){
 		  }*/
     
 
-    /*std::cout << "NETWORK ";
-    for(unsigned int i = 0; i < _nbInputs; i++)
+    /* std::cout << "NETWORK ";
+    for(int i = 0; i < _nbInputs; i++)
 	std::cout << to_string(inputs[i]) + " ";
-
+    
     std::vector<double>::iterator itr;
     for(itr = outputs.begin (); itr != outputs.end (); itr++)
 	std::cout << to_string(*itr) + " ";
-    std::cout << std::endl;
-    */
+	std::cout << std::endl;*/
+    
 
-    /* _wm->_desiredTranslationalValue = 0.0; */
-    /* _wm->_desiredRotationalVelocity = 0.0; */
+    /*_wm->_desiredTranslationalValue = 0.0; 
+      _wm->_desiredRotationalVelocity = 0.0; */
 
 } 
 

@@ -55,8 +55,8 @@ private:
     GenomeAdapted*          _genome;
     Network*                _neurocontroller;
     
-    unsigned int            _nbInputs;
-    unsigned int            _nbOutputs;
+     int            _nbInputs;
+     int            _nbOutputs;
     
     std::map<int, message>  _glist; // genome list (local population)
    
