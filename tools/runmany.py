@@ -14,8 +14,12 @@ global_script = 'run-all'
 sr_extraction_script = 'genome_phylo_stats.py'
 sr_extraction_list = 'sr_list'
 
-var_parameter = 'gSelectionPressure'
-var_values = [ '1.00', '0.75', '0.50', '0.25', '0.00' ]
+#var_parameter = 'gSelectionPressure'
+#var_values = [ '1.00', '0.75', '0.50', '0.25', '0.00' ]
+
+var_parameter = 'gBasketCapacity'
+var_values = [ '1', '5', '7', '13' ]
+
 
 parameters={
     'gInitialNumberOfRobots': 100,
@@ -26,9 +30,9 @@ parameters={
     'gEvaluationTime': 1000,
     'gMaxIt'         : 300000,
     'gPaintFloorIteration' : 200000,
-    'gBasketCapacity': 10,
+    'gSelectionPressure': 1.0,
     'gPaintFloor'    : 'false',
-    'gHidePicked'    : 'false', 
+    'gHidePicked'    : 'true', 
     'gBatchMode'     : 'true'}
 
 # copy the tenmplate file and update the values 

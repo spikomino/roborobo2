@@ -154,7 +154,7 @@ void neatestController::reset(){
     _locomotion        = 0.0;
     _basket_usage      = 0.0;
 
-    emptyBasket();      // item dont respawn should not empty 
+    //emptyBasket();      // item dont respawn should not empty 
     emptyGenomeList();
 }
 
@@ -164,6 +164,7 @@ void neatestController::step(){
 	stepBehaviour(); // execute the neuro controller
 	if(matured())
 	    broadcast();     // broadcast genome to neighbors
+	
     }
     else{ // if not alive stop motor from any residual voltage
 	_wm->_desiredTranslationalValue = 0.0; 
@@ -437,8 +438,8 @@ void neatestController::stepBehaviour(){
 	std::cout << std::endl;*/
     
 
-    /*_wm->_desiredTranslationalValue = 0.0; 
-      _wm->_desiredRotationalVelocity = 0.0; */
+    /* _wm->_desiredTranslationalValue = 0.0;  */
+    /* _wm->_desiredRotationalVelocity = 0.0; */
 
 } 
 

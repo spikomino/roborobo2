@@ -143,7 +143,8 @@ void neatestWorldObserver::updateMonitoring(){
 	int collected   = 0;
 	int forraged    = 0;
 	int basket      = 0;
-	
+	double norm_basket =0.0;
+
 	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
 	    neatestController* controller = dynamic_cast<neatestController*>
 		(gWorld->getRobot(i)->getController());
@@ -161,7 +162,10 @@ void neatestWorldObserver::updateMonitoring(){
 	}
 	
 	popsize /= gNumberOfRobots;
-	    
+	norm_basket = (double)basket / (double)gNumberOfRobots / 
+	    (double) neatestSharedData::gBasketCapacity ; 
+
+
 	if ( gVerbose )
 	    std::cout << "[gen:" 
 		      << (gWorld->getIterations()/
@@ -176,6 +180,7 @@ void neatestWorldObserver::updateMonitoring(){
 		      << ";lst"      << _pickedItems.size()
 		      << ";total:"   << gPhysicalObjects.size()
 		      << ";bskuse:"  << basket_usage
+		      << ";nbsk:"    << norm_basket
 		      << "]\n";		
 	
         // Logging
@@ -186,8 +191,12 @@ void neatestWorldObserver::updateMonitoring(){
 	    "] [popsize:" + std::to_string(popsize) +
 	    "] [col:" + std::to_string(collected) +
 	    "] [for:" + std::to_string(forraged) +
-	    "] [use:" + std::to_string(basket_usage) +
-	    "] [mis:" + std::to_string(droped) + "]\n";
+	    "] [mis:" + std::to_string(droped) +
+	    "] [bsk:" + std::to_string(basket) +
+	    "] [lst:" + std::to_string(_pickedItems.size()) +
+	    "] [tot:" + std::to_string(gPhysicalObjects.size()) +
+	    "] [use:" + std::to_string(basket_usage) + 
+	    "] [nbk:" + std::to_string(norm_basket) + "]\n";
         gLogManager->write(s);
 	gLogManager->flush();
     }
