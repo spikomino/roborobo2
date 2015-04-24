@@ -162,14 +162,13 @@ def process_experiment2(path):
        
     F=[]
     C=[]
-    Fr=[]
+    B=[]
     M=[]
     P=[]
     for f in datalogs:
-        # default 'fit'. Possible: popsize col for mis
         F.append(process_datalog(f, 'fit')) 
         C.append(process_datalog(f, 'col')) 
-        Fr.append(process_datalog(f, 'nbk')) 
+        B.append(process_datalog(f, 'nbk')) 
         M.append(process_datalog(f, 'mis')) 
         P.append(process_datalog(f, 'mis')) 
         
@@ -184,7 +183,7 @@ def process_experiment2(path):
     for f in survival:
         R.append(process_srfile(f))
 
-    return F,C,Fr,M,P,R
+    return F,C,B,M,P,R
 
 
 # draw a figure
