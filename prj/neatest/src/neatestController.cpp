@@ -48,9 +48,11 @@ neatestController::neatestController(RobotWorldModel * wm){
   _reported_missed    = 0;
   _reported_collected = 0;
   _reported_forraged  = 0.0; 
+  _reported_forraged_at_landmark = 0;
 
   _items_collected   = 0;
   _items_forraged    = 0;
+  _items_forraged_at_landmark = 0;
   _items_miss_droped = 0;
   _basket_usage      = 0.0;
 
@@ -147,12 +149,15 @@ void neatestController::reset(){
     _reported_basket_usage = _basket_usage / 
 	(double) neatestSharedData::gEvaluationTime;
 
+    _reported_forraged_at_landmark = _items_forraged_at_landmark;
+
     _fitness           = 0.0;
     _items_collected   = 0;
     _items_forraged    = 0;
     _items_miss_droped = 0;
     _locomotion        = 0.0;
     _basket_usage      = 0.0;
+    _items_forraged_at_landmark = 0;
 
     //emptyBasket();      // item dont respawn should not empty 
     emptyGenomeList();
@@ -203,10 +208,16 @@ void neatestController::dropItem(int n, bool at_nest){
     for (int i=0; i<n; i++)
 	if(!_basket.empty())
 	    _basket.pop_front();
-    if(at_nest)
+    if(at_nest){
 	_items_forraged += n;
+	// are we on a landmark nest 
+	if(gLandmarks.size() > 0 && _wm->getLandmarkDistanceValue() < 0.3)
+	    _items_forraged_at_landmark += n;
+    }
     else  
 	_items_miss_droped += n;
+    
+
 }
  
 bool neatestController::stillRoomInBasket() { 
@@ -438,7 +449,7 @@ void neatestController::stepBehaviour(){
 	std::cout << std::endl;*/
     
 
-    /* _wm->_desiredTranslationalValue = 0.0;  */
+    /* _wm->_desiredTranslationalValue = 0.0; */
     /* _wm->_desiredRotationalVelocity = 0.0; */
 
 } 

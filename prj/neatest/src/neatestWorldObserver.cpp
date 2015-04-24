@@ -143,6 +143,7 @@ void neatestWorldObserver::updateMonitoring(){
 	int collected   = 0;
 	int forraged    = 0;
 	int basket      = 0;
+	int frg_at_landmark = 0; 
 	double norm_basket =0.0;
 
 	for ( int i = 0 ; i != gNumberOfRobots ; i++ ){
@@ -159,6 +160,7 @@ void neatestWorldObserver::updateMonitoring(){
 	    forraged  += controller->getForraged();
 	    basket    += controller->getBasketSize();
 	    basket_usage += controller->getBasketUsage();
+	    frg_at_landmark  += controller->getItemsAtLandmark();
 	}
 	
 	popsize /= gNumberOfRobots;
@@ -181,6 +183,7 @@ void neatestWorldObserver::updateMonitoring(){
 		      << ";total:"   << gPhysicalObjects.size()
 		      << ";bskuse:"  << basket_usage
 		      << ";nbsk:"    << norm_basket
+		      << ";lnd:"     << frg_at_landmark
 		      << "]\n";		
 	
         // Logging
@@ -196,7 +199,8 @@ void neatestWorldObserver::updateMonitoring(){
 	    "] [lst:" + std::to_string(_pickedItems.size()) +
 	    "] [tot:" + std::to_string(gPhysicalObjects.size()) +
 	    "] [use:" + std::to_string(basket_usage) + 
-	    "] [nbk:" + std::to_string(norm_basket) + "]\n";
+	    "] [nbk:" + std::to_string(norm_basket) +
+	    "] [lnd:" + std::to_string(frg_at_landmark) + "]\n";
         gLogManager->write(s);
 	gLogManager->flush();
     }

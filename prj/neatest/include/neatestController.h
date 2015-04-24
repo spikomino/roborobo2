@@ -37,6 +37,7 @@ private:
     int            _reported_collected;
     int            _reported_forraged;
     int            _reported_basket;
+    int            _reported_forraged_at_landmark;
     double         _reported_basket_usage;
 
     double         _locomotion;        // accumulates the locomotion fitness
@@ -44,6 +45,7 @@ private:
     int            _items_forraged;    // items brought back to the nest
     int            _items_miss_droped; // item dropeed outside of nest
     double         _basket_usage;      // basket usage accumulator
+    int            _items_forraged_at_landmark ;
 
     //   int            _items_in_basket;
     std::list<int> _basket;
@@ -108,7 +110,7 @@ public:
     int          getCollected      () { return _reported_collected; }
     int          getForraged       () { return _reported_forraged; }
     int          getBasketSize     () { return _reported_basket; }
-    
+    int          getItemsAtLandmark() { return _reported_forraged_at_landmark; }
 
     bool         stillRoomInBasket () ;
     void         pickItem          (int);
