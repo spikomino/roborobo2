@@ -169,7 +169,7 @@ def process_experiment2(path):
         F.append(process_datalog(f, 'fit')) 
         C.append(process_datalog(f, 'col')) 
         B.append(process_datalog(f, 'nbk')) 
-        M.append(process_datalog(f, 'mis')) 
+        M.append(process_datalog(f, 'lnd')) 
         P.append(process_datalog(f, 'mis')) 
         
         
