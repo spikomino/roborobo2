@@ -289,7 +289,7 @@ void neatestController::stepBehaviour(){
     if (neatestSharedData::gFitnessFunction > 1){
     
 	/* read basket capacity */
-	double activation = (double) _items_collected / (double) _items_max; 
+	double activation = (double) _basket.size() / (double) _items_max; 
 	inputs[inputToUse++] = activation;
 
 	/* update the basket usage */
