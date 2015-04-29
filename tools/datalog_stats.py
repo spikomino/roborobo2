@@ -37,7 +37,7 @@ def list_srfiles(path):
 # read a datalog and extract the [fit:##.###] component
 # in  : a file name 
 # out : returns a list of fitness values. 
-def process_datalog(fname, key='fit'):
+def process_datalog(fname, key='fit', norm=0):
     d=[]
     fh = open(fname, 'r')
     for line in fh :
@@ -46,9 +46,11 @@ def process_datalog(fname, key='fit'):
             if o.startswith(key, 1, len(key)+1):
                 f = re.sub('[:\[\]]', ' ', o)
                 f = float(f.split()[1])
+                if norm != 0 :
+                    f = f/norm
                 d.append(f)
     fh.close()
-    print fname, len(d)
+    #print fname, len(d)
     return d
 
 # read the survival rate file 
@@ -58,7 +60,7 @@ def process_srfile(fname):
     for line in fh :
         d.append(float(line))
     fh.close()
-    print fname, len(d)
+    #print fname, len(d)
 
     return d
 
@@ -121,7 +123,7 @@ def perc(data_l):
   
     
     data = np.asarray(data_l)
-    print data.shape
+    #print data.shape
     median  = np.zeros(data.shape[1])
     perc_25 = np.zeros(data.shape[1])
     perc_75 = np.zeros(data.shape[1])
@@ -166,10 +168,11 @@ def process_experiment2(path):
     M=[]
     P=[]
     for f in datalogs:
+        n = int((f.split('sp_')[1]).split('/')[0])
         F.append(process_datalog(f, 'fit')) 
         C.append(process_datalog(f, 'col')) 
-        B.append(process_datalog(f, 'nbk')) 
-        M.append(process_datalog(f, 'lnd')) 
+        B.append(process_datalog(f, 'use')) 
+        M.append(process_datalog(f, 'mis')) 
         P.append(process_datalog(f, 'mis')) 
         
         
