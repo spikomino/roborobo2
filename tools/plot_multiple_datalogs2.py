@@ -18,6 +18,6 @@ for d in sys.argv[1:] :
     D.append((d,F,C,Fr,M,P,R))
 
 if len(F) == 1:
-    draw_data2(D, runs=False, tex=False)
-else:
     draw_data2(D, runs=True, tex=False)
+else:
+    draw_data2(D, runs=False, tex=False)

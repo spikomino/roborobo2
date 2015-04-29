@@ -49,6 +49,7 @@ neatestController::neatestController(RobotWorldModel * wm){
   _reported_collected = 0;
   _reported_forraged  = 0.0; 
   _reported_forraged_at_landmark = 0;
+  _reported_locomotion = 0.0;
 
   _items_collected   = 0;
   _items_forraged    = 0;
@@ -140,23 +141,24 @@ void neatestController::reset(){
     _birthdate = gWorld->getIterations();
     
     /* store for world observer (previous generation) */
-    _reported_popsize   = _glist.size(); 
-    _reported_fitness   = _fitness;
-    _reported_missed    = _items_miss_droped;
-    _reported_collected = _items_collected;
-    _reported_forraged  = _items_forraged;
-    _reported_basket    = _basket.size();
-    _reported_basket_usage = _basket_usage / 
+    _reported_popsize              = _glist.size(); 
+    _reported_fitness              = _fitness;
+    _reported_missed               = _items_miss_droped;
+    _reported_collected            = _items_collected;
+    _reported_forraged             = _items_forraged;
+    _reported_basket               = _basket.size();
+    _reported_locomotion           = _locomotion;
+    _reported_forraged_at_landmark = _items_forraged_at_landmark;
+    _reported_basket_usage         = _basket_usage / 
 	(double) neatestSharedData::gEvaluationTime;
 
-    _reported_forraged_at_landmark = _items_forraged_at_landmark;
-
-    _fitness           = 0.0;
-    _items_collected   = 0;
-    _items_forraged    = 0;
-    _items_miss_droped = 0;
-    _locomotion        = 0.0;
-    _basket_usage      = 0.0;
+    /* reset internal values */
+    _fitness                    = 0.0;
+    _items_collected            = 0;
+    _items_forraged             = 0;
+    _items_miss_droped          = 0;
+    _locomotion                 = 0.0;
+    _basket_usage               = 0.0;
     _items_forraged_at_landmark = 0;
 
     //emptyBasket();      // item dont respawn should not empty 
@@ -384,12 +386,15 @@ void neatestController::stepBehaviour(){
     }
     
     /* (5) update the fitness function */
+
+    /* store locomotion data */
+    _locomotion += (fabs(lv) + fabs(rv)) * (1.0 - sqrt(fabs(lv - rv))) * 
+	(1.0 - md) ;
+    
     switch(neatestSharedData::gFitnessFunction) {
 
     case 0: /* locomotion */
-	_locomotion += (fabs(lv) + fabs(rv)) * 
-	    (1.0 - sqrt(fabs(lv - rv))) * 
-	    (1.0 - md) ;
+
 	_fitness = _locomotion  / (double) get_lifetime();
 	break;
 

@@ -38,6 +38,7 @@ private:
     int            _reported_forraged;
     int            _reported_basket;
     int            _reported_forraged_at_landmark;
+    double         _reported_locomotion;
     double         _reported_basket_usage;
 
     double         _locomotion;        // accumulates the locomotion fitness
@@ -111,6 +112,7 @@ public:
     int          getForraged       () { return _reported_forraged; }
     int          getBasketSize     () { return _reported_basket; }
     int          getItemsAtLandmark() { return _reported_forraged_at_landmark; }
+    double       getLocomotion     () { return _reported_locomotion; }
 
     bool         stillRoomInBasket () ;
     void         pickItem          (int);
