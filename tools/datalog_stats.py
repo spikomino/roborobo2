@@ -160,33 +160,28 @@ def process_experiment(path):
 # process multiple datalogs Fitness + missed + collected + foraged 
 def process_experiment2(path):
     datalogs = list_datalogs(path)
-    survival = list_srfiles(path)
-       
+    
     F=[]
     C=[]
-    B=[]
+    U=[]
     M=[]
-    P=[]
+    L=[]
+    R=[]
     for f in datalogs:
         n = int((f.split('sp_')[1]).split('/')[0])
         F.append(process_datalog(f, 'fit')) 
         C.append(process_datalog(f, 'col')) 
-        B.append(process_datalog(f, 'use')) 
-        M.append(process_datalog(f, 'mis')) 
-        P.append(process_datalog(f, 'mis')) 
-        
+        U.append(process_datalog(f, 'use')) 
+        M.append(process_datalog(f, 'mis'))
+        L.append(process_datalog(f, 'lnd'))
+        R.append(process_datalog(f, 'mis')) 
         
     # compute the rate of col/drop
     for j in xrange(len(datalogs)):
-        for i in xrange(len(P[j])):
-            P[j][i] = P[j][i] / (C[j][i] + 1e-19)
+        for i in xrange(len(R[j])):
+            R[j][i] = R[j][i] / (C[j][i] + 1e-19)
         
-
-    R=[]
-    for f in survival:
-        R.append(process_srfile(f))
-
-    return F,C,B,M,P,R
+    return F,C,U,M,L,R
 
 
 # draw a figure
@@ -297,88 +292,36 @@ def draw_data2(exp, runs=False, tex=False):
     figure(num=None, figsize=(10, 5), dpi=100)
     clf()
 
-    
-
-    # median Fitness
     ax1 = subplot2grid((2,3), (0,0))
+    ax2 = subplot2grid((2,3), (1,0))
+    ax3 = subplot2grid((2,3), (0,1))
+    ax4 = subplot2grid((2,3), (0,2))
+    ax5 = subplot2grid((2,3), (1,1))
+    ax6 = subplot2grid((2,3), (1,2))
+
     c=0
     for e in exp:
-        (n,F,C,Fr,M,P,R) = e
+        (n,F,C,U,M,L,R) = e
         plot_one_curve(F, colors[c], ax1,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    #ax1.set_title('Median swarm fitness over time (%d runs)'%(len(F)))
-    #ax1.legend(loc='lower right')
-    ax1.set_xlabel('Generations')
-    ax1.set_ylabel('Fitness')
-
-
-    # Median Lineage survival rate
-    ax11 = subplot2grid((2,3), (1,0))
-    c=0
-    for e in exp:
-        (n,F,C,Fr,M,P,R) = e
-        plot_one_curve(R, colors[c], ax11,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    #ax11.set_title('Genetic lines over time (%d runs)'%(len(R)))
-    ax11.legend(loc='upper right')
-    ax11.set_xlabel('Generations')
-    ax11.set_ylabel('Rate of survival')  
-
-
-    # Items collected
-    print 'ax2'
-    ax2 = subplot2grid((2,3), (0,1))
-    c=0
-    for e in exp:
-        (n,F,C,Fr,M,P,R) = e
         plot_one_curve(C, colors[c], ax2,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    #ax2.set_title('Items collected over time (%d runs)'%(len(C)))
-    #ax2.legend(loc='upper right')
-    ax2.set_xlabel('Generations')
-    ax2.set_ylabel('Items collected')  
-
-
-    # Items forraged 
-    print 'ax3'
-    ax3 = subplot2grid((2,3), (0, 2))
-    c=0
-    for e in exp:
-        (n,F,C,Fr,M,P,R) = e
-        plot_one_curve(Fr, colors[c], ax3,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    #ax3.set_title('Items forraged over time (%d runs)'%(len(Fr)))
-    #ax3.legend(loc='upper right')
-    ax3.set_xlabel('Generations')
-    ax3.set_ylabel('Basket Usage') 
-
- 
-    # Items droped
-    print 'ax4'
-    ax4 = subplot2grid((2,3), (1, 1))
-    c=0
-    for e in exp:
-        (n,F,C,Fr,M,P,R) = e
+        plot_one_curve(U, colors[c], ax3,  re.sub('[_/]', '', n), runs)
         plot_one_curve(M, colors[c], ax4,  re.sub('[_/]', '', n), runs)
+        plot_one_curve(L, colors[c], ax5,  re.sub('[_/]', '', n), runs)
+        plot_one_curve(R, colors[c], ax6,  re.sub('[_/]', '', n), runs)
         c=c+1
-    #ax4.set_title('Items droped over time (%d runs)'%(len(M)))
-    # ax4.legend(loc='upper right')
-    ax4.set_xlabel('Generations')
-    ax4.set_ylabel('Items droped') 
-    
+  
 
-    # Population size
-    print 'ax5'
-    ax5 = subplot2grid((2,3), (1, 2))
-    c=0
-    for e in exp:
-        (n,F,C,Fr,M,P,R) = e
-        plot_one_curve(P, colors[c], ax5,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    #ax5.set_title('Median average population size over time(%d runs)'%(len(P)))
-    #ax5.legend(loc='upper right')
-    ax5.set_xlabel('Generations')
-    ax5.set_ylabel('Ratio missed/collected') 
+    for x in [ax1,ax2,ax3,ax4,ax5,ax6]:
+        x.set_xlabel('Generations')
+
+    ax1.set_ylabel('Fitness')
+    ax2.set_ylabel('Items collected')  
+    ax3.set_ylabel('Basket Usage') 
+    ax4.set_ylabel('Items droped') 
+    ax5.set_ylabel('Items forraged at landmark')  
+    ax6.set_ylabel('Ratio missed/collected') 
+
+    ax2.legend(loc='upper right')
 
     draw()
     show()

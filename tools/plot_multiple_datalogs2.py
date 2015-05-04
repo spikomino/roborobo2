@@ -14,8 +14,8 @@ if len(sys.argv) < 2 :
     
 D=[]
 for d in sys.argv[1:] :
-    F,C,Fr,M,P,R = process_experiment2(d)
-    D.append((d,F,C,Fr,M,P,R))
+    F,C,U,M,L,R = process_experiment2(d)
+    D.append((d,F,C,U,M,L,R))
 
 if len(F) == 1:
     draw_data2(D, runs=True, tex=False)
