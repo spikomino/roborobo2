@@ -91,7 +91,7 @@ void neatestController::initRobot (){
 
     // Foraging
     if(neatestSharedData::gFitnessFunction > 1){   
-	_nbInputs ++;                              // basket capacity sensor
+	//_nbInputs ++;                              // basket capacity sensor
 	_nbInputs += 3;                            // ground sensor 3 inputs
 	if(gLandmarks.size() > 0){
 	    _nbInputs ++;                          // landmark direction
