@@ -292,7 +292,7 @@ void neatestController::stepBehaviour(){
     
 	/* read basket capacity */
 	double activation = (double) _basket.size() / (double) _items_max; 
-	inputs[inputToUse++] = activation;
+	//inputs[inputToUse++] = activation;
 
 	/* update the basket usage */
 	_basket_usage += activation;
