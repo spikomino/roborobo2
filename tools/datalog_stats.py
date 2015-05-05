@@ -169,11 +169,11 @@ def process_experiment2(path):
     R=[]
     for f in datalogs:
         n = int((f.split('sp_')[1]).split('/')[0])
-        F.append(process_datalog(f, 'fit')) 
+        F.append(process_datalog(f, 'for')) 
         C.append(process_datalog(f, 'col')) 
         U.append(process_datalog(f, 'use')) 
         M.append(process_datalog(f, 'mis'))
-        L.append(process_datalog(f, 'lnd'))
+        L.append(process_datalog(f, 'loc'))
         R.append(process_datalog(f, 'mis')) 
         
     # compute the rate of col/drop
