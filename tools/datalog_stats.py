@@ -72,14 +72,14 @@ def ave_accu_sf(data, cut=0.25):
         result.append(average(d[-gen:]))
     return result
 
-def fix_budg_sf(data, cut=0.8):
+def fix_budg_sf(data, cut=0.75):
     gen = int(cut * len(data[0])) 
     result=[]
     for d in data:
         result.append(d[gen])
     return result
 
-def time_reach_target(data, pers=0.75):
+def time_reach_target(data, pers=0.50):
     max_l=[]
     for d in data:
         max_l.append(max(d))
@@ -96,9 +96,32 @@ def acc_above_target(data, trg_gen):
     result=[]
     g=0
     for d in data :
-        result.append( sum(d[trg_gen[g]-1:]) )
+        trg_fit = d[trg_gen[g]] # target fitness for this run
+        s = 0.0
+        for t in xrange(trg_gen[g], len(d)): # sum of above (+) an below (-)
+            s = s + (d[t] - trg_fit)
+        result.append(s)
         g +=1
     return result
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def stat_test(x,y, ks=False):
     if ks:
@@ -143,7 +166,7 @@ def process_experiment(path):
     D=[]
     for f in datalogs:
         # default 'fit'. Possible: popsize col for mis
-        D.append(process_datalog(f, 'fit')) 
+        D.append(process_datalog(f, 'for')) 
 
     R=[]
     for f in survival:
@@ -233,7 +256,8 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
         # and 4 caps to remove
         for c in bp['caps']:
             c.set_linewidth(0)
-
+    
+    # fill the boxes 
     for i in range(len(bp['boxes'])):
         box = bp['boxes'][i]
         box.set_linewidth(0)
@@ -248,6 +272,15 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
 
 
     
+ 
+
+    # stat test 
+    if sig :
+        for i in xrange(len(stats)) :
+            for j in xrange(i+1,len(stats)) :
+                draw_stars(stats[i], stats[j], axis)
+               
+
     axis.set_xticklabels(labels)
     axis.spines['top'].set_visible(False)
     axis.spines['right'].set_visible(False)
@@ -258,25 +291,27 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
     axis.tick_params(axis='y', length=0)
     axis.grid(axis='y', color="0.9", linestyle='-', linewidth=1)
     axis.set_axisbelow(True)
+   
 
 
-    # stat test 
-    if sig :
-        for i in xrange(len(stats)) :
-            for j in xrange(i+1,len(stats)) :
-                y_max = max(concatenate((stats[i], stats[j])))
-                y_min = min(concatenate((stats[i], stats[j])))
-                z,p = stat_test(stats[i], stats[j])
 
-                axis.annotate("", xy=(i+1, y_max), xycoords='data',
-                             xytext=(j+1, y_max), textcoords='data',
-                             arrowprops=dict(arrowstyle="-", ec='#aaaaaa',
-                                             connectionstyle="bar,fraction=0.1"))
-                axis.text((j-i)/2.0 + j, y_max + abs(y_max - y_min)*0.1, stars(p*2.0),
-                         horizontalalignment='center',
-                         verticalalignment='center')
+def draw_stars(d1, d2, ax):
+
+    y_max = max(concatenate((d1, d2)))
+    y_min = min(concatenate((d1, d2)))
+    print y_max
+    z,p = stat_test(d1, d2)
+
+    ax.annotate("", 
+                xy=(1, y_max),     xycoords='data',
+                xytext=(2, y_max), textcoords='data',
+                arrowprops=dict(arrowstyle="-", ec='#aaaaaa',
+                                connectionstyle="bar,fraction=0.2"))
+
+    ax.text(1.5, y_max + abs(y_max - y_min)*0.2, stars(p*2.0),
+            horizontalalignment='center',
+            verticalalignment='center')
                 
-         
 
 
 # designed for foraging experiements
@@ -329,7 +364,7 @@ def draw_data2(exp, runs=False, tex=False):
 
 
 
-def draw_data(exp, runs=False, tex=False): 
+def draw_data(exp, runs=False, tex=False, sig=False): 
     font = {'family' : 'serif', 'size'   : 10}
     if tex :
         matplotlib.rc('text', usetex=True)
@@ -343,80 +378,51 @@ def draw_data(exp, runs=False, tex=False):
 
     # median Fitness
     ax1 = subplot2grid((2,3), (0,0))
+    ax2 = subplot2grid((2,3), (1,0))
+    ax3 = subplot2grid((2,3), (0,1))
+    ax4 = subplot2grid((2,3), (0,2))
+    ax5 = subplot2grid((2,3), (1,1))
+    ax6 = subplot2grid((2,3), (1,2))
+
+
     c=0
     for e in exp:
-        (n, data, stats, survival) = e
-        plot_one_curve(data, colors[c], ax1,  re.sub('[_/]', '', n), runs)
+        (n, d, s, r) = e  = e
+        plot_one_curve(d, colors[c], ax1,  re.sub('[_/]', '', n), runs)
+        plot_one_curve(r, colors[c], ax2,  re.sub('[_/]', '', n), runs)
         c=c+1
-    ax1.set_title('Median swarm fitness over time (%d runs)'%(len(data)))
-    ax1.legend(loc='lower right')
+     
+    
     ax1.set_xlabel('Generations')
+    ax2.set_xlabel('Generations')
+
     ax1.set_ylabel('Fitness')   
+    ax2.set_ylabel('Rate of survival')  
 
-    # Median Lineage survival rate
-    ax11 = subplot2grid((2,3), (1,0))
-    c=0
-    for e in exp:
-        (n, data, stats, survival) = e
-        plot_one_curve(survival, colors[c], ax11,  re.sub('[_/]', '', n), runs)
-        c=c+1
-    ax11.set_title('Genetic lines over time (%d runs)'%(len(data)))
-    ax11.legend(loc='upper right')
-    ax11.set_xlabel('Generations')
-    ax11.set_ylabel('Rate of survival')  
-
-
-    # average accumulated swarm fitness
-    print 'ax2'
-    ax2 = subplot2grid((2,3), (0,1))
-    stats=[]
-    l=[]
+    aasf=[]
+    fbsf=[]
+    trt=[]
+    aat=[]
+    lbl=[]
     for e in exp:
         (n, d, s, r) = e 
-        stats.append(s['aasf']) 
-        l.append(re.sub('[_/]', '', n))
-       
-    plot_boxplot(stats, colors, ax2, l, sig=False)
-    ax2.set_title('Average accumulated swarm fitness')
-    
+        aasf.append(s['aasf']) 
+        fbsf.append(s['fbsf']) 
+        trt.append(s['trt'])
+        aat.append(s['aat'])
+        lbl.append(re.sub('[_/]', '', n))
 
-    # Fix budget swarm fitness
-    print 'ax3'
-    ax3 = subplot2grid((2,3), (0, 2))
-    stats=[]
-    l=[]
-    for e in exp:
-        (n, d, s, r) = e
-        stats.append(s['fbsf']) 
-        l.append(re.sub('[_/]', '', n))
-    plot_boxplot(stats, colors, ax3, l, sig=False)
-    ax3.set_title('Fixed budget swarm fitness')
-    
+    plot_boxplot(aasf, colors, ax3, lbl, sig)
+    plot_boxplot(fbsf, colors, ax4, lbl, sig)
+    plot_boxplot(trt,  colors, ax5, lbl, sig)
+    plot_boxplot(aat,  colors, ax6, lbl, sig)
 
-    # Time to reach target
-    print 'ax4'
-    ax4 = subplot2grid((2,3), (1, 1))
-    stats=[]
-    l=[]
-    for e in exp:
-        (n, d, s, r) = e
-        stats.append(s['trt']) 
-        l.append(re.sub('[_/]', '', n))
-    plot_boxplot(stats, colors, ax4, l, sig=False)
-    ax4.set_title('Time to reach target')
+    ax3.set_title('Average accumulated swarm fitness')
+    ax4.set_title('Fixed budget swarm fitness')
+    ax5.set_title('Time to reach target')
+    ax6.set_title('Accumulated fitness above target')
 
-    # accumulated fitness above target
-    print 'ax5'
-    ax5 = subplot2grid((2,3), (1, 2))
-    stats=[]
-    l=[]
-    for e in exp:
-        (n, d, s, r) = e
-        stats.append(s['aat']) 
-        l.append(re.sub('[_/]', '', n))
-    plot_boxplot(stats, colors, ax5, l, sig=False)
-    ax5.set_title('Accumulated fitness above target')
-    
+  
 
     draw()
     show()
