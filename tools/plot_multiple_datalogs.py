@@ -15,7 +15,9 @@ if len(sys.argv) < 2 :
 
 D=[]
 for d in sys.argv[1:] :
-    data, stats, survival = process_experiment(d)
-    D.append((d, data, stats, survival))
+    data, survival = process_experiment(d)
+    D.append((d, data, survival))
         
-draw_data(D, runs=False, tex=False, sig=True)
+stats = compute_stats(D)
+
+draw_data(D,stats, runs=False, tex=False, sig=True)

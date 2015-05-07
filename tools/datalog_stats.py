@@ -79,11 +79,8 @@ def fix_budg_sf(data, cut=0.75):
         result.append(d[gen])
     return result
 
-def time_reach_target(data, pers=0.50):
-    max_l=[]
-    for d in data:
-        max_l.append(max(d))
-    target = pers*max(max_l)
+def time_reach_target(data, max_v, pers=0.75):
+    target = pers * max_v
     result=[]
     for d in data:
         for g in xrange(len(d)):
@@ -91,6 +88,7 @@ def time_reach_target(data, pers=0.50):
                 break
         result.append(g)
     return result
+
 
 def acc_above_target(data, trg_gen):
     result=[]
@@ -142,9 +140,6 @@ def stars(p):
        return "-"
 
 def perc(data_l):
-    
-  
-    
     data = np.asarray(data_l)
     #print data.shape
     median  = np.zeros(data.shape[1])
@@ -171,14 +166,40 @@ def process_experiment(path):
     R=[]
     for f in survival:
         R.append(process_srfile(f))
+    
+    return D, R
 
-    S = {} 
-    S['aasf'] = ave_accu_sf(D)
-    S['fbsf'] = fix_budg_sf(D)
-    S['trt']  = time_reach_target(D)
-    S['aat']  = acc_above_target(D, S['trt']) 
+def max_list_of_list(L):
+    max_l = []
+    for l in L:
+        max_l.append(max(l))
+    return max(max_l)
 
-    return D,S,R
+def compute_stats(D):
+
+    # find the max value over all data needed for trt below
+    (n, data, survival) = D[0]
+    max_fit = max_list_of_list(data)
+    print max_fit
+    for d in D[1:] :
+        (n, data, survival) = d
+        cur_max = max_list_of_list(data)
+        print cur_max
+        if max_fit < cur_max : 
+            max_fit = cur_max # max over all stats
+
+    S=[]
+    for d in D :
+        (n, data, survival) = d
+        s = {} 
+        s['aasf'] = ave_accu_sf(data)
+        s['fbsf'] = fix_budg_sf(data)
+        s['trt']  = time_reach_target(data, max_fit)
+        s['aat']  = acc_above_target(data, s['trt']) 
+        print s['trt']
+        S.append(s)
+
+    return S
 
 # process multiple datalogs Fitness + missed + collected + foraged 
 def process_experiment2(path):
@@ -234,6 +255,15 @@ def plot_one_curve(data, color, axis, label, quartiles=False):
 
 def plot_boxplot(stats, colors, axis, labels, sig=False):
     
+    y_max = max(stats[0])
+    y_min = min(stats[0])
+    for s in stats :
+        if y_max < max(s) : y_max = max(s)
+        if y_min > min(s) : y_min = min(s)
+   
+    pad=abs(y_max-y_min)*0.4
+    axis.set_ylim([y_min-pad, y_max+pad])
+
     bp = axis.boxplot(stats)
     
     for i in range(0, len(bp['boxes'])):
@@ -278,9 +308,9 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
     if sig :
         for i in xrange(len(stats)) :
             for j in xrange(i+1,len(stats)) :
-                draw_stars(stats[i], stats[j], axis)
+                draw_stars(stats[i], stats[j], axis, i, j)
                
-
+    # fix the figure 
     axis.set_xticklabels(labels)
     axis.spines['top'].set_visible(False)
     axis.spines['right'].set_visible(False)
@@ -295,20 +325,19 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
 
 
 
-def draw_stars(d1, d2, ax):
+def draw_stars(d1, d2, ax, i, j):
 
     y_max = max(concatenate((d1, d2)))
     y_min = min(concatenate((d1, d2)))
-    print y_max
     z,p = stat_test(d1, d2)
 
     ax.annotate("", 
-                xy=(1, y_max),     xycoords='data',
-                xytext=(2, y_max), textcoords='data',
+                xy=(i+1, y_max),     xycoords='data',
+                xytext=(j+1, y_max), textcoords='data',
                 arrowprops=dict(arrowstyle="-", ec='#aaaaaa',
                                 connectionstyle="bar,fraction=0.2"))
 
-    ax.text(1.5, y_max + abs(y_max - y_min)*0.2, stars(p*2.0),
+    ax.text((j-i)+0.5, y_max + abs(y_max - y_min)*0.3, stars(p*2.0),
             horizontalalignment='center',
             verticalalignment='center')
                 
@@ -364,7 +393,7 @@ def draw_data2(exp, runs=False, tex=False):
 
 
 
-def draw_data(exp, runs=False, tex=False, sig=False): 
+def draw_data(exp, stats, runs=False, tex=False, sig=False): 
     font = {'family' : 'serif', 'size'   : 10}
     if tex :
         matplotlib.rc('text', usetex=True)
@@ -387,7 +416,7 @@ def draw_data(exp, runs=False, tex=False, sig=False):
 
     c=0
     for e in exp:
-        (n, d, s, r) = e  = e
+        (n, d, r) = e  
         plot_one_curve(d, colors[c], ax1,  re.sub('[_/]', '', n), runs)
         plot_one_curve(r, colors[c], ax2,  re.sub('[_/]', '', n), runs)
         c=c+1
@@ -404,8 +433,7 @@ def draw_data(exp, runs=False, tex=False, sig=False):
     trt=[]
     aat=[]
     lbl=[]
-    for e in exp:
-        (n, d, s, r) = e 
+    for s in stats:
         aasf.append(s['aasf']) 
         fbsf.append(s['fbsf']) 
         trt.append(s['trt'])
