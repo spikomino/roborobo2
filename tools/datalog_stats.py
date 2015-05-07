@@ -79,7 +79,7 @@ def fix_budg_sf(data, cut=0.75):
         result.append(d[gen])
     return result
 
-def time_reach_target(data, max_v, pers=0.75):
+def time_reach_target(data, max_v, pers=0.50):
     target = pers * max_v
     result=[]
     for d in data:
@@ -161,7 +161,7 @@ def process_experiment(path):
     D=[]
     for f in datalogs:
         # default 'fit'. Possible: popsize col for mis
-        D.append(process_datalog(f, 'for')) 
+        D.append(process_datalog(f, 'col')) 
 
     R=[]
     for f in survival:
@@ -265,8 +265,9 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
     axis.set_ylim([y_min-pad, y_max+pad])
 
     bp = axis.boxplot(stats)
+
     
-    for i in range(0, len(bp['boxes'])):
+    for i in range(0, len(bp['boxes'])) :
         bp['boxes'][i].set_color(colors[i])
         # we have two whiskers!
         bp['whiskers'][i*2].set_color(colors[i])
@@ -275,17 +276,20 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
         bp['whiskers'][i*2 + 1].set_linewidth(2)
         # top and bottom fliers
         # (set allows us to set many parameters at once)
-        bp['fliers'][i * 2].set(markerfacecolor=colors[i],
-                                marker='o', alpha=0.75, markersize=6,
-                                markeredgecolor='none')
-        bp['fliers'][i * 2 + 1].set(markerfacecolor=colors[i],
-                                    marker='o', alpha=0.75, markersize=6,
-                                    markeredgecolor='none')
+
+        print i,len( bp['fliers'])
+        if len(bp['fliers']) > 2*i : # hack for when flatbox
+            bp['fliers'][i*2].set(markerfacecolor=colors[i],
+                                  marker='o', alpha=0.75, markersize=6,
+                                  markeredgecolor='none')
+            bp['fliers'][i*2 + 1].set(markerfacecolor=colors[i],
+                                      marker='o', alpha=0.75, markersize=6,
+                                      markeredgecolor='none')
         bp['medians'][i].set_color('black')
         bp['medians'][i].set_linewidth(3)
         # and 4 caps to remove
         for c in bp['caps']:
-            c.set_linewidth(0)
+            c.set_linewidth(1)
     
     # fill the boxes 
     for i in range(len(bp['boxes'])):
@@ -293,7 +297,7 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
         box.set_linewidth(0)
         boxX = []
         boxY = []
-        for j in range(5):
+        for j in range(5) :
             boxX.append(box.get_xdata()[j])
             boxY.append(box.get_ydata()[j])
             boxCoords = zip(boxX,boxY)
