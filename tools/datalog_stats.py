@@ -79,7 +79,7 @@ def fix_budg_sf(data, cut=0.75):
         result.append(d[gen])
     return result
 
-def time_reach_target(data, max_v, pers=0.50):
+def time_reach_target(data, max_v, pers=0.75):
     target = pers * max_v
     result=[]
     for d in data:
@@ -90,16 +90,15 @@ def time_reach_target(data, max_v, pers=0.50):
     return result
 
 
-def acc_above_target(data, trg_gen):
+def acc_above_target(data, max_v, pers=0.75):
+    target = pers * max_v
     result=[]
-    g=0
     for d in data :
-        trg_fit = d[trg_gen[g]] # target fitness for this run
         s = 0.0
-        for t in xrange(trg_gen[g], len(d)): # sum of above (+) an below (-)
-            s = s + (d[t] - trg_fit)
+        for g in xrange(len(d)):
+            if d[g] >= target :
+                s = s + (d[g] - target)
         result.append(s)
-        g +=1
     return result
 
 
@@ -161,7 +160,7 @@ def process_experiment(path):
     D=[]
     for f in datalogs:
         # default 'fit'. Possible: popsize col for mis
-        D.append(process_datalog(f, 'col')) 
+        D.append(process_datalog(f, 'for')) 
 
     R=[]
     for f in survival:
@@ -180,11 +179,11 @@ def compute_stats(D):
     # find the max value over all data needed for trt below
     (n, data, survival) = D[0]
     max_fit = max_list_of_list(data)
-    print max_fit
+    #print max_fit
     for d in D[1:] :
         (n, data, survival) = d
         cur_max = max_list_of_list(data)
-        print cur_max
+        #print cur_max
         if max_fit < cur_max : 
             max_fit = cur_max # max over all stats
 
@@ -195,8 +194,7 @@ def compute_stats(D):
         s['aasf'] = ave_accu_sf(data)
         s['fbsf'] = fix_budg_sf(data)
         s['trt']  = time_reach_target(data, max_fit)
-        s['aat']  = acc_above_target(data, s['trt']) 
-        print s['trt']
+        s['aat']  = acc_above_target (data, max_fit) 
         S.append(s)
 
     return S
@@ -277,7 +275,7 @@ def plot_boxplot(stats, colors, axis, labels, sig=False):
         # top and bottom fliers
         # (set allows us to set many parameters at once)
 
-        print i,len( bp['fliers'])
+        
         if len(bp['fliers']) > 2*i : # hack for when flatbox
             bp['fliers'][i*2].set(markerfacecolor=colors[i],
                                   marker='o', alpha=0.75, markersize=6,
@@ -442,6 +440,7 @@ def draw_data(exp, stats, runs=False, tex=False, sig=False):
         fbsf.append(s['fbsf']) 
         trt.append(s['trt'])
         aat.append(s['aat'])
+
         lbl.append(re.sub('[_/]', '', n))
 
     plot_boxplot(aasf, colors, ax3, lbl, sig)
