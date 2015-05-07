@@ -30,8 +30,8 @@ parameters={
     'gEvaluationTime': 1000,
     'gMaxIt'         : 300000,
     'gPaintFloorIteration' : 200000,
-    'gSelectionPressure': 0.0,
-    'gPaintFloor'    : 'true',
+    'gSelectionPressure': 1.0,
+    'gPaintFloor'    : 'false',
     'gHidePicked'    : 'true', 
     'gBatchMode'     : 'true'}
 
