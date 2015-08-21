@@ -9,6 +9,8 @@
 #include <neuralnetworks/NeuralNetwork.h>
 #include <sstream>
 #include <math.h>
+#include <iostream>
+#include <fstream>
 
 using namespace Neural;
 
@@ -128,3 +130,72 @@ MLP* MLP::clone() const {
 	return new MLP(*this);
 }
 
+void MLP::saveFile(int id, std::string& fname) {
+    
+
+    std::ofstream ofile;
+
+    ofile.open(fname);
+
+    unsigned int weightsIndice = 0;
+    unsigned int source_off    = 1;
+    unsigned int target_off    = 1;
+
+    
+
+    ofile << "genomestart " << id << std::endl;
+
+    for(unsigned int k = 0; k < _nbNeuronsPerLayer.size() - 1; k++) {
+		
+	target_off += _nbNeuronsPerLayer[k];
+	
+	unsigned int const nbInputs =  _nbNeuronsPerLayer[k];
+	unsigned int const nbOutputs = _nbNeuronsPerLayer[k + 1];
+	
+	/* k -> k+1 */
+	for(unsigned int i=0; i < nbInputs; i++) {
+	    
+	    int n1 = source_off + i;
+	    if(k == 0)
+		ofile << "node " <<  n1 << " 0 1 1" << std::endl;
+	    else
+		ofile << "node " <<  n1 << " 0 1 0" << std::endl;
+
+	    for(unsigned int j = 0; j < nbOutputs; j++) {
+		int n2 = target_off + j ;
+		if(_activeBiais && (k==0 || !_onlyUseBiaisForFirstHiddenLayer))
+		    n2++;
+		
+		// gene 1 1 14 2.94319 0 1 0 1
+		// trait, n1, n2, w, recur, inov, mut_num, enabled 
+		ofile << "gene 1 " << n1 << " " << n2 << " "
+		      <<   _weights[weightsIndice++] 
+		      << " 0 1 0 1" << std::endl;
+	    }
+	}
+	source_off += nbInputs;
+
+	// bias -> k+1
+	if(_activeBiais && (k==0 || !_onlyUseBiaisForFirstHiddenLayer)){
+	    int n1 = source_off  ;
+	    ofile << "node " << n1 << " 0 1 3" << std::endl;
+
+	    for(unsigned int j = 0; j < nbOutputs; j++){
+		int n2 = target_off + j +1;
+
+		ofile << "gene 1 " << n1 << " " <<n2 << " "
+			  <<   _weights[weightsIndice++]
+			  << " 0 1 0 1" << std::endl;
+	    }
+	    source_off++;
+	    target_off++;
+	}
+    }
+    
+    for (unsigned int i = 0; i < _nbOutputs; i++)
+	ofile << "node " <<  source_off++ << " 0 1 2" << std::endl;
+    
+    ofile << "genomeend " << id << std::endl;
+
+    ofile.close();
+}

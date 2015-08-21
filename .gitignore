@@ -7,4 +7,5 @@ Makefile.modular
 roborobo
 logs
 plots
-
+tools/test
+*.pyc

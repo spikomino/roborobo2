@@ -157,7 +157,7 @@ namespace Neural {
 			 * Do all neural computations
 			 */
 			virtual void step() = 0;
-
+			virtual void saveFile(int, std::string&) = 0;
 
 			// -+-+-  Operators Overloads  -+-+- //
 

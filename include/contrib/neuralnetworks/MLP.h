@@ -63,6 +63,9 @@ namespace Neural {
 			 */
 			static std::string getNNTypeName();
 
+
+			virtual void saveFile(int, std::string&);
+
 	};
 
 }
