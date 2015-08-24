@@ -10,14 +10,21 @@
 #include "RoboroboMain/roborobo.h"
 
 #include "Observers/WorldObserver.h"
+#include "esMedea/include/esMedeaSharedData.h"
+
+#include <list>
 
 class esMedeaWorldObserver : public WorldObserver{
 
 private: 
-     
+
+    std::list<int> _pickedItems;
+
     int _lifeIterationCount;
     int _generationCount;
 
+    void updateMonitoring();
+    void updateEnvironment();
 
 protected:
 

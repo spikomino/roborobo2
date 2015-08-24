@@ -25,6 +25,12 @@ esMedeaController::esMedeaController( RobotWorldModel * __wm ) {
     _iteration  = 0;
     _generation = 0;
     _wm->setAlive(true);
+    _wm->setRobotLED_colorValues(255, 0, 0);
+    _wm->_desiredTranslationalValue = 0.0; 
+    _wm->_desiredRotationalVelocity = 0.0; 
+
+    if ( gEnergyLevel ) _wm->setEnergyLevel(gEnergyInit);
+   
 
     init();
 
@@ -42,10 +48,7 @@ void esMedeaController::reset(){
 
 void esMedeaController::step(){
     _iteration++;
-    
-    _wm->_desiredTranslationalValue = 0.0; 
-    _wm->_desiredRotationalVelocity = 0.0; 
- 
+      
     stepBehaviour(); 
 
     if( lifeTimeOver() ) {
@@ -66,11 +69,23 @@ void esMedeaController::step(){
  *
  */
 void esMedeaController::stepBehaviour(){
+    _wm->_desiredTranslationalValue = 0.0; 
+    _wm->_desiredRotationalVelocity = 0.0; 
+
+
     if( _wm->isAlive() ) {
 	readInputs();
 	writeOutput();
 	updateFitness();
 	broadcast();
+    }
+
+    if( esMedeaSharedData::gExtendedVerbose ){
+	printGenome();
+	printSensors();
+	printOutputs();
+	printBasket();
+        printPopulation();
     }
 }
 
@@ -154,6 +169,7 @@ void esMedeaController::updateMeasures(){
     _reported_items_forraged             = _items_forraged;   
     _reported_items_miss_droped          = _items_miss_droped;
     _reported_items_forraged_at_landmark = _items_forraged_at_landmark;
+    _reported_basket_size                =  _basket.size();
     _reported_basket_usage               = _basket_usage / 
 	(double) esMedeaSharedData::gEvaluationTime;
 }
@@ -174,6 +190,8 @@ void esMedeaController::resetMeasures(){
  *
  * 1 - compute number of inputs and outputs of the NN depending on the problem
  * 2 - create the sensor vector 
+ * 3 - create the NN controller 
+ * 4 - create a random genome
  *
  */
 
@@ -181,8 +199,7 @@ void esMedeaController::init(){
     // 1 - setup the number of input and outputs
 
     // Locomotion
-    _nbInputs = 1;		                   // bias 
-    _nbInputs += _wm->_cameraSensorsNb;	           // proximity sensors
+    _nbInputs = _wm->_cameraSensorsNb;	           // proximity sensors
 
     // Collection 
     if(esMedeaSharedData::gFitnessFunction > 0)   
@@ -218,8 +235,6 @@ void esMedeaController::init(){
 
     // 4 - create a random genome
     randomGenome();
-    _birthdate = _iteration;
-    
 }
 
 
@@ -240,7 +255,7 @@ void esMedeaController::readInputs(){
     for(int i = 0; i < _wm->_cameraSensorsNb; i++)
 	(*_sensors)[inputToUse++] = 1.0 - (
 	    _wm->getDistanceValueFromCameraSensor (i) /
-	    _wm->getCameraSensorMaximumDistanceValue (i));
+	    _wm->getCameraSensorMaximumDistanceValue (i));              // [0,1]
        
     /* Collecting / Foraging */
     if(esMedeaSharedData::gFitnessFunction > 0)
@@ -252,7 +267,7 @@ void esMedeaController::readInputs(){
 	    /* if physical object, and of correct type */
 	    if(PhysicalObject::isInstanceOf(objectId)){
 		if(isEnergyItem(objectId))
-		    (*_sensors)[inputToUse] = 1.0;  
+		    (*_sensors)[inputToUse] = 1.0;                      // {0,1}
 		else
 		    (*_sensors)[inputToUse] = 0.0;
 		inputToUse++;
@@ -265,28 +280,29 @@ void esMedeaController::readInputs(){
     /* Forraging */
     if (esMedeaSharedData::gFitnessFunction > 1){
     
-	/* read basket capacity */
-	double activation = (double) _basket.size() / (double) _items_max; 
+	/* read basket capacity  [0, 1] */
+	double activation = (double) _basket.size()/
+	    (double) esMedeaSharedData::gBasketCapacity;                // [0,1]
 	(*_sensors)[inputToUse++] = activation;
 
 	/* update the basket usage */
 	_basket_usage += activation;
 
-	/* ground sensor */
+	/* ground sensor [0, 1] */
 	double r = (double)_wm->getGroundSensor_redValue()  / 255.0;
 	double g = (double)_wm->getGroundSensor_greenValue()/ 255.0;
 	double b = (double)_wm->getGroundSensor_blueValue() / 255.0;
 	
-	// make all the floor as nest 
+	/* make all the floor as nest depending on experiment */
 	if (esMedeaSharedData::gPaintFloor &&  
 	    gWorld->getIterations() > esMedeaSharedData::gPaintFloorIteration) {
 	    r = 0.0;
 	    g = 1.0;
 	    b = 0.0;
 	}
-	(*_sensors)[inputToUse++] = r;
-	(*_sensors)[inputToUse++] = g;
-	(*_sensors)[inputToUse++] = b;
+	(*_sensors)[inputToUse++] = r;                                  // [0,1]
+	(*_sensors)[inputToUse++] = g;                                  // [0,1]
+	(*_sensors)[inputToUse++] = b;                                  // [0,1]
 
 	/* landmark sensors */
 	if(gLandmarks.size() > 0){
@@ -297,10 +313,7 @@ void esMedeaController::readInputs(){
 	    (*_sensors)[inputToUse++] = landmark_dis;
 	}
     }
-    
-    /* bias node : neat put biases after sensors */
-    (*_sensors)[inputToUse++] = 1.0; 
-
+        
     assert (inputToUse == _nbInputs);
 }
 
@@ -590,7 +603,7 @@ bool esMedeaController::stillRoomInBasket() {
 
     /* forraging => fixed capacity basket */
     if (esMedeaSharedData::gFitnessFunction > 1)
-	return _items_max > _basket.size();
+	return esMedeaSharedData::gBasketCapacity > (int) _basket.size();
     /* collection no limit */
     return true;
 }
@@ -627,7 +640,9 @@ void esMedeaController::randomGenome(){
     for ( unsigned int i = 0 ; i != nbGene ; i++ )
         _genome.push_back(
 	    (double)(rand() % esMedeaSharedData::gNeuronWeightRange) /
-	    (esMedeaSharedData::gNeuronWeightRange/2)-1.0); 	
+	    (esMedeaSharedData::gNeuronWeightRange/2)-1.0);
+
+    _birthdate = _iteration;
 }
 
 void esMedeaController::printRobot(){
@@ -652,4 +667,56 @@ void esMedeaController::printRobot(){
 	      << " bsk=" << _basket.size()
 	      << " usg=" << _basket_usage
 	      << " ]\n";
+}
+
+
+void esMedeaController::printGenome(){
+    std::cout << "[genome: id " <<  _wm->getId() 
+	      << ": " ;
+   
+    for (const auto& g : _genome)
+	std::cout << g << ", " ; 
+
+    std::cout << "]" << std::endl;
+}
+
+void esMedeaController::printSensors(){
+    std::cout << "[sensors: id " <<  _wm->getId() 
+	      << ": " ;
+   
+    for (const auto& g : *_sensors)
+	std::cout << g << ", " ; 
+
+    std::cout << "]" << std::endl;
+}
+
+void esMedeaController::printOutputs(){
+    std::cout << "[outputs: id " <<  _wm->getId() 
+	      << ": " ;
+   
+    for (const auto& g : _outputs)
+	std::cout << g << ", " ; 
+
+    std::cout << "]" << std::endl;
+}
+
+void esMedeaController::printBasket(){
+    std::cout << "[Basket: id " <<  _wm->getId() 
+	      << ": " ;
+   
+    for (const auto& g : _basket)
+	std::cout << g << ", " ; 
+
+    std::cout << "]" << std::endl;
+}
+
+void esMedeaController::printPopulation(){
+    std::cout << "[population id " <<  _wm->getId() 
+	      << ": " ;
+
+    std::map<int, message>::iterator it;
+    for (it=_population.begin() ; it != _population.end(); it++)
+	std::cout << it->first  << ", " ; 
+	
+	std::cout << "]" << std::endl;
 }

@@ -25,30 +25,22 @@ private:
     int    _generation;
 
     /* genome */
-    int    _birthdate; // evaluation when this controller was initialized.
-    double _fitness;
-    double _sigma; 
-    
-    double _reported_fitness;
-    double _reported_sigma; 
-    
     std::vector<double>     _genome;
     std::map<int, message>  _population;
     void emptyPopulation();
 
-
     /* neurocontroller */
     std::string      _nnType;
-    std::vector<int> _nbHiddenNeuronsPerLayer;
-    std::vector<int> _nbBiaisNeuronsPerLayer;
+    //std::vector<int> _nbHiddenNeuronsPerLayer;
+    //std::vector<int> _nbBiaisNeuronsPerLayer;
     Neural::NeuralNetwork* _nn;
     
-    double _minValue;
-    double _maxValue;
-    unsigned int _nbInputs;
-    unsigned int _nbOutputs;
-    unsigned int _nbHiddenLayers;
-    std::vector<unsigned int>* _nbNeuronsPerHiddenLayer;
+    double                      _minValue;
+    double                      _maxValue;
+    unsigned int                _nbInputs;
+    unsigned int                _nbOutputs;
+    unsigned int                _nbHiddenLayers;
+    std::vector<unsigned int>*  _nbNeuronsPerHiddenLayer;
     
     std::vector<double> *_sensors;
     std::vector<double>  _outputs;
@@ -57,12 +49,15 @@ private:
 
     /* effectors and sensors */
     std::list<int> _basket;
-    unsigned int   _items_max;        // basket capacity 
     
 
 
     /* various counters for diferent fitness measures */
     
+    int    _birthdate; // evaluation when this controller was initialized.
+    double _fitness;
+    double _sigma; 
+
     double _locomotion;        // accumulates the locomotion fitness
     int    _items_collected;   // items collected 
     int    _items_forraged;    // items brought back to the nest
@@ -71,14 +66,18 @@ private:
     double _basket_usage;      // basket usage accumulator
   
     double _reported_locomotion;       
+
     int    _reported_items_collected;  
     int    _reported_items_forraged;   
     int    _reported_items_miss_droped;
     int    _reported_items_forraged_at_landmark ;
-    double _reported_basket_usage;
-    
-    
 
+    double _reported_basket_usage;
+    int    _reported_basket_size;
+
+    double _reported_fitness;
+    double _reported_sigma; 
+    int    _reported_popsize;
     
     void init  (); 
 
@@ -109,10 +108,10 @@ private:
     
     void randomGenome();
 
-    void pickItem(int);
+   
     void dropItem(int, bool);
     void emptyBasket();
-    bool stillRoomInBasket();
+    
 
     bool isEnergyItem(int);
     int  getLifetime();
@@ -121,7 +120,11 @@ private:
     void reset(); /* called every generation */
     
     void printRobot();
-
+    void printGenome();
+    void printSensors();
+    void printOutputs();
+    void printBasket();
+    void printPopulation();
 public:
     
     esMedeaController   ( RobotWorldModel *__wm );
@@ -134,6 +137,21 @@ public:
 
     int          getId             () { return _wm->getId(); }
 
+
+    double getFitness        () { return _reported_fitness; }
+    double getPopsize        () { return _reported_popsize; }
+    double getBasketUsage    () { return _reported_basket_usage; }
+    int    getBasketSize     () { return _reported_basket_size; }
+    int    getMisseDroped    () { return _reported_items_miss_droped; }
+    int    getCollected      () { return _reported_items_collected; }
+    int    getForraged       () { return _reported_items_forraged; }
+    int    getItemsAtLandmark() { return _reported_items_forraged_at_landmark; }
+    double getLocomotion     () { return _reported_locomotion; }
+
+
+    std::list<int>&  getBasket(){ return _basket ; }
+    bool             stillRoomInBasket();
+    void             pickItem(int);
 
 
 

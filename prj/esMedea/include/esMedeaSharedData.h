@@ -11,8 +11,6 @@ class esMedeaSharedData {
     static double gSigmaRef;
     static double gSelectionPressure;
     
-    
-    
     static int    gFitnessFunction;
 
     static bool   gHidePicked;
@@ -23,6 +21,7 @@ class esMedeaSharedData {
 
     static bool   gExtendedVerbose;
     static std::string gControllersDirectory;
+
     static int    gControllerType;
     static int    gNbHiddenLayers; 
     static int    gNbNeuronsPerHiddenLayer;
@@ -30,7 +29,9 @@ class esMedeaSharedData {
     static bool   gOnlyUseBiaisForFirstHiddenLayer;
     static bool   gActiveBiais;
 
-    
+    static bool   gSnapshots; // take snapshots
+    static int    gSnapshotsFrequency; // every N generations
+
 };
 
 

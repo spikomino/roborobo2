@@ -13,7 +13,6 @@
 class esMedeaAgentObserver : public AgentObserver
 {
 	public:
-		esMedeaAgentObserver( );
 		esMedeaAgentObserver( RobotWorldModel *__wm );
 		~esMedeaAgentObserver();
 				

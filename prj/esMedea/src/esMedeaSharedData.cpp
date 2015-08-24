@@ -26,3 +26,6 @@ int    esMedeaSharedData::gNbNeuronsPerHiddenLayer =5;
 int    esMedeaSharedData::gNeuronWeightRange       =800;
 bool   esMedeaSharedData::gOnlyUseBiaisForFirstHiddenLayer = true;
 bool   esMedeaSharedData::gActiveBiais = true;
+
+bool   esMedeaSharedData::gSnapshots = false; // take snapshots
+int    esMedeaSharedData::gSnapshotsFrequency = 1; // every N generations
